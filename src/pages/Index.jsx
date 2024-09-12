@@ -1,12 +1,47 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold mb-8 text-center">Football Pick 'Em League Dashboard</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <DashboardCard
+            title="Set Up Games"
+            description="Input this week's matchups"
+            linkTo="/setup-games"
+          />
+          <DashboardCard
+            title="Submit Picks"
+            description="Make your predictions for the week"
+            linkTo="/submit-picks"
+          />
+          <DashboardCard
+            title="Enter Results"
+            description="Input game results and calculate scores"
+            linkTo="/enter-results"
+          />
+          <DashboardCard
+            title="View Standings"
+            description="See weekly and cumulative standings"
+            linkTo="/standings"
+          />
+        </div>
       </div>
+    </div>
+  );
+};
+
+const DashboardCard = ({ title, description, linkTo }) => {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-semibold mb-2">{title}</h2>
+      <p className="text-gray-600 mb-4">{description}</p>
+      <Link to={linkTo}>
+        <Button>Go to {title}</Button>
+      </Link>
     </div>
   );
 };
