@@ -13,10 +13,18 @@ const ImportPicks = () => {
 
   const parsePollResults = () => {
     const lines = pollResults.split('\n');
-    const picks = lines.map(line => {
-      const [name, pick] = line.split(':');
-      return { name: name.trim(), pick: pick.trim() };
+    const picks = [];
+    let currentTeam = '';
+
+    lines.forEach(line => {
+      line = line.trim();
+      if (line.startsWith('"') && line.endsWith('"')) {
+        currentTeam = line.replace(/"/g, '');
+      } else if (line && currentTeam) {
+        picks.push({ name: line, pick: currentTeam });
+      }
     });
+
     setParsedPicks(picks);
     console.log('Parsed picks:', picks);
     // TODO: Implement API call to save parsed picks
@@ -35,7 +43,7 @@ const ImportPicks = () => {
               placeholder="Paste poll results here..."
               value={pollResults}
               onChange={handleInputChange}
-              rows={10}
+              rows={20}
               className="mb-4"
             />
             <Button onClick={parsePollResults} className="w-full">
@@ -44,9 +52,11 @@ const ImportPicks = () => {
             {parsedPicks.length > 0 && (
               <div className="mt-4">
                 <h3 className="text-lg font-semibold mb-2">Parsed Picks:</h3>
-                <ul>
+                <ul className="space-y-2">
                   {parsedPicks.map((pick, index) => (
-                    <li key={index}>{pick.name}: {pick.pick}</li>
+                    <li key={index} className="bg-white p-2 rounded shadow">
+                      <span className="font-semibold">{pick.name}:</span> {pick.pick}
+                    </li>
                   ))}
                 </ul>
               </div>
