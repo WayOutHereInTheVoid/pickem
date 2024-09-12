@@ -20,7 +20,7 @@ const ImportPicks = () => {
       line = line.trim();
       if (line.startsWith('"') && line.endsWith('"')) {
         currentTeam = line.replace(/"/g, '');
-      } else if (line && currentTeam) {
+      } else if (line && currentTeam && !line.includes('vs')) {
         picks.push({ name: line, pick: currentTeam });
       }
     });
