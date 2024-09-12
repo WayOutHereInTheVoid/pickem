@@ -14,9 +14,9 @@ const Index = () => {
             linkTo="/setup-games"
           />
           <DashboardCard
-            title="Submit Picks"
-            description="Make your predictions for the week"
-            linkTo="/submit-picks"
+            title="Import Picks"
+            description="Import picks from poll results"
+            linkTo="/import-picks"
           />
           <DashboardCard
             title="Enter Results"

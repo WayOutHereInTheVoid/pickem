@@ -1,7 +1,7 @@
-import { HomeIcon, CalendarIcon, CheckSquareIcon, TrophyIcon, BarChartIcon } from "lucide-react";
+import { HomeIcon, CalendarIcon, FileImportIcon, TrophyIcon, BarChartIcon } from "lucide-react";
 import Index from "./pages/Index.jsx";
 import SetupGames from "./pages/SetupGames.jsx";
-import SubmitPicks from "./pages/SubmitPicks.jsx";
+import ImportPicks from "./pages/ImportPicks.jsx";
 import EnterResults from "./pages/EnterResults.jsx";
 import Standings from "./pages/Standings.jsx";
 
@@ -19,10 +19,10 @@ export const navItems = [
     page: <SetupGames />,
   },
   {
-    title: "Submit Picks",
-    to: "/submit-picks",
-    icon: <CheckSquareIcon className="h-4 w-4" />,
-    page: <SubmitPicks />,
+    title: "Import Picks",
+    to: "/import-picks",
+    icon: <FileImportIcon className="h-4 w-4" />,
+    page: <ImportPicks />,
   },
   {
     title: "Enter Results",
