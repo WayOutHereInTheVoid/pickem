@@ -1,21 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const Standings = () => {
+  const [selectedWeek, setSelectedWeek] = useState("1");
   const [standings, setStandings] = useState({
-    weekly: [
-      { rank: 1, name: 'John Doe', score: 10 },
-      { rank: 2, name: 'Jane Smith', score: 9 },
-      { rank: 3, name: 'Bob Johnson', score: 8 },
-    ],
-    cumulative: [
-      { rank: 1, name: 'Jane Smith', score: 45 },
-      { rank: 2, name: 'John Doe', score: 42 },
-      { rank: 3, name: 'Bob Johnson', score: 40 },
-    ],
+    weekly: [],
+    cumulative: []
   });
+
+  // Mock data - replace this with actual data fetching logic
+  const mockData = {
+    1: {
+      weekly: [
+        { name: 'John Doe', score: 10 },
+        { name: 'Jane Smith', score: 9 },
+        { name: 'Bob Johnson', score: 8 },
+      ],
+      cumulative: [
+        { name: 'John Doe', score: 10 },
+        { name: 'Jane Smith', score: 9 },
+        { name: 'Bob Johnson', score: 8 },
+      ]
+    },
+    2: {
+      weekly: [
+        { name: 'Jane Smith', score: 11 },
+        { name: 'John Doe', score: 9 },
+        { name: 'Bob Johnson', score: 7 },
+      ],
+      cumulative: [
+        { name: 'Jane Smith', score: 20 },
+        { name: 'John Doe', score: 19 },
+        { name: 'Bob Johnson', score: 15 },
+      ]
+    },
+  };
+
+  useEffect(() => {
+    // Simulating data fetch based on selected week
+    const fetchStandings = () => {
+      const weekData = mockData[selectedWeek] || { weekly: [], cumulative: [] };
+      setStandings({
+        weekly: weekData.weekly.map((entry, index) => ({ ...entry, rank: index + 1 })),
+        cumulative: weekData.cumulative.map((entry, index) => ({ ...entry, rank: index + 1 }))
+      });
+    };
+
+    fetchStandings();
+  }, [selectedWeek]);
 
   const StandingsTable = ({ data }) => (
     <Table>
@@ -28,7 +64,7 @@ const Standings = () => {
       </TableHeader>
       <TableBody>
         {data.map((entry) => (
-          <TableRow key={entry.rank}>
+          <TableRow key={entry.name}>
             <TableCell className="font-medium">{entry.rank}</TableCell>
             <TableCell>{entry.name}</TableCell>
             <TableCell className="text-right">{entry.score}</TableCell>
@@ -42,9 +78,29 @@ const Standings = () => {
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Standings</h1>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Select Week</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Label htmlFor="week-select">Week</Label>
+            <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+              <SelectTrigger id="week-select">
+                <SelectValue placeholder="Select week" />
+              </SelectTrigger>
+              <SelectContent>
+                {[...Array(16)].map((_, i) => (
+                  <SelectItem key={i + 1} value={(i + 1).toString()}>
+                    Week {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader>
-            <CardTitle>League Standings</CardTitle>
+            <CardTitle>League Standings - Week {selectedWeek}</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="weekly" className="w-full">
