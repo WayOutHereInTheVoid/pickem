@@ -6,10 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/scoreCalculations';
 
 const EnterResults = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [games, setGames] = useState([]);
+  const [weeklyScores, setWeeklyScores] = useState([]);
+  const [cumulativeScores, setCumulativeScores] = useState([]);
 
   useEffect(() => {
     const storedGames = localStorage.getItem(`week${selectedWeek}Games`);
@@ -28,8 +31,31 @@ const EnterResults = () => {
   };
 
   const calculateScores = () => {
-    // TODO: Implement score calculation logic
-    console.log('Calculating scores for:', games);
+    const results = games.map(game => ({
+      id: game.id,
+      homeScore: parseInt(game.homeScore),
+      awayScore: parseInt(game.awayScore)
+    }));
+
+    // Fetch picks from localStorage (assuming they're stored there)
+    const picks = JSON.parse(localStorage.getItem(`week${selectedWeek}Picks`) || '[]');
+
+    const weekScores = calculateWeeklyScores(games, picks, results);
+    setWeeklyScores(weekScores);
+
+    // Update cumulative scores
+    const allWeeklyScores = [];
+    for (let i = 1; i <= parseInt(selectedWeek); i++) {
+      const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
+      allWeeklyScores.push(weekScores);
+    }
+    allWeeklyScores[parseInt(selectedWeek) - 1] = weekScores;
+    const cumulativeScores = calculateCumulativeScores(allWeeklyScores);
+    setCumulativeScores(cumulativeScores);
+
+    // Save weekly scores to localStorage
+    localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
+
     toast.success("Scores calculated successfully!");
   };
 
@@ -102,6 +128,58 @@ const EnterResults = () => {
             )}
           </CardContent>
         </Card>
+
+        {weeklyScores.length > 0 && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Weekly Scores</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Score</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {weeklyScores.map((score, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{score.name}</TableCell>
+                      <TableCell>{score.score}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
+
+        {cumulativeScores.length > 0 && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Cumulative Scores</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Score</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {cumulativeScores.map((score, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{score.name}</TableCell>
+                      <TableCell>{score.score}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
