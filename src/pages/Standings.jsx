@@ -12,41 +12,14 @@ const Standings = () => {
     cumulative: []
   });
 
-  // Mock data - replace this with actual data fetching logic
-  const mockData = {
-    1: {
-      weekly: [
-        { name: 'John Doe', score: 10 },
-        { name: 'Jane Smith', score: 9 },
-        { name: 'Bob Johnson', score: 8 },
-      ],
-      cumulative: [
-        { name: 'John Doe', score: 10 },
-        { name: 'Jane Smith', score: 9 },
-        { name: 'Bob Johnson', score: 8 },
-      ]
-    },
-    2: {
-      weekly: [
-        { name: 'Jane Smith', score: 11 },
-        { name: 'John Doe', score: 9 },
-        { name: 'Bob Johnson', score: 7 },
-      ],
-      cumulative: [
-        { name: 'Jane Smith', score: 20 },
-        { name: 'John Doe', score: 19 },
-        { name: 'Bob Johnson', score: 15 },
-      ]
-    },
-  };
-
   useEffect(() => {
-    // Simulating data fetch based on selected week
     const fetchStandings = () => {
-      const weekData = mockData[selectedWeek] || { weekly: [], cumulative: [] };
+      const weeklyScores = JSON.parse(localStorage.getItem(`week${selectedWeek}Scores`) || '[]');
+      const cumulativeScores = JSON.parse(localStorage.getItem('cumulativeScores') || '[]');
+
       setStandings({
-        weekly: weekData.weekly.map((entry, index) => ({ ...entry, rank: index + 1 })),
-        cumulative: weekData.cumulative.map((entry, index) => ({ ...entry, rank: index + 1 }))
+        weekly: weeklyScores.sort((a, b) => b.score - a.score).map((entry, index) => ({ ...entry, rank: index + 1 })),
+        cumulative: cumulativeScores.sort((a, b) => b.score - a.score).map((entry, index) => ({ ...entry, rank: index + 1 }))
       });
     };
 

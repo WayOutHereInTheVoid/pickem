@@ -37,13 +37,11 @@ const EnterResults = () => {
       awayScore: parseInt(game.awayScore)
     }));
 
-    // Fetch picks from localStorage (assuming they're stored there)
     const picks = JSON.parse(localStorage.getItem(`week${selectedWeek}Picks`) || '[]');
-
     const weekScores = calculateWeeklyScores(games, picks, results);
     setWeeklyScores(weekScores);
 
-    // Update cumulative scores
+    // Calculate cumulative scores
     const allWeeklyScores = [];
     for (let i = 1; i <= parseInt(selectedWeek); i++) {
       const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
@@ -55,15 +53,16 @@ const EnterResults = () => {
 
     // Save weekly scores to localStorage
     localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
+    localStorage.setItem(`cumulativeScores`, JSON.stringify(cumulativeScores));
 
-    toast.success("Scores calculated successfully!");
+    toast.success("Scores calculated and saved successfully!");
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Enter Results</h1>
-        <Card>
+        <Card className="mb-6">
           <CardHeader>
             <CardTitle>Input Game Results</CardTitle>
           </CardHeader>
@@ -102,7 +101,7 @@ const EnterResults = () => {
                         <Input
                           type="number"
                           value={game.homeScore}
-                          onChange={(e) => handleScoreChange(game.id, 'home', e.target.value)}
+                          onChange={(e) => handleScoreChange(game.id, 'homeScore', e.target.value)}
                           placeholder="Home Score"
                         />
                       </TableCell>
@@ -110,7 +109,7 @@ const EnterResults = () => {
                         <Input
                           type="number"
                           value={game.awayScore}
-                          onChange={(e) => handleScoreChange(game.id, 'away', e.target.value)}
+                          onChange={(e) => handleScoreChange(game.id, 'awayScore', e.target.value)}
                           placeholder="Away Score"
                         />
                       </TableCell>
