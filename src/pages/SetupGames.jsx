@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
 const SetupGames = () => {
+  const [selectedWeek, setSelectedWeek] = useState("1");
   const [games, setGames] = useState([
     { id: 1, homeTeam: '', awayTeam: '' },
     { id: 2, homeTeam: '', awayTeam: '' },
@@ -21,10 +23,12 @@ const SetupGames = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSubmittedGames(games);
-    console.log('Submitted games:', games);
+    const gamesWithWeek = games.map(game => ({ ...game, week: selectedWeek }));
+    setSubmittedGames(gamesWithWeek);
+    console.log('Submitted games:', gamesWithWeek);
     // TODO: Implement API call to save games
-    toast.success("Games submitted successfully!");
+    localStorage.setItem(`week${selectedWeek}Games`, JSON.stringify(gamesWithWeek));
+    toast.success(`Games for Week ${selectedWeek} submitted successfully!`);
   };
 
   return (
@@ -37,6 +41,21 @@ const SetupGames = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <Label htmlFor="week-select">Select Week</Label>
+                <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+                  <SelectTrigger id="week-select">
+                    <SelectValue placeholder="Select week" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[...Array(16)].map((_, i) => (
+                      <SelectItem key={i + 1} value={(i + 1).toString()}>
+                        Week {i + 1}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               {games.map((game, index) => (
                 <div key={game.id} className="mb-6">
                   <h3 className="text-lg font-semibold mb-2">Game {index + 1}</h3>
@@ -72,7 +91,7 @@ const SetupGames = () => {
         {submittedGames.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Submitted Games</CardTitle>
+              <CardTitle>Submitted Games for Week {selectedWeek}</CardTitle>
             </CardHeader>
             <CardContent>
               <ul>
