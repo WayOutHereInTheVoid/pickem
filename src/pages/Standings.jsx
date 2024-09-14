@@ -5,27 +5,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
+const teamNameMapping = {
+  "Thumbz": "Murder Hornets",
+  "JordyV1bez": "Black Hawk Bones",
+  "chupalo": "Sonora Sugar Skulls",
+  "Scrody": "Newfoundland Growlers",
+  "JoshMartinez": "California Burritos",
+  "iammickloven": "Kyoto Ninjas",
+  "TheNewEra22": "Brutal Hogs",
+  "ejdale4944": "Southwest Aliens",
+  "ClemCola": "Jesters",
+  "kailamartinez": "Mile High Melonheads",
+  "Econley19": "Seattle Prestiges",
+  "Detroilet": "D-Town Swirlies"
+};
+
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [standings, setStandings] = useState({
     weekly: [],
     cumulative: []
   });
-
-  const teamNameMapping = {
-    "Thumbz": "Murder Hornets",
-    "JordyV1bez": "Black Hawk Bones",
-    "chupalo": "Sonora Sugar Skulls",
-    "Scrody": "Newfoundland Growlers",
-    "JoshMartinez": "California Burritos",
-    "iammickloven": "Kyoto Ninjas",
-    "TheNewEra22": "Brutal Hogs",
-    "ejdale4944": "Southwest Aliens",
-    "ClemCola": "Jesters",
-    "kailamartinez": "Mile High Melonheads",
-    "Econley19": "Seattle Prestiges",
-    "Detroilet": "D-Town Swirlies"
-  };
 
   useEffect(() => {
     const fetchStandings = () => {

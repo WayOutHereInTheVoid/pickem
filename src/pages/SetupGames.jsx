@@ -1,10 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+
+const GameInput = ({ game, onInputChange }) => (
+  <div className="mb-4">
+    <h3 className="text-lg font-semibold mb-2">Game {game.id}</h3>
+    <div className="grid grid-cols-2 gap-4">
+      <div>
+        <Label htmlFor={`home-team-${game.id}`}>Home Team</Label>
+        <Input
+          id={`home-team-${game.id}`}
+          value={game.homeTeam}
+          onChange={(e) => onInputChange(game.id, 'homeTeam', e.target.value)}
+          placeholder="Enter home team"
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor={`away-team-${game.id}`}>Away Team</Label>
+        <Input
+          id={`away-team-${game.id}`}
+          value={game.awayTeam}
+          onChange={(e) => onInputChange(game.id, 'awayTeam', e.target.value)}
+          placeholder="Enter away team"
+          required
+        />
+      </div>
+    </div>
+  </div>
+);
 
 const SetupGames = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
@@ -13,7 +41,19 @@ const SetupGames = () => {
     { id: 2, homeTeam: '', awayTeam: '' },
     { id: 3, homeTeam: '', awayTeam: '' },
   ]);
-  const [submittedGames, setSubmittedGames] = useState([]);
+
+  useEffect(() => {
+    const storedGames = localStorage.getItem(`week${selectedWeek}Games`);
+    if (storedGames) {
+      setGames(JSON.parse(storedGames));
+    } else {
+      setGames([
+        { id: 1, homeTeam: '', awayTeam: '' },
+        { id: 2, homeTeam: '', awayTeam: '' },
+        { id: 3, homeTeam: '', awayTeam: '' },
+      ]);
+    }
+  }, [selectedWeek]);
 
   const handleInputChange = (id, team, value) => {
     setGames(games.map(game => 
@@ -23,11 +63,7 @@ const SetupGames = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const gamesWithWeek = games.map(game => ({ ...game, week: selectedWeek }));
-    setSubmittedGames(gamesWithWeek);
-    console.log('Submitted games:', gamesWithWeek);
-    // TODO: Implement API call to save games
-    localStorage.setItem(`week${selectedWeek}Games`, JSON.stringify(gamesWithWeek));
+    localStorage.setItem(`week${selectedWeek}Games`, JSON.stringify(games));
     toast.success(`Games for Week ${selectedWeek} submitted successfully!`);
   };
 
@@ -35,7 +71,7 @@ const SetupGames = () => {
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Set Up Games</h1>
-        <Card className="mb-6">
+        <Card>
           <CardHeader>
             <CardTitle>Input This Week's Matchups</CardTitle>
           </CardHeader>
@@ -56,54 +92,13 @@ const SetupGames = () => {
                   </SelectContent>
                 </Select>
               </div>
-              {games.map((game, index) => (
-                <div key={game.id} className="mb-6">
-                  <h3 className="text-lg font-semibold mb-2">Game {index + 1}</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor={`home-team-${game.id}`}>Home Team</Label>
-                      <Input
-                        id={`home-team-${game.id}`}
-                        value={game.homeTeam}
-                        onChange={(e) => handleInputChange(game.id, 'homeTeam', e.target.value)}
-                        placeholder="Enter home team"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor={`away-team-${game.id}`}>Away Team</Label>
-                      <Input
-                        id={`away-team-${game.id}`}
-                        value={game.awayTeam}
-                        onChange={(e) => handleInputChange(game.id, 'awayTeam', e.target.value)}
-                        placeholder="Enter away team"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
+              {games.map((game) => (
+                <GameInput key={game.id} game={game} onInputChange={handleInputChange} />
               ))}
               <Button type="submit" className="w-full">Save Games</Button>
             </form>
           </CardContent>
         </Card>
-
-        {submittedGames.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Submitted Games for Week {selectedWeek}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul>
-                {submittedGames.map((game, index) => (
-                  <li key={game.id} className="mb-2">
-                    Game {index + 1}: {game.homeTeam} vs {game.awayTeam}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );

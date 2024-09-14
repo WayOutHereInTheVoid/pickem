@@ -8,26 +8,52 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/scoreCalculations';
 
+const teamNameMapping = {
+  "Thumbz": "Murder Hornets",
+  "JordyV1bez": "Black Hawk Bones",
+  "chupalo": "Sonora Sugar Skulls",
+  "Scrody": "Newfoundland Growlers",
+  "JoshMartinez": "California Burritos",
+  "iammickloven": "Kyoto Ninjas",
+  "TheNewEra22": "Brutal Hogs",
+  "ejdale4944": "Southwest Aliens",
+  "ClemCola": "Jesters",
+  "kailamartinez": "Mile High Melonheads",
+  "Econley19": "Seattle Prestiges",
+  "Detroilet": "D-Town Swirlies"
+};
+
+const ScoreTable = ({ title, scores }) => (
+  <Card className="mt-6">
+    <CardHeader>
+      <CardTitle>{title}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Team Name</TableHead>
+            <TableHead>Score</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {scores.map((score, index) => (
+            <TableRow key={index}>
+              <TableCell>{score.name}</TableCell>
+              <TableCell>{score.score}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </CardContent>
+  </Card>
+);
+
 const EnterResults = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [games, setGames] = useState([]);
   const [weeklyScores, setWeeklyScores] = useState([]);
   const [cumulativeScores, setCumulativeScores] = useState([]);
-
-  const teamNameMapping = {
-    "Thumbz": "Murder Hornets",
-    "JordyV1bez": "Black Hawk Bones",
-    "chupalo": "Sonora Sugar Skulls",
-    "Scrody": "Newfoundland Growlers",
-    "JoshMartinez": "California Burritos",
-    "iammickloven": "Kyoto Ninjas",
-    "TheNewEra22": "Brutal Hogs",
-    "ejdale4944": "Southwest Aliens",
-    "ClemCola": "Jesters",
-    "kailamartinez": "Mile High Melonheads",
-    "Econley19": "Seattle Prestiges",
-    "Detroilet": "D-Town Swirlies"
-  };
 
   useEffect(() => {
     const storedGames = localStorage.getItem(`week${selectedWeek}Games`);
@@ -60,7 +86,6 @@ const EnterResults = () => {
     }));
     setWeeklyScores(mappedWeekScores);
 
-    // Calculate cumulative scores
     const allWeeklyScores = [];
     for (let i = 1; i <= parseInt(selectedWeek); i++) {
       const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
@@ -74,7 +99,6 @@ const EnterResults = () => {
     }));
     setCumulativeScores(mappedCumulativeScores);
 
-    // Save weekly scores to localStorage
     localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
     localStorage.setItem(`cumulativeScores`, JSON.stringify(cumulativeScores));
 
@@ -151,57 +175,8 @@ const EnterResults = () => {
           </CardContent>
         </Card>
 
-        {weeklyScores.length > 0 && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Weekly Scores</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Team Name</TableHead>
-                    <TableHead>Score</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {weeklyScores.map((score, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{score.name}</TableCell>
-                      <TableCell>{score.score}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
-
-        {cumulativeScores.length > 0 && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Cumulative Scores</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Team Name</TableHead>
-                    <TableHead>Score</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {cumulativeScores.map((score, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{score.name}</TableCell>
-                      <TableCell>{score.score}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
+        {weeklyScores.length > 0 && <ScoreTable title="Weekly Scores" scores={weeklyScores} />}
+        {cumulativeScores.length > 0 && <ScoreTable title="Cumulative Scores" scores={cumulativeScores} />}
       </div>
     </div>
   );
