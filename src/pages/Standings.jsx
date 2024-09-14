@@ -4,21 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-
-const teamNameMapping = {
-  "Thumbz": "Murder Hornets",
-  "JordyV1bez": "Black Hawk Bones",
-  "chupalo": "Sonora Sugar Skulls",
-  "Scrody": "Newfoundland Growlers",
-  "JoshMartinez": "California Burritos",
-  "iammickloven": "Kyoto Ninjas",
-  "TheNewEra22": "Brutal Hogs",
-  "ejdale4944": "Southwest Aliens",
-  "ClemCola": "Jesters",
-  "kailamartinez": "Mile High Melonheads",
-  "Econley19": "Seattle Prestiges",
-  "Detroilet": "D-Town Swirlies"
-};
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
@@ -26,6 +12,8 @@ const Standings = () => {
     weekly: [],
     cumulative: []
   });
+  const [weeklyData, setWeeklyData] = useState([]);
+  const [seasonTrendData, setSeasonTrendData] = useState([]);
 
   useEffect(() => {
     const fetchStandings = () => {
@@ -34,20 +22,29 @@ const Standings = () => {
 
       setStandings({
         weekly: weeklyScores
-          .map(entry => ({
-            ...entry,
-            name: teamNameMapping[entry.name] || entry.name
-          }))
           .sort((a, b) => b.score - a.score)
           .map((entry, index) => ({ ...entry, rank: index + 1 })),
         cumulative: cumulativeScores
-          .map(entry => ({
-            ...entry,
-            name: teamNameMapping[entry.name] || entry.name
-          }))
           .sort((a, b) => b.score - a.score)
           .map((entry, index) => ({ ...entry, rank: index + 1 }))
       });
+
+      setWeeklyData(weeklyScores);
+
+      // Prepare season trend data
+      const trendData = [];
+      for (let i = 1; i <= 16; i++) {
+        const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
+        weekScores.forEach(score => {
+          const existingEntry = trendData.find(entry => entry.name === score.name);
+          if (existingEntry) {
+            existingEntry[`Week ${i}`] = score.score;
+          } else {
+            trendData.push({ name: score.name, [`Week ${i}`]: score.score });
+          }
+        });
+      }
+      setSeasonTrendData(trendData);
     };
 
     fetchStandings();
@@ -57,17 +54,17 @@ const Standings = () => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">Rank</TableHead>
-          <TableHead>Team Name</TableHead>
-          <TableHead className="text-right">Score</TableHead>
+          <TableHead className="w-[100px] text-foreground">Rank</TableHead>
+          <TableHead className="text-foreground">Team Name</TableHead>
+          <TableHead className="text-right text-foreground">Score</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {data.map((entry) => (
           <TableRow key={entry.name}>
-            <TableCell className="font-medium">{entry.rank}</TableCell>
-            <TableCell>{entry.name}</TableCell>
-            <TableCell className="text-right">{entry.score}</TableCell>
+            <TableCell className="font-medium text-foreground">{entry.rank}</TableCell>
+            <TableCell className="text-foreground">{entry.name}</TableCell>
+            <TableCell className="text-right text-foreground">{entry.score}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -75,17 +72,17 @@ const Standings = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Standings</h1>
-        <Card className="mb-6">
+        <h1 className="text-3xl font-bold mb-6 text-foreground">Standings</h1>
+        <Card className="mb-6 bg-card">
           <CardHeader>
-            <CardTitle>Select Week</CardTitle>
+            <CardTitle className="text-foreground">Select Week</CardTitle>
           </CardHeader>
           <CardContent>
-            <Label htmlFor="week-select">Week</Label>
+            <Label htmlFor="week-select" className="text-foreground">Week</Label>
             <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-              <SelectTrigger id="week-select">
+              <SelectTrigger id="week-select" className="bg-secondary text-foreground">
                 <SelectValue placeholder="Select week" />
               </SelectTrigger>
               <SelectContent>
@@ -98,9 +95,9 @@ const Standings = () => {
             </Select>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-card">
           <CardHeader>
-            <CardTitle>League Standings - Week {selectedWeek}</CardTitle>
+            <CardTitle className="text-foreground">League Standings - Week {selectedWeek}</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="weekly" className="w-full">
@@ -115,6 +112,42 @@ const Standings = () => {
                 <StandingsTable data={standings.cumulative} />
               </TabsContent>
             </Tabs>
+          </CardContent>
+        </Card>
+        <Card className="mt-6 bg-card">
+          <CardHeader>
+            <CardTitle className="text-foreground">Weekly Scores Comparison</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={weeklyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="score" fill="#7ee787" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        <Card className="mt-6 bg-card">
+          <CardHeader>
+            <CardTitle className="text-foreground">Season Score Trends</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={seasonTrendData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {[...Array(16)].map((_, i) => (
+                  <Line key={i} type="monotone" dataKey={`Week ${i + 1}`} stroke={`#${Math.floor(Math.random()*16777215).toString(16)}`} />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>

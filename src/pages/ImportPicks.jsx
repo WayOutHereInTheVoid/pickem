@@ -54,12 +54,12 @@ const ImportPicks = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Import Picks</h1>
-        <Card className="mb-6">
+        <h1 className="text-3xl font-bold mb-6 text-foreground">Import Picks</h1>
+        <Card className="mb-6 bg-card">
           <CardHeader>
-            <CardTitle>Paste Poll Results</CardTitle>
+            <CardTitle className="text-foreground">Paste Poll Results</CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea
@@ -67,37 +67,37 @@ const ImportPicks = () => {
               value={pollResults}
               onChange={handleInputChange}
               rows={10}
-              className="mb-4"
+              className="mb-4 bg-secondary text-foreground"
             />
-            <Button onClick={parsePollResults} className="w-full">
+            <Button onClick={parsePollResults} className="w-full bg-primary text-primary-foreground">
               Parse Picks
             </Button>
           </CardContent>
         </Card>
         
         {parsedPicks.length > 0 && (
-          <Card>
+          <Card className="bg-card">
             <CardHeader>
-              <CardTitle>Parsed Picks</CardTitle>
+              <CardTitle className="text-foreground">Parsed Picks</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Team Name</TableHead>
-                    <TableHead>Pick</TableHead>
+                    <TableHead className="text-foreground">Team Name</TableHead>
+                    <TableHead className="text-foreground">Pick</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {parsedPicks.map((pick, index) => (
                     <TableRow key={index}>
-                      <TableCell>{pick.name}</TableCell>
-                      <TableCell>{pick.pick}</TableCell>
+                      <TableCell className="text-foreground">{pick.name}</TableCell>
+                      <TableCell className="text-foreground">{pick.pick}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              <Button onClick={savePicks} className="w-full mt-4">
+              <Button onClick={savePicks} className="w-full mt-4 bg-primary text-primary-foreground">
                 Save Picks
               </Button>
             </CardContent>

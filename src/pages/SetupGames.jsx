@@ -10,32 +10,35 @@ import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/score
 
 const GameInput = ({ game, onInputChange, onWinnerChange }) => (
   <div className="mb-4">
-    <h3 className="text-lg font-semibold mb-2">Game {game.id}</h3>
+    <h3 className="text-lg font-semibold mb-2 text-foreground">Game {game.id}</h3>
     <div className="grid grid-cols-2 gap-4 mb-2">
       <div>
-        <Label htmlFor={`home-team-${game.id}`}>Home Team</Label>
+        <Label htmlFor={`home-team-${game.id}`} className="text-foreground">Home Team</Label>
         <Input
           id={`home-team-${game.id}`}
           value={game.homeTeam}
           onChange={(e) => onInputChange(game.id, 'homeTeam', e.target.value)}
           placeholder="Enter home team"
           required
+          className="bg-secondary text-foreground"
         />
       </div>
       <div>
-        <Label htmlFor={`away-team-${game.id}`}>Away Team</Label>
+        <Label htmlFor={`away-team-${game.id}`} className="text-foreground">Away Team</Label>
         <Input
           id={`away-team-${game.id}`}
           value={game.awayTeam}
           onChange={(e) => onInputChange(game.id, 'awayTeam', e.target.value)}
           placeholder="Enter away team"
           required
+          className="bg-secondary text-foreground"
         />
       </div>
     </div>
     <RadioGroup
       onValueChange={(value) => onWinnerChange(game.id, value)}
       value={game.winner}
+      className="text-foreground"
     >
       <div className="flex items-center space-x-2">
         <RadioGroupItem value="home" id={`home-win-${game.id}`} />
@@ -109,19 +112,19 @@ const SetupGames = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Set Up Games</h1>
-        <Card>
+        <h1 className="text-3xl font-bold mb-6 text-foreground">Set Up Games</h1>
+        <Card className="bg-card">
           <CardHeader>
-            <CardTitle>Input This Week's Matchups</CardTitle>
+            <CardTitle className="text-foreground">Input This Week's Matchups</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <Label htmlFor="week-select">Select Week</Label>
+                <Label htmlFor="week-select" className="text-foreground">Select Week</Label>
                 <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-                  <SelectTrigger id="week-select">
+                  <SelectTrigger id="week-select" className="bg-secondary text-foreground">
                     <SelectValue placeholder="Select week" />
                   </SelectTrigger>
                   <SelectContent>
@@ -141,7 +144,7 @@ const SetupGames = () => {
                   onWinnerChange={handleWinnerChange}
                 />
               ))}
-              <Button type="submit" className="w-full">Save Games and Calculate Scores</Button>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground">Save Games and Calculate Scores</Button>
             </form>
           </CardContent>
         </Card>
