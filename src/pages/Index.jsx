@@ -10,18 +10,13 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <DashboardCard
             title="Set Up Games"
-            description="Input this week's matchups"
+            description="Input this week's matchups and results"
             linkTo="/setup-games"
           />
           <DashboardCard
             title="Import Picks"
             description="Import picks from poll results"
             linkTo="/import-picks"
-          />
-          <DashboardCard
-            title="Enter Results"
-            description="Input game results and calculate scores"
-            linkTo="/enter-results"
           />
           <DashboardCard
             title="View Standings"

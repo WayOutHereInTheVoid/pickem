@@ -1,4 +1,3 @@
-// Function to calculate scores for a single week
 export const calculateWeeklyScores = (games, picks, results) => {
   const scores = {};
 
@@ -11,10 +10,8 @@ export const calculateWeeklyScores = (games, picks, results) => {
     const result = results.find(r => r.id === game.id);
     if (!result) return;
 
-    const winner = result.homeScore > result.awayScore ? game.homeTeam : game.awayTeam;
-
     picks.forEach(pick => {
-      if (pick.pick === winner) {
+      if (pick.pick === result.winner) {
         scores[pick.name]++;
       }
     });
@@ -23,7 +20,6 @@ export const calculateWeeklyScores = (games, picks, results) => {
   return Object.entries(scores).map(([name, score]) => ({ name, score }));
 };
 
-// Function to calculate cumulative scores
 export const calculateCumulativeScores = (weeklyScores) => {
   const cumulativeScores = {};
 

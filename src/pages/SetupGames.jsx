@@ -4,12 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
+import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/scoreCalculations';
 
-const GameInput = ({ game, onInputChange }) => (
+const GameInput = ({ game, onInputChange, onWinnerChange }) => (
   <div className="mb-4">
     <h3 className="text-lg font-semibold mb-2">Game {game.id}</h3>
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-4 mb-2">
       <div>
         <Label htmlFor={`home-team-${game.id}`}>Home Team</Label>
         <Input
@@ -31,15 +33,28 @@ const GameInput = ({ game, onInputChange }) => (
         />
       </div>
     </div>
+    <RadioGroup
+      onValueChange={(value) => onWinnerChange(game.id, value)}
+      value={game.winner}
+    >
+      <div className="flex items-center space-x-2">
+        <RadioGroupItem value="home" id={`home-win-${game.id}`} />
+        <Label htmlFor={`home-win-${game.id}`}>Home Team Wins</Label>
+      </div>
+      <div className="flex items-center space-x-2">
+        <RadioGroupItem value="away" id={`away-win-${game.id}`} />
+        <Label htmlFor={`away-win-${game.id}`}>Away Team Wins</Label>
+      </div>
+    </RadioGroup>
   </div>
 );
 
 const SetupGames = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [games, setGames] = useState([
-    { id: 1, homeTeam: '', awayTeam: '' },
-    { id: 2, homeTeam: '', awayTeam: '' },
-    { id: 3, homeTeam: '', awayTeam: '' },
+    { id: 1, homeTeam: '', awayTeam: '', winner: null },
+    { id: 2, homeTeam: '', awayTeam: '', winner: null },
+    { id: 3, homeTeam: '', awayTeam: '', winner: null },
   ]);
 
   useEffect(() => {
@@ -48,9 +63,9 @@ const SetupGames = () => {
       setGames(JSON.parse(storedGames));
     } else {
       setGames([
-        { id: 1, homeTeam: '', awayTeam: '' },
-        { id: 2, homeTeam: '', awayTeam: '' },
-        { id: 3, homeTeam: '', awayTeam: '' },
+        { id: 1, homeTeam: '', awayTeam: '', winner: null },
+        { id: 2, homeTeam: '', awayTeam: '', winner: null },
+        { id: 3, homeTeam: '', awayTeam: '', winner: null },
       ]);
     }
   }, [selectedWeek]);
@@ -61,10 +76,36 @@ const SetupGames = () => {
     ));
   };
 
+  const handleWinnerChange = (id, winner) => {
+    setGames(games.map(game =>
+      game.id === id ? { ...game, winner } : game
+    ));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     localStorage.setItem(`week${selectedWeek}Games`, JSON.stringify(games));
-    toast.success(`Games for Week ${selectedWeek} submitted successfully!`);
+    
+    // Calculate scores
+    const picks = JSON.parse(localStorage.getItem(`week${selectedWeek}Picks`) || '[]');
+    const results = games.map(game => ({
+      id: game.id,
+      winner: game.winner === 'home' ? game.homeTeam : game.awayTeam
+    }));
+    const weekScores = calculateWeeklyScores(games, picks, results);
+    
+    localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
+    
+    // Update cumulative scores
+    const allWeeklyScores = [];
+    for (let i = 1; i <= parseInt(selectedWeek); i++) {
+      const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
+      allWeeklyScores.push(weekScores);
+    }
+    const cumulativeScores = calculateCumulativeScores(allWeeklyScores);
+    localStorage.setItem(`cumulativeScores`, JSON.stringify(cumulativeScores));
+
+    toast.success(`Games and scores for Week ${selectedWeek} submitted successfully!`);
   };
 
   return (
@@ -93,9 +134,14 @@ const SetupGames = () => {
                 </Select>
               </div>
               {games.map((game) => (
-                <GameInput key={game.id} game={game} onInputChange={handleInputChange} />
+                <GameInput 
+                  key={game.id} 
+                  game={game} 
+                  onInputChange={handleInputChange}
+                  onWinnerChange={handleWinnerChange}
+                />
               ))}
-              <Button type="submit" className="w-full">Save Games</Button>
+              <Button type="submit" className="w-full">Save Games and Calculate Scores</Button>
             </form>
           </CardContent>
         </Card>

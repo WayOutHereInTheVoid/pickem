@@ -1,8 +1,7 @@
-import { HomeIcon, CalendarIcon, FileUpIcon, TrophyIcon, BarChartIcon } from "lucide-react";
+import { HomeIcon, CalendarIcon, FileUpIcon, BarChartIcon } from "lucide-react";
 import Index from "./pages/Index.jsx";
 import SetupGames from "./pages/SetupGames.jsx";
 import ImportPicks from "./pages/ImportPicks.jsx";
-import EnterResults from "./pages/EnterResults.jsx";
 import Standings from "./pages/Standings.jsx";
 
 export const navItems = [
@@ -23,12 +22,6 @@ export const navItems = [
     to: "/import-picks",
     icon: <FileUpIcon className="h-4 w-4" />,
     page: <ImportPicks />,
-  },
-  {
-    title: "Enter Results",
-    to: "/enter-results",
-    icon: <TrophyIcon className="h-4 w-4" />,
-    page: <EnterResults />,
   },
   {
     title: "Standings",
