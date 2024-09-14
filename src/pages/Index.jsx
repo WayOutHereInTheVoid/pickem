@@ -3,9 +3,13 @@ import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
+import { exportResultsToCSV } from '../utils/exportResults';
 
 const Index = () => {
   const [cumulativeScores, setCumulativeScores] = useState([]);
+  const [selectedWeek, setSelectedWeek] = useState("1");
 
   useEffect(() => {
     const scores = JSON.parse(localStorage.getItem('cumulativeScores') || '[]');
@@ -26,6 +30,27 @@ const Index = () => {
         </CardContent>
       </Card>
     );
+  };
+
+  const handleExport = async () => {
+    try {
+      const csvContent = await exportResultsToCSV(selectedWeek);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `NFL_Week_${selectedWeek}_Results.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      toast.success("Export completed successfully!");
+    } catch (error) {
+      console.error("Export failed:", error);
+      toast.error("Export failed. Please try again.");
+    }
   };
 
   return (
@@ -49,6 +74,30 @@ const Index = () => {
             linkTo="/standings"
           />
         </div>
+        <Card className="bg-card mb-8">
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold text-foreground">Export Results</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-4">
+              <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+                <SelectTrigger className="w-[180px] bg-secondary text-foreground">
+                  <SelectValue placeholder="Select week" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[...Array(16)].map((_, i) => (
+                    <SelectItem key={i + 1} value={(i + 1).toString()}>
+                      Week {i + 1}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button onClick={handleExport} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                Export Results
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
         <Card className="bg-card">
           <CardHeader>
             <CardTitle className="text-2xl font-semibold text-foreground">Leaderboard</CardTitle>
