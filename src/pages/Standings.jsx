@@ -12,14 +12,41 @@ const Standings = () => {
     cumulative: []
   });
 
+  const teamNameMapping = {
+    "Thumbz": "Murder Hornets",
+    "JordyV1bez": "Black Hawk Bones",
+    "chupalo": "Sonora Sugar Skulls",
+    "Scrody": "Newfoundland Growlers",
+    "JoshMartinez": "California Burritos",
+    "iammickloven": "Kyoto Ninjas",
+    "TheNewEra22": "Brutal Hogs",
+    "ejdale4944": "Southwest Aliens",
+    "ClemCola": "Jesters",
+    "kailamartinez": "Mile High Melonheads",
+    "Econley19": "Seattle Prestiges",
+    "Detroilet": "D-Town Swirlies"
+  };
+
   useEffect(() => {
     const fetchStandings = () => {
       const weeklyScores = JSON.parse(localStorage.getItem(`week${selectedWeek}Scores`) || '[]');
       const cumulativeScores = JSON.parse(localStorage.getItem('cumulativeScores') || '[]');
 
       setStandings({
-        weekly: weeklyScores.sort((a, b) => b.score - a.score).map((entry, index) => ({ ...entry, rank: index + 1 })),
-        cumulative: cumulativeScores.sort((a, b) => b.score - a.score).map((entry, index) => ({ ...entry, rank: index + 1 }))
+        weekly: weeklyScores
+          .map(entry => ({
+            ...entry,
+            name: teamNameMapping[entry.name] || entry.name
+          }))
+          .sort((a, b) => b.score - a.score)
+          .map((entry, index) => ({ ...entry, rank: index + 1 })),
+        cumulative: cumulativeScores
+          .map(entry => ({
+            ...entry,
+            name: teamNameMapping[entry.name] || entry.name
+          }))
+          .sort((a, b) => b.score - a.score)
+          .map((entry, index) => ({ ...entry, rank: index + 1 }))
       });
     };
 
@@ -31,7 +58,7 @@ const Standings = () => {
       <TableHeader>
         <TableRow>
           <TableHead className="w-[100px]">Rank</TableHead>
-          <TableHead>Name</TableHead>
+          <TableHead>Team Name</TableHead>
           <TableHead className="text-right">Score</TableHead>
         </TableRow>
       </TableHeader>

@@ -14,6 +14,21 @@ const EnterResults = () => {
   const [weeklyScores, setWeeklyScores] = useState([]);
   const [cumulativeScores, setCumulativeScores] = useState([]);
 
+  const teamNameMapping = {
+    "Thumbz": "Murder Hornets",
+    "JordyV1bez": "Black Hawk Bones",
+    "chupalo": "Sonora Sugar Skulls",
+    "Scrody": "Newfoundland Growlers",
+    "JoshMartinez": "California Burritos",
+    "iammickloven": "Kyoto Ninjas",
+    "TheNewEra22": "Brutal Hogs",
+    "ejdale4944": "Southwest Aliens",
+    "ClemCola": "Jesters",
+    "kailamartinez": "Mile High Melonheads",
+    "Econley19": "Seattle Prestiges",
+    "Detroilet": "D-Town Swirlies"
+  };
+
   useEffect(() => {
     const storedGames = localStorage.getItem(`week${selectedWeek}Games`);
     if (storedGames) {
@@ -39,7 +54,11 @@ const EnterResults = () => {
 
     const picks = JSON.parse(localStorage.getItem(`week${selectedWeek}Picks`) || '[]');
     const weekScores = calculateWeeklyScores(games, picks, results);
-    setWeeklyScores(weekScores);
+    const mappedWeekScores = weekScores.map(score => ({
+      ...score,
+      name: teamNameMapping[score.name] || score.name
+    }));
+    setWeeklyScores(mappedWeekScores);
 
     // Calculate cumulative scores
     const allWeeklyScores = [];
@@ -49,7 +68,11 @@ const EnterResults = () => {
     }
     allWeeklyScores[parseInt(selectedWeek) - 1] = weekScores;
     const cumulativeScores = calculateCumulativeScores(allWeeklyScores);
-    setCumulativeScores(cumulativeScores);
+    const mappedCumulativeScores = cumulativeScores.map(score => ({
+      ...score,
+      name: teamNameMapping[score.name] || score.name
+    }));
+    setCumulativeScores(mappedCumulativeScores);
 
     // Save weekly scores to localStorage
     localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
@@ -137,7 +160,7 @@ const EnterResults = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Team Name</TableHead>
                     <TableHead>Score</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -163,7 +186,7 @@ const EnterResults = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Team Name</TableHead>
                     <TableHead>Score</TableHead>
                   </TableRow>
                 </TableHeader>

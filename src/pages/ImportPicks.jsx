@@ -9,6 +9,21 @@ const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
 
+  const teamNameMapping = {
+    "Thumbz": "Murder Hornets",
+    "JordyV1bez": "Black Hawk Bones",
+    "chupalo": "Sonora Sugar Skulls",
+    "Scrody": "Newfoundland Growlers",
+    "JoshMartinez": "California Burritos",
+    "iammickloven": "Kyoto Ninjas",
+    "TheNewEra22": "Brutal Hogs",
+    "ejdale4944": "Southwest Aliens",
+    "ClemCola": "Jesters",
+    "kailamartinez": "Mile High Melonheads",
+    "Econley19": "Seattle Prestiges",
+    "Detroilet": "D-Town Swirlies"
+  };
+
   const handleInputChange = (e) => {
     setPollResults(e.target.value);
   };
@@ -23,18 +38,18 @@ const ImportPicks = () => {
       if (line.startsWith('"') && line.endsWith('"')) {
         currentTeam = line.replace(/"/g, '');
       } else if (line && currentTeam && !line.includes('vs')) {
-        picks.push({ name: line, pick: currentTeam });
+        picks.push({ name: teamNameMapping[line] || line, pick: currentTeam });
       }
     });
 
     setParsedPicks(picks);
     console.log('Parsed picks:', picks);
     toast.success(`Successfully parsed ${picks.length} picks`);
-    // TODO: Implement API call to save parsed picks
   };
 
   const savePicks = () => {
-    // TODO: Implement API call to save parsed picks
+    const currentWeek = localStorage.getItem('currentWeek') || '1';
+    localStorage.setItem(`week${currentWeek}Picks`, JSON.stringify(parsedPicks));
     toast.success("Picks saved successfully!");
   };
 
@@ -69,7 +84,7 @@ const ImportPicks = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Team Name</TableHead>
                     <TableHead>Pick</TableHead>
                   </TableRow>
                 </TableHeader>
