@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { useResults, useParticipants, useWeeklyPicks, useGames } from '../integrations/supabase';
+import { useResults, useParticipants } from '../integrations/supabase';
 
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
@@ -15,59 +15,38 @@ const Standings = () => {
 
   const { data: results } = useResults();
   const { data: participants } = useParticipants();
-  const { data: weeklyPicks } = useWeeklyPicks();
-  const { data: games } = useGames();
 
   useEffect(() => {
-    if (results && participants && weeklyPicks && games) {
-      const weeklyScores = calculateWeeklyScores(selectedWeek, weeklyPicks, games, participants);
-      const cumulativeScores = calculateCumulativeScores(weeklyPicks, games, participants);
+    if (results && participants) {
+      const weeklyScores = results
+        .filter(result => result.week.toString() === selectedWeek)
+        .map(result => {
+          const participant = participants.find(p => p.id === result.participant_id);
+          return {
+            name: participant ? participant.name : 'Unknown',
+            score: result.total_correct
+          };
+        })
+        .sort((a, b) => b.score - a.score)
+        .map((entry, index) => ({ ...entry, rank: index + 1 }));
+
+      const cumulativeScores = participants.map(participant => {
+        const participantResults = results.filter(result => result.participant_id === participant.id);
+        const totalScore = participantResults.reduce((sum, result) => sum + result.total_correct, 0);
+        return {
+          name: participant.name,
+          score: totalScore
+        };
+      })
+      .sort((a, b) => b.score - a.score)
+      .map((entry, index) => ({ ...entry, rank: index + 1 }));
 
       setStandings({
         weekly: weeklyScores,
         cumulative: cumulativeScores
       });
     }
-  }, [selectedWeek, results, participants, weeklyPicks, games]);
-
-  const calculateWeeklyScores = (week, picks, games, participants) => {
-    const weekPicks = picks.filter(pick => pick.week.toString() === week);
-    const weekGames = games.filter(game => game.week.toString() === week);
-
-    return participants.map(participant => {
-      const participantPicks = weekPicks.filter(pick => pick.participant_id === participant.id);
-      let score = 0;
-
-      participantPicks.forEach(pick => {
-        const game1 = weekGames.find(game => game.id === pick.game1_id);
-        const game2 = weekGames.find(game => game.id === pick.game2_id);
-
-        if (game1 && game1.winner_id === pick.game1_pick) score++;
-        if (game2 && game2.winner_id === pick.game2_pick) score++;
-        // Fantasy matchup scoring logic can be added here if needed
-      });
-
-      return { name: participant.name, score };
-    }).sort((a, b) => b.score - a.score);
-  };
-
-  const calculateCumulativeScores = (picks, games, participants) => {
-    return participants.map(participant => {
-      const participantPicks = picks.filter(pick => pick.participant_id === participant.id);
-      let totalScore = 0;
-
-      participantPicks.forEach(pick => {
-        const game1 = games.find(game => game.id === pick.game1_id);
-        const game2 = games.find(game => game.id === pick.game2_id);
-
-        if (game1 && game1.winner_id === pick.game1_pick) totalScore++;
-        if (game2 && game2.winner_id === pick.game2_pick) totalScore++;
-        // Fantasy matchup scoring logic can be added here if needed
-      });
-
-      return { name: participant.name, score: totalScore };
-    }).sort((a, b) => b.score - a.score);
-  };
+  }, [selectedWeek, results, participants]);
 
   const StandingsTable = ({ data }) => (
     <Table>
@@ -79,9 +58,9 @@ const Standings = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((entry, index) => (
+        {data.map((entry) => (
           <TableRow key={entry.name}>
-            <TableCell className="font-medium text-foreground">{index + 1}</TableCell>
+            <TableCell className="font-medium text-foreground">{entry.rank}</TableCell>
             <TableCell className="text-foreground">{entry.name}</TableCell>
             <TableCell className="text-right text-foreground">{entry.score}</TableCell>
           </TableRow>

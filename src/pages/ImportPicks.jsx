@@ -3,17 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useAddWeeklyPick, useParticipants, useGames, useFantasyMatchups } from '../integrations/supabase';
+import { useAddWeeklyPick, useParticipants } from '../integrations/supabase';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
-  const [selectedWeek, setSelectedWeek] = useState("1");
   const { data: participants } = useParticipants();
-  const { data: games } = useGames();
-  const { data: fantasyMatchups } = useFantasyMatchups();
   const addWeeklyPick = useAddWeeklyPick();
 
   const handleInputChange = (e) => {
@@ -23,16 +19,16 @@ const ImportPicks = () => {
   const parsePollResults = () => {
     const lines = pollResults.split('\n');
     const picks = [];
-    let currentGame = null;
+    let currentTeam = '';
 
     lines.forEach(line => {
       line = line.trim();
       if (line.startsWith('"') && line.endsWith('"')) {
-        currentGame = line.replace(/"/g, '');
-      } else if (line && currentGame) {
-        const participant = participants?.find(p => p.name === line);
+        currentTeam = line.replace(/"/g, '');
+      } else if (line && currentTeam && !line.includes('vs')) {
+        const participant = participants.find(p => p.name === line);
         if (participant) {
-          picks.push({ name: participant.name, pick: currentGame, participant_id: participant.id });
+          picks.push({ name: participant.name, pick: currentTeam, participant_id: participant.id });
         }
       }
     });
@@ -43,32 +39,15 @@ const ImportPicks = () => {
   };
 
   const savePicks = async () => {
-    const weekGames = games?.filter(game => game.week.toString() === selectedWeek);
-    const weekFantasyMatchup = fantasyMatchups?.find(matchup => matchup.week.toString() === selectedWeek);
-
-    if (!weekGames || weekGames.length === 0 || !weekFantasyMatchup) {
-      toast.error("No games or fantasy matchup found for the selected week");
-      return;
-    }
-
+    const currentWeek = 1; // You might want to make this dynamic
     for (const pick of parsedPicks) {
-      const weeklyPick = {
+      await addWeeklyPick.mutateAsync({
         participant_id: pick.participant_id,
-        week: parseInt(selectedWeek),
-        game1_id: weekGames[0]?.id,
-        game1_pick: weekGames[0]?.home_team_id === pick.pick ? weekGames[0]?.home_team_id : weekGames[0]?.away_team_id,
-        game2_id: weekGames[1]?.id,
-        game2_pick: weekGames[1]?.home_team_id === pick.pick ? weekGames[1]?.home_team_id : weekGames[1]?.away_team_id,
-        fantasy_matchup_id: weekFantasyMatchup.id,
-        fantasy_matchup_pick: weekFantasyMatchup.team1_id === pick.participant_id ? weekFantasyMatchup.team1_id : weekFantasyMatchup.team2_id,
-      };
-
-      try {
-        await addWeeklyPick.mutateAsync(weeklyPick);
-      } catch (error) {
-        console.error('Error saving pick:', error);
-        toast.error(`Failed to save pick for ${pick.name}`);
-      }
+        week: currentWeek,
+        game1_pick: pick.pick, // This needs to be adjusted based on your actual data structure
+        game2_pick: pick.pick, // This needs to be adjusted based on your actual data structure
+        fantasy_matchup_pick: pick.pick, // This needs to be adjusted based on your actual data structure
+      });
     }
     toast.success("Picks saved successfully!");
   };
@@ -82,20 +61,6 @@ const ImportPicks = () => {
             <CardTitle className="text-foreground">Paste Poll Results</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mb-4">
-              <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-                <SelectTrigger className="bg-secondary text-foreground">
-                  <SelectValue placeholder="Select week" />
-                </SelectTrigger>
-                <SelectContent>
-                  {[...Array(16)].map((_, i) => (
-                    <SelectItem key={i + 1} value={(i + 1).toString()}>
-                      Week {i + 1}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             <Textarea
               placeholder="Paste poll results here..."
               value={pollResults}
