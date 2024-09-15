@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { useGames, useAddGame, useUpdateGame } from '../integrations/supabase';
+import { useGames, useAddGame, useUpdateGame, useDeleteGame } from '../integrations/supabase';
 import { useNflTeams } from '../integrations/supabase';
 
 const GameInput = ({ game, onInputChange, onWinnerChange, nflTeams }) => (
@@ -40,6 +40,16 @@ const GameInput = ({ game, onInputChange, onWinnerChange, nflTeams }) => (
         </Select>
       </div>
     </div>
+    <div className="mb-2">
+      <Label htmlFor={`game-date-${game.id}`} className="text-foreground">Game Date</Label>
+      <Input
+        id={`game-date-${game.id}`}
+        type="date"
+        value={game.game_date}
+        onChange={(e) => onInputChange(game.id, 'game_date', e.target.value)}
+        className="bg-secondary text-foreground"
+      />
+    </div>
     <RadioGroup
       onValueChange={(value) => onWinnerChange(game.id, value)}
       value={game.winner_id}
@@ -64,6 +74,7 @@ const SetupGames = () => {
   const { data: existingGames, refetch: refetchGames } = useGames();
   const addGame = useAddGame();
   const updateGame = useUpdateGame();
+  const deleteGame = useDeleteGame();
 
   useEffect(() => {
     if (existingGames) {
@@ -72,9 +83,8 @@ const SetupGames = () => {
         setGames(weekGames);
       } else {
         setGames([
-          { id: 1, week: selectedWeek, home_team_id: '', away_team_id: '', winner_id: null, game_date: new Date().toISOString().split('T')[0] },
-          { id: 2, week: selectedWeek, home_team_id: '', away_team_id: '', winner_id: null, game_date: new Date().toISOString().split('T')[0] },
-          { id: 3, week: selectedWeek, home_team_id: '', away_team_id: '', winner_id: null, game_date: new Date().toISOString().split('T')[0] },
+          { id: 'new1', week: selectedWeek, home_team_id: '', away_team_id: '', winner_id: null, game_date: new Date().toISOString().split('T')[0] },
+          { id: 'new2', week: selectedWeek, home_team_id: '', away_team_id: '', winner_id: null, game_date: new Date().toISOString().split('T')[0] },
         ]);
       }
     }
@@ -94,15 +104,41 @@ const SetupGames = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    for (const game of games) {
-      if (game.id.toString().startsWith('new')) {
-        await addGame.mutateAsync(game);
-      } else {
-        await updateGame.mutateAsync({ id: game.id, ...game });
+    try {
+      for (const game of games) {
+        if (typeof game.id === 'string' && game.id.startsWith('new')) {
+          const { id, ...newGame } = game;
+          await addGame.mutateAsync(newGame);
+        } else {
+          await updateGame.mutateAsync(game);
+        }
       }
+      await refetchGames();
+      toast.success(`Games for Week ${selectedWeek} submitted successfully!`);
+    } catch (error) {
+      console.error('Error submitting games:', error);
+      toast.error('Failed to submit games. Please try again.');
     }
-    await refetchGames();
-    toast.success(`Games for Week ${selectedWeek} submitted successfully!`);
+  };
+
+  const handleAddGame = () => {
+    const newId = `new${games.length + 1}`;
+    setGames([...games, { id: newId, week: selectedWeek, home_team_id: '', away_team_id: '', winner_id: null, game_date: new Date().toISOString().split('T')[0] }]);
+  };
+
+  const handleDeleteGame = async (id) => {
+    try {
+      if (typeof id === 'string' && id.startsWith('new')) {
+        setGames(games.filter(game => game.id !== id));
+      } else {
+        await deleteGame.mutateAsync(id);
+        await refetchGames();
+      }
+      toast.success('Game deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting game:', error);
+      toast.error('Failed to delete game. Please try again.');
+    }
   };
 
   return (
@@ -131,14 +167,25 @@ const SetupGames = () => {
                 </Select>
               </div>
               {games.map((game) => (
-                <GameInput 
-                  key={game.id} 
-                  game={game} 
-                  onInputChange={handleInputChange}
-                  onWinnerChange={handleWinnerChange}
-                  nflTeams={nflTeams || []}
-                />
+                <div key={game.id}>
+                  <GameInput 
+                    game={game} 
+                    onInputChange={handleInputChange}
+                    onWinnerChange={handleWinnerChange}
+                    nflTeams={nflTeams || []}
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={() => handleDeleteGame(game.id)}
+                    className="mb-4 bg-destructive text-destructive-foreground"
+                  >
+                    Delete Game
+                  </Button>
+                </div>
               ))}
+              <Button type="button" onClick={handleAddGame} className="mb-4 bg-secondary text-secondary-foreground">
+                Add Game
+              </Button>
               <Button type="submit" className="w-full bg-primary text-primary-foreground">Save Games</Button>
             </form>
           </CardContent>
