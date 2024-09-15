@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { supabase } from '../lib/supabase';
 
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
@@ -13,17 +14,35 @@ const Standings = () => {
   });
 
   useEffect(() => {
-    const fetchStandings = () => {
-      const weeklyScores = JSON.parse(localStorage.getItem(`week${selectedWeek}Scores`) || '[]');
-      const cumulativeScores = JSON.parse(localStorage.getItem('cumulativeScores') || '[]');
+    const fetchStandings = async () => {
+      // Fetch weekly scores
+      const { data: weeklyScores, error: weeklyError } = await supabase
+        .from('weekly_scores')
+        .select('*')
+        .eq('week', selectedWeek)
+        .order('score', { ascending: false });
+
+      if (weeklyError) {
+        console.error('Error fetching weekly scores:', weeklyError);
+        toast.error('Failed to fetch weekly scores');
+        return;
+      }
+
+      // Fetch cumulative scores
+      const { data: cumulativeScores, error: cumulativeError } = await supabase
+        .from('cumulative_scores')
+        .select('*')
+        .order('score', { ascending: false });
+
+      if (cumulativeError) {
+        console.error('Error fetching cumulative scores:', cumulativeError);
+        toast.error('Failed to fetch cumulative scores');
+        return;
+      }
 
       setStandings({
-        weekly: weeklyScores
-          .sort((a, b) => b.score - a.score)
-          .map((entry, index) => ({ ...entry, rank: index + 1 })),
-        cumulative: cumulativeScores
-          .sort((a, b) => b.score - a.score)
-          .map((entry, index) => ({ ...entry, rank: index + 1 }))
+        weekly: weeklyScores.map((entry, index) => ({ ...entry, rank: index + 1 })),
+        cumulative: cumulativeScores.map((entry, index) => ({ ...entry, rank: index + 1 }))
       });
     };
 

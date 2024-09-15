@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
@@ -50,9 +51,22 @@ const ImportPicks = () => {
     toast.success(`Successfully parsed ${picks.length} picks`);
   };
 
-  const savePicks = () => {
-    localStorage.setItem(`week${selectedWeek}Picks`, JSON.stringify(parsedPicks));
-    toast.success("Picks saved successfully!");
+  const savePicks = async () => {
+    const picksToSave = parsedPicks.map(pick => ({
+      ...pick,
+      week: selectedWeek
+    }));
+
+    const { error } = await supabase
+      .from('picks')
+      .upsert(picksToSave, { onConflict: ['name', 'week'] });
+
+    if (error) {
+      console.error('Error saving picks:', error);
+      toast.error("Failed to save picks");
+    } else {
+      toast.success("Picks saved successfully!");
+    }
   };
 
   return (
