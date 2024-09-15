@@ -6,51 +6,46 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { useGames, useAddGame, useUpdateGame } from '../integrations/supabase';
-import { useNflTeams } from '../integrations/supabase';
+import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/scoreCalculations';
 
-const GameInput = ({ game, onInputChange, onWinnerChange, nflTeams }) => (
+const GameInput = ({ game, onInputChange, onWinnerChange }) => (
   <div className="mb-4">
     <h3 className="text-lg font-semibold mb-2 text-foreground">Game {game.id}</h3>
     <div className="grid grid-cols-2 gap-4 mb-2">
       <div>
         <Label htmlFor={`home-team-${game.id}`} className="text-foreground">Home Team</Label>
-        <Select value={game.home_team_id} onValueChange={(value) => onInputChange(game.id, 'home_team_id', value)}>
-          <SelectTrigger id={`home-team-${game.id}`} className="bg-secondary text-foreground">
-            <SelectValue placeholder="Select home team" />
-          </SelectTrigger>
-          <SelectContent>
-            {nflTeams.map((team) => (
-              <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Input
+          id={`home-team-${game.id}`}
+          value={game.homeTeam}
+          onChange={(e) => onInputChange(game.id, 'homeTeam', e.target.value)}
+          placeholder="Enter home team"
+          required
+          className="bg-secondary text-foreground"
+        />
       </div>
       <div>
         <Label htmlFor={`away-team-${game.id}`} className="text-foreground">Away Team</Label>
-        <Select value={game.away_team_id} onValueChange={(value) => onInputChange(game.id, 'away_team_id', value)}>
-          <SelectTrigger id={`away-team-${game.id}`} className="bg-secondary text-foreground">
-            <SelectValue placeholder="Select away team" />
-          </SelectTrigger>
-          <SelectContent>
-            {nflTeams.map((team) => (
-              <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Input
+          id={`away-team-${game.id}`}
+          value={game.awayTeam}
+          onChange={(e) => onInputChange(game.id, 'awayTeam', e.target.value)}
+          placeholder="Enter away team"
+          required
+          className="bg-secondary text-foreground"
+        />
       </div>
     </div>
     <RadioGroup
       onValueChange={(value) => onWinnerChange(game.id, value)}
-      value={game.winner_id}
+      value={game.winner}
       className="text-foreground"
     >
       <div className="flex items-center space-x-2">
-        <RadioGroupItem value={game.home_team_id} id={`home-win-${game.id}`} />
+        <RadioGroupItem value="home" id={`home-win-${game.id}`} />
         <Label htmlFor={`home-win-${game.id}`}>Home Team Wins</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <RadioGroupItem value={game.away_team_id} id={`away-win-${game.id}`} />
+        <RadioGroupItem value="away" id={`away-win-${game.id}`} />
         <Label htmlFor={`away-win-${game.id}`}>Away Team Wins</Label>
       </div>
     </RadioGroup>
@@ -58,51 +53,62 @@ const GameInput = ({ game, onInputChange, onWinnerChange, nflTeams }) => (
 );
 
 const SetupGames = () => {
-  const [selectedWeek, setSelectedWeek] = useState(1);
-  const [games, setGames] = useState([]);
-  const { data: nflTeams } = useNflTeams();
-  const { data: existingGames, refetch: refetchGames } = useGames();
-  const addGame = useAddGame();
-  const updateGame = useUpdateGame();
+  const [selectedWeek, setSelectedWeek] = useState("1");
+  const [games, setGames] = useState([
+    { id: 1, homeTeam: '', awayTeam: '', winner: null },
+    { id: 2, homeTeam: '', awayTeam: '', winner: null },
+    { id: 3, homeTeam: '', awayTeam: '', winner: null },
+  ]);
 
   useEffect(() => {
-    if (existingGames) {
-      const weekGames = existingGames.filter(game => game.week === selectedWeek);
-      if (weekGames.length > 0) {
-        setGames(weekGames);
-      } else {
-        setGames([
-          { id: 1, week: selectedWeek, home_team_id: '', away_team_id: '', winner_id: null, game_date: new Date().toISOString().split('T')[0] },
-          { id: 2, week: selectedWeek, home_team_id: '', away_team_id: '', winner_id: null, game_date: new Date().toISOString().split('T')[0] },
-          { id: 3, week: selectedWeek, home_team_id: '', away_team_id: '', winner_id: null, game_date: new Date().toISOString().split('T')[0] },
-        ]);
-      }
+    const storedGames = localStorage.getItem(`week${selectedWeek}Games`);
+    if (storedGames) {
+      setGames(JSON.parse(storedGames));
+    } else {
+      setGames([
+        { id: 1, homeTeam: '', awayTeam: '', winner: null },
+        { id: 2, homeTeam: '', awayTeam: '', winner: null },
+        { id: 3, homeTeam: '', awayTeam: '', winner: null },
+      ]);
     }
-  }, [selectedWeek, existingGames]);
+  }, [selectedWeek]);
 
-  const handleInputChange = (id, field, value) => {
+  const handleInputChange = (id, team, value) => {
     setGames(games.map(game => 
-      game.id === id ? { ...game, [field]: value } : game
+      game.id === id ? { ...game, [team]: value } : game
     ));
   };
 
-  const handleWinnerChange = (id, winnerId) => {
+  const handleWinnerChange = (id, winner) => {
     setGames(games.map(game =>
-      game.id === id ? { ...game, winner_id: winnerId } : game
+      game.id === id ? { ...game, winner } : game
     ));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    for (const game of games) {
-      if (game.id.toString().startsWith('new')) {
-        await addGame.mutateAsync(game);
-      } else {
-        await updateGame.mutateAsync({ id: game.id, ...game });
-      }
+    localStorage.setItem(`week${selectedWeek}Games`, JSON.stringify(games));
+    
+    // Calculate scores
+    const picks = JSON.parse(localStorage.getItem(`week${selectedWeek}Picks`) || '[]');
+    const results = games.map(game => ({
+      id: game.id,
+      winner: game.winner === 'home' ? game.homeTeam : game.awayTeam
+    }));
+    const weekScores = calculateWeeklyScores(games, picks, results);
+    
+    localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
+    
+    // Update cumulative scores
+    const allWeeklyScores = [];
+    for (let i = 1; i <= parseInt(selectedWeek); i++) {
+      const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
+      allWeeklyScores.push(weekScores);
     }
-    await refetchGames();
-    toast.success(`Games for Week ${selectedWeek} submitted successfully!`);
+    const cumulativeScores = calculateCumulativeScores(allWeeklyScores);
+    localStorage.setItem(`cumulativeScores`, JSON.stringify(cumulativeScores));
+
+    toast.success(`Games and scores for Week ${selectedWeek} submitted successfully!`);
   };
 
   return (
@@ -117,7 +123,7 @@ const SetupGames = () => {
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <Label htmlFor="week-select" className="text-foreground">Select Week</Label>
-                <Select value={selectedWeek.toString()} onValueChange={(value) => setSelectedWeek(parseInt(value))}>
+                <Select value={selectedWeek} onValueChange={setSelectedWeek}>
                   <SelectTrigger id="week-select" className="bg-secondary text-foreground">
                     <SelectValue placeholder="Select week" />
                   </SelectTrigger>
@@ -136,10 +142,9 @@ const SetupGames = () => {
                   game={game} 
                   onInputChange={handleInputChange}
                   onWinnerChange={handleWinnerChange}
-                  nflTeams={nflTeams || []}
                 />
               ))}
-              <Button type="submit" className="w-full bg-primary text-primary-foreground">Save Games</Button>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground">Save Games and Calculate Scores</Button>
             </form>
           </CardContent>
         </Card>
