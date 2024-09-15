@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
@@ -12,8 +11,6 @@ const Standings = () => {
     weekly: [],
     cumulative: []
   });
-  const [weeklyData, setWeeklyData] = useState([]);
-  const [seasonTrendData, setSeasonTrendData] = useState([]);
 
   useEffect(() => {
     const fetchStandings = () => {
@@ -28,23 +25,6 @@ const Standings = () => {
           .sort((a, b) => b.score - a.score)
           .map((entry, index) => ({ ...entry, rank: index + 1 }))
       });
-
-      setWeeklyData(weeklyScores);
-
-      // Prepare season trend data
-      const trendData = [];
-      for (let i = 1; i <= 16; i++) {
-        const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
-        weekScores.forEach(score => {
-          const existingEntry = trendData.find(entry => entry.name === score.name);
-          if (existingEntry) {
-            existingEntry[`Week ${i}`] = score.score;
-          } else {
-            trendData.push({ name: score.name, [`Week ${i}`]: score.score });
-          }
-        });
-      }
-      setSeasonTrendData(trendData);
     };
 
     fetchStandings();
@@ -112,42 +92,6 @@ const Standings = () => {
                 <StandingsTable data={standings.cumulative} />
               </TabsContent>
             </Tabs>
-          </CardContent>
-        </Card>
-        <Card className="mt-6 bg-card">
-          <CardHeader>
-            <CardTitle className="text-foreground">Weekly Scores Comparison</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={weeklyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="score" fill="#7ee787" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card className="mt-6 bg-card">
-          <CardHeader>
-            <CardTitle className="text-foreground">Season Score Trends</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={seasonTrendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                {[...Array(16)].map((_, i) => (
-                  <Line key={i} type="monotone" dataKey={`Week ${i + 1}`} stroke={`#${Math.floor(Math.random()*16777215).toString(16)}`} />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
