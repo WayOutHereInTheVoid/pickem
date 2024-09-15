@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useResults, useParticipants } from '../integrations/supabase';
 
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
@@ -12,23 +13,40 @@ const Standings = () => {
     cumulative: []
   });
 
+  const { data: results } = useResults();
+  const { data: participants } = useParticipants();
+
   useEffect(() => {
-    const fetchStandings = () => {
-      const weeklyScores = JSON.parse(localStorage.getItem(`week${selectedWeek}Scores`) || '[]');
-      const cumulativeScores = JSON.parse(localStorage.getItem('cumulativeScores') || '[]');
+    if (results && participants) {
+      const weeklyScores = results
+        .filter(result => result.week.toString() === selectedWeek)
+        .map(result => {
+          const participant = participants.find(p => p.id === result.participant_id);
+          return {
+            name: participant ? participant.name : 'Unknown',
+            score: result.total_correct
+          };
+        })
+        .sort((a, b) => b.score - a.score)
+        .map((entry, index) => ({ ...entry, rank: index + 1 }));
+
+      const cumulativeScores = participants.map(participant => {
+        const participantResults = results.filter(result => result.participant_id === participant.id);
+        const totalScore = participantResults.reduce((sum, result) => sum + result.total_correct, 0);
+        return {
+          name: participant.name,
+          score: totalScore
+        };
+      })
+      .sort((a, b) => b.score - a.score)
+      .map((entry, index) => ({ ...entry, rank: index + 1 }));
 
       setStandings({
-        weekly: weeklyScores
-          .sort((a, b) => b.score - a.score)
-          .map((entry, index) => ({ ...entry, rank: index + 1 })),
+        weekly: weeklyScores,
         cumulative: cumulativeScores
-          .sort((a, b) => b.score - a.score)
-          .map((entry, index) => ({ ...entry, rank: index + 1 }))
       });
-    };
-
-    fetchStandings();
-  }, [selectedWeek]);
+    }
+  }, [selectedWeek, results, participants]);
 
   const StandingsTable = ({ data }) => (
     <Table>

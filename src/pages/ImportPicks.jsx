@@ -4,25 +4,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
+import { useAddWeeklyPick, useParticipants } from '../integrations/supabase';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
-
-  const teamNameMapping = {
-    "Thumbz": "Murder Hornets",
-    "JordyV1bez": "Black Hawk Bones",
-    "chupalo": "Sonora Sugar Skulls",
-    "Scrody": "Newfoundland Growlers",
-    "JoshMartinez": "California Burritos",
-    "iammickloven": "Kyoto Ninjas",
-    "TheNewEra22": "Brutal Hogs",
-    "ejdale4944": "Southwest Aliens",
-    "ClemCola": "Jesters",
-    "kailamartinez": "Mile High Melonheads",
-    "Econley19": "Seattle Prestiges",
-    "Detroilet": "D-Town Swirlies"
-  };
+  const { data: participants } = useParticipants();
+  const addWeeklyPick = useAddWeeklyPick();
 
   const handleInputChange = (e) => {
     setPollResults(e.target.value);
@@ -38,7 +26,10 @@ const ImportPicks = () => {
       if (line.startsWith('"') && line.endsWith('"')) {
         currentTeam = line.replace(/"/g, '');
       } else if (line && currentTeam && !line.includes('vs')) {
-        picks.push({ name: teamNameMapping[line] || line, pick: currentTeam });
+        const participant = participants.find(p => p.name === line);
+        if (participant) {
+          picks.push({ name: participant.name, pick: currentTeam, participant_id: participant.id });
+        }
       }
     });
 
@@ -47,9 +38,17 @@ const ImportPicks = () => {
     toast.success(`Successfully parsed ${picks.length} picks`);
   };
 
-  const savePicks = () => {
-    const currentWeek = localStorage.getItem('currentWeek') || '1';
-    localStorage.setItem(`week${currentWeek}Picks`, JSON.stringify(parsedPicks));
+  const savePicks = async () => {
+    const currentWeek = 1; // You might want to make this dynamic
+    for (const pick of parsedPicks) {
+      await addWeeklyPick.mutateAsync({
+        participant_id: pick.participant_id,
+        week: currentWeek,
+        game1_pick: pick.pick, // This needs to be adjusted based on your actual data structure
+        game2_pick: pick.pick, // This needs to be adjusted based on your actual data structure
+        fantasy_matchup_pick: pick.pick, // This needs to be adjusted based on your actual data structure
+      });
+    }
     toast.success("Picks saved successfully!");
   };
 
