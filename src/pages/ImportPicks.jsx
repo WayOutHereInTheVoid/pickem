@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState("1");
+  const [savedPicks, setSavedPicks] = useState([]);
 
   const teamNameMapping = {
     "Thumbz": "Murder Hornets",
@@ -24,6 +26,15 @@ const ImportPicks = () => {
     "kailamartinez": "Mile High Melonheads",
     "Econley19": "Seattle Prestiges",
     "Detroilet": "D-Town Swirlies"
+  };
+
+  useEffect(() => {
+    loadSavedPicks();
+  }, [selectedWeek]);
+
+  const loadSavedPicks = () => {
+    const picks = JSON.parse(localStorage.getItem(`week${selectedWeek}Picks`) || '[]');
+    setSavedPicks(picks);
   };
 
   const handleInputChange = (e) => {
@@ -50,7 +61,8 @@ const ImportPicks = () => {
   };
 
   const savePicks = () => {
-    localStorage.setItem(`week${selectedWeek}Picks`, JSON.stringify(parsedPicks));
+    const picksToSave = parsedPicks.length > 0 ? parsedPicks : savedPicks;
+    localStorage.setItem(`week${selectedWeek}Picks`, JSON.stringify(picksToSave));
     toast.success(`Picks saved successfully for Week ${selectedWeek}!`);
     
     // Trigger score calculation
@@ -61,7 +73,7 @@ const ImportPicks = () => {
         winner: game.winner === 'home' ? game.homeTeam : game.awayTeam
       }));
       const { calculateWeeklyScores, calculateCumulativeScores } = require('../utils/scoreCalculations');
-      const weekScores = calculateWeeklyScores(games, parsedPicks, results);
+      const weekScores = calculateWeeklyScores(games, picksToSave, results);
       localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
       
       // Update cumulative scores
@@ -73,6 +85,13 @@ const ImportPicks = () => {
       const cumulativeScores = calculateCumulativeScores(allWeeklyScores);
       localStorage.setItem('cumulativeScores', JSON.stringify(cumulativeScores));
     }
+    loadSavedPicks();
+  };
+
+  const handlePickEdit = (index, newPick) => {
+    const updatedPicks = [...savedPicks];
+    updatedPicks[index].pick = newPick;
+    setSavedPicks(updatedPicks);
   };
 
   return (
@@ -116,10 +135,12 @@ const ImportPicks = () => {
           </CardContent>
         </Card>
         
-        {parsedPicks.length > 0 && (
+        {(parsedPicks.length > 0 || savedPicks.length > 0) && (
           <Card className="bg-card">
             <CardHeader>
-              <CardTitle className="text-foreground">Parsed Picks</CardTitle>
+              <CardTitle className="text-foreground">
+                {parsedPicks.length > 0 ? 'Parsed Picks' : `Saved Picks for Week ${selectedWeek}`}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
@@ -130,10 +151,16 @@ const ImportPicks = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {parsedPicks.map((pick, index) => (
+                  {(parsedPicks.length > 0 ? parsedPicks : savedPicks).map((pick, index) => (
                     <TableRow key={index}>
                       <TableCell className="text-foreground">{pick.name}</TableCell>
-                      <TableCell className="text-foreground">{pick.pick}</TableCell>
+                      <TableCell className="text-foreground">
+                        <Input
+                          value={pick.pick}
+                          onChange={(e) => handlePickEdit(index, e.target.value)}
+                          className="bg-secondary text-foreground"
+                        />
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
