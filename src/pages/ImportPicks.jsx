@@ -4,10 +4,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
+  const [selectedWeek, setSelectedWeek] = useState("1");
 
   const teamNameMapping = {
     "Thumbz": "Murder Hornets",
@@ -48,15 +50,54 @@ const ImportPicks = () => {
   };
 
   const savePicks = () => {
-    const currentWeek = localStorage.getItem('currentWeek') || '1';
-    localStorage.setItem(`week${currentWeek}Picks`, JSON.stringify(parsedPicks));
-    toast.success("Picks saved successfully!");
+    localStorage.setItem(`week${selectedWeek}Picks`, JSON.stringify(parsedPicks));
+    toast.success(`Picks saved successfully for Week ${selectedWeek}!`);
+    
+    // Trigger score calculation
+    const games = JSON.parse(localStorage.getItem(`week${selectedWeek}Games`) || '[]');
+    if (games.length > 0) {
+      const results = games.map(game => ({
+        id: game.id,
+        winner: game.winner === 'home' ? game.homeTeam : game.awayTeam
+      }));
+      const { calculateWeeklyScores, calculateCumulativeScores } = require('../utils/scoreCalculations');
+      const weekScores = calculateWeeklyScores(games, parsedPicks, results);
+      localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
+      
+      // Update cumulative scores
+      const allWeeklyScores = [];
+      for (let i = 1; i <= parseInt(selectedWeek); i++) {
+        const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
+        allWeeklyScores.push(weekScores);
+      }
+      const cumulativeScores = calculateCumulativeScores(allWeeklyScores);
+      localStorage.setItem('cumulativeScores', JSON.stringify(cumulativeScores));
+    }
   };
 
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-foreground">Import Picks</h1>
+        <Card className="mb-6 bg-card">
+          <CardHeader>
+            <CardTitle className="text-foreground">Select Week</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+              <SelectTrigger className="w-[180px] bg-secondary text-foreground">
+                <SelectValue placeholder="Select week" />
+              </SelectTrigger>
+              <SelectContent>
+                {[...Array(16)].map((_, i) => (
+                  <SelectItem key={i + 1} value={(i + 1).toString()}>
+                    Week {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
         <Card className="mb-6 bg-card">
           <CardHeader>
             <CardTitle className="text-foreground">Paste Poll Results</CardTitle>

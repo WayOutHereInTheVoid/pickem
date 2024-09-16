@@ -103,24 +103,28 @@ const Index = () => {
             <CardTitle className="text-2xl font-semibold text-foreground">Leaderboard</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-foreground">Rank</TableHead>
-                  <TableHead className="text-foreground">Team Name</TableHead>
-                  <TableHead className="text-right text-foreground">Score</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {cumulativeScores.map((score, index) => (
-                  <TableRow key={score.name}>
-                    <TableCell className="font-medium text-foreground">{index + 1}</TableCell>
-                    <TableCell className="text-foreground">{score.name}</TableCell>
-                    <TableCell className="text-right text-foreground">{score.score}</TableCell>
+            {cumulativeScores.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-foreground">Rank</TableHead>
+                    <TableHead className="text-foreground">Team Name</TableHead>
+                    <TableHead className="text-right text-foreground">Score</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {cumulativeScores.map((score, index) => (
+                    <TableRow key={score.name}>
+                      <TableCell className="font-medium text-foreground">{index + 1}</TableCell>
+                      <TableCell className="text-foreground">{score.name}</TableCell>
+                      <TableCell className="text-right text-foreground">{score.score}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-center text-muted-foreground">No scores available. Import picks and set up games to see the leaderboard.</p>
+            )}
           </CardContent>
         </Card>
       </div>
