@@ -3,15 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
-  const [selectedWeek, setSelectedWeek] = useState("1");
 
   const teamNameMapping = {
     "Thumbz": "Murder Hornets",
@@ -51,47 +47,16 @@ const ImportPicks = () => {
     toast.success(`Successfully parsed ${picks.length} picks`);
   };
 
-  const savePicks = async () => {
-    const picksToSave = parsedPicks.map(pick => ({
-      ...pick,
-      week: selectedWeek
-    }));
-
-    const { error } = await supabase
-      .from('picks')
-      .upsert(picksToSave, { onConflict: ['name', 'week'] });
-
-    if (error) {
-      console.error('Error saving picks:', error);
-      toast.error("Failed to save picks");
-    } else {
-      toast.success("Picks saved successfully!");
-    }
+  const savePicks = () => {
+    const currentWeek = localStorage.getItem('currentWeek') || '1';
+    localStorage.setItem(`week${currentWeek}Picks`, JSON.stringify(parsedPicks));
+    toast.success("Picks saved successfully!");
   };
 
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-foreground">Import Picks</h1>
-        <Card className="mb-6 bg-card">
-          <CardHeader>
-            <CardTitle className="text-foreground">Select Week</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-              <SelectTrigger className="w-[180px] bg-secondary text-foreground">
-                <SelectValue placeholder="Select week" />
-              </SelectTrigger>
-              <SelectContent>
-                {[...Array(16)].map((_, i) => (
-                  <SelectItem key={i + 1} value={(i + 1).toString()}>
-                    Week {i + 1}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
         <Card className="mb-6 bg-card">
           <CardHeader>
             <CardTitle className="text-foreground">Paste Poll Results</CardTitle>
@@ -132,16 +97,9 @@ const ImportPicks = () => {
                   ))}
                 </TableBody>
               </Table>
-              <div className="flex justify-between mt-4">
-                <Button onClick={savePicks} className="bg-primary text-primary-foreground">
-                  Save Picks
-                </Button>
-                <Link to={`/edit-picks/${selectedWeek}`}>
-                  <Button className="bg-secondary text-secondary-foreground">
-                    Edit Picks
-                  </Button>
-                </Link>
-              </div>
+              <Button onClick={savePicks} className="w-full mt-4 bg-primary text-primary-foreground">
+                Save Picks
+              </Button>
             </CardContent>
           </Card>
         )}
