@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/scoreCalculations';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
@@ -72,7 +73,6 @@ const ImportPicks = () => {
         id: game.id,
         winner: game.winner === 'home' ? game.homeTeam : game.awayTeam
       }));
-      const { calculateWeeklyScores, calculateCumulativeScores } = require('../utils/scoreCalculations');
       const weekScores = calculateWeeklyScores(games, picksToSave, results);
       localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
       
