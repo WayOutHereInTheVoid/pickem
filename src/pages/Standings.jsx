@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { supabase } from '../lib/supabase';
 
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
@@ -16,10 +17,28 @@ const Standings = () => {
   const [seasonTrendData, setSeasonTrendData] = useState([]);
 
   useEffect(() => {
-    const fetchStandings = () => {
-      const weeklyScores = JSON.parse(localStorage.getItem(`week${selectedWeek}Scores`) || '[]');
-      const cumulativeScores = JSON.parse(localStorage.getItem('cumulativeScores') || '[]');
+    fetchStandings();
+  }, [selectedWeek]);
 
+  const fetchStandings = async () => {
+    const { data: weeklyScores, error: weeklyError } = await supabase
+      .from('scores')
+      .select('*')
+      .eq('week', selectedWeek);
+
+    const { data: cumulativeScores, error: cumulativeError } = await supabase
+      .from('cumulative_scores')
+      .select('*');
+
+    if (weeklyError) {
+      console.error('Error fetching weekly scores:', weeklyError);
+    }
+
+    if (cumulativeError) {
+      console.error('Error fetching cumulative scores:', cumulativeError);
+    }
+
+    if (weeklyScores && cumulativeScores) {
       setStandings({
         weekly: weeklyScores
           .sort((a, b) => b.score - a.score)
@@ -32,23 +51,26 @@ const Standings = () => {
       setWeeklyData(weeklyScores);
 
       // Prepare season trend data
-      const trendData = [];
-      for (let i = 1; i <= 16; i++) {
-        const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
-        weekScores.forEach(score => {
+      const { data: allScores, error: allScoresError } = await supabase
+        .from('scores')
+        .select('*');
+
+      if (allScoresError) {
+        console.error('Error fetching all scores:', allScoresError);
+      } else {
+        const trendData = [];
+        allScores.forEach(score => {
           const existingEntry = trendData.find(entry => entry.name === score.name);
           if (existingEntry) {
-            existingEntry[`Week ${i}`] = score.score;
+            existingEntry[`Week ${score.week}`] = score.score;
           } else {
-            trendData.push({ name: score.name, [`Week ${i}`]: score.score });
+            trendData.push({ name: score.name, [`Week ${score.week}`]: score.score });
           }
         });
+        setSeasonTrendData(trendData);
       }
-      setSeasonTrendData(trendData);
-    };
-
-    fetchStandings();
-  }, [selectedWeek]);
+    }
+  };
 
   const StandingsTable = ({ data }) => (
     <Table>

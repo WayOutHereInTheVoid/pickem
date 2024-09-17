@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { supabase } from '../lib/supabase';
 import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/scoreCalculations';
 
 const ImportPicks = () => {
@@ -33,9 +34,18 @@ const ImportPicks = () => {
     loadSavedPicks();
   }, [selectedWeek]);
 
-  const loadSavedPicks = () => {
-    const picks = JSON.parse(localStorage.getItem(`week${selectedWeek}Picks`) || '[]');
-    setSavedPicks(picks);
+  const loadSavedPicks = async () => {
+    const { data, error } = await supabase
+      .from('picks')
+      .select('*')
+      .eq('week', selectedWeek);
+    
+    if (error) {
+      console.error('Error loading picks:', error);
+      toast.error('Failed to load picks');
+    } else {
+      setSavedPicks(data);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -61,31 +71,24 @@ const ImportPicks = () => {
     toast.success(`Successfully parsed ${picks.length} picks`);
   };
 
-  const savePicks = () => {
+  const savePicks = async () => {
     const picksToSave = parsedPicks.length > 0 ? parsedPicks : savedPicks;
-    localStorage.setItem(`week${selectedWeek}Picks`, JSON.stringify(picksToSave));
-    toast.success(`Picks saved successfully for Week ${selectedWeek}!`);
     
-    // Trigger score calculation
-    const games = JSON.parse(localStorage.getItem(`week${selectedWeek}Games`) || '[]');
-    if (games.length > 0) {
-      const results = games.map(game => ({
-        id: game.id,
-        winner: game.winner === 'home' ? game.homeTeam : game.awayTeam
-      }));
-      const weekScores = calculateWeeklyScores(games, picksToSave, results);
-      localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
-      
-      // Update cumulative scores
-      const allWeeklyScores = [];
-      for (let i = 1; i <= parseInt(selectedWeek); i++) {
-        const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
-        allWeeklyScores.push(weekScores);
-      }
-      const cumulativeScores = calculateCumulativeScores(allWeeklyScores);
-      localStorage.setItem('cumulativeScores', JSON.stringify(cumulativeScores));
+    const { data, error } = await supabase
+      .from('picks')
+      .upsert(picksToSave.map(pick => ({
+        week: selectedWeek,
+        name: pick.name,
+        pick: pick.pick
+      })));
+
+    if (error) {
+      console.error('Error saving picks:', error);
+      toast.error('Failed to save picks');
+    } else {
+      toast.success(`Picks saved successfully for Week ${selectedWeek}!`);
+      loadSavedPicks();
     }
-    loadSavedPicks();
   };
 
   const handlePickEdit = (index, newPick) => {

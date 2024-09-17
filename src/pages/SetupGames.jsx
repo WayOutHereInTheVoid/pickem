@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
+import { supabase } from '../lib/supabase';
 import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/scoreCalculations';
 
 const GameInput = ({ game, onInputChange, onWinnerChange }) => (
@@ -61,9 +62,20 @@ const SetupGames = () => {
   ]);
 
   useEffect(() => {
-    const storedGames = localStorage.getItem(`week${selectedWeek}Games`);
-    if (storedGames) {
-      setGames(JSON.parse(storedGames));
+    loadGames();
+  }, [selectedWeek]);
+
+  const loadGames = async () => {
+    const { data, error } = await supabase
+      .from('games')
+      .select('*')
+      .eq('week', selectedWeek);
+    
+    if (error) {
+      console.error('Error loading games:', error);
+      toast.error('Failed to load games');
+    } else if (data.length > 0) {
+      setGames(data);
     } else {
       setGames([
         { id: 1, homeTeam: '', awayTeam: '', winner: null },
@@ -71,7 +83,7 @@ const SetupGames = () => {
         { id: 3, homeTeam: '', awayTeam: '', winner: null },
       ]);
     }
-  }, [selectedWeek]);
+  };
 
   const handleInputChange = (id, team, value) => {
     setGames(games.map(game => 
@@ -85,30 +97,70 @@ const SetupGames = () => {
     ));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem(`week${selectedWeek}Games`, JSON.stringify(games));
     
-    // Calculate scores
-    const picks = JSON.parse(localStorage.getItem(`week${selectedWeek}Picks`) || '[]');
-    const results = games.map(game => ({
-      id: game.id,
-      winner: game.winner === 'home' ? game.homeTeam : game.awayTeam
-    }));
-    const weekScores = calculateWeeklyScores(games, picks, results);
-    
-    localStorage.setItem(`week${selectedWeek}Scores`, JSON.stringify(weekScores));
-    
-    // Update cumulative scores
-    const allWeeklyScores = [];
-    for (let i = 1; i <= parseInt(selectedWeek); i++) {
-      const weekScores = JSON.parse(localStorage.getItem(`week${i}Scores`) || '[]');
-      allWeeklyScores.push(weekScores);
-    }
-    const cumulativeScores = calculateCumulativeScores(allWeeklyScores);
-    localStorage.setItem(`cumulativeScores`, JSON.stringify(cumulativeScores));
+    const { data, error } = await supabase
+      .from('games')
+      .upsert(games.map(game => ({
+        ...game,
+        week: selectedWeek
+      })));
 
-    toast.success(`Games and scores for Week ${selectedWeek} submitted successfully!`);
+    if (error) {
+      console.error('Error saving games:', error);
+      toast.error('Failed to save games');
+    } else {
+      toast.success(`Games for Week ${selectedWeek} submitted successfully!`);
+      
+      // Calculate and save scores
+      const { data: picks, error: picksError } = await supabase
+        .from('picks')
+        .select('*')
+        .eq('week', selectedWeek);
+
+      if (picksError) {
+        console.error('Error loading picks:', picksError);
+      } else {
+        const results = games.map(game => ({
+          id: game.id,
+          winner: game.winner === 'home' ? game.homeTeam : game.awayTeam
+        }));
+        const weekScores = calculateWeeklyScores(games, picks, results);
+        
+        const { error: scoresError } = await supabase
+          .from('scores')
+          .upsert(weekScores.map(score => ({
+            ...score,
+            week: selectedWeek
+          })));
+
+        if (scoresError) {
+          console.error('Error saving scores:', scoresError);
+        } else {
+          // Update cumulative scores
+          const { data: allScores, error: allScoresError } = await supabase
+            .from('scores')
+            .select('*');
+
+          if (allScoresError) {
+            console.error('Error loading all scores:', allScoresError);
+          } else {
+            const cumulativeScores = calculateCumulativeScores(allScores);
+            
+            const { error: cumulativeError } = await supabase
+              .from('cumulative_scores')
+              .upsert(cumulativeScores);
+
+            if (cumulativeError) {
+              console.error('Error saving cumulative scores:', cumulativeError);
+            } else {
+              toast.success('Scores updated successfully!');
+            }
+          }
+        }
+      }
+    }
   };
 
   return (

@@ -23,13 +23,11 @@ export const calculateWeeklyScores = (games, picks, results) => {
 export const calculateCumulativeScores = (weeklyScores) => {
   const cumulativeScores = {};
 
-  weeklyScores.forEach(week => {
-    week.forEach(({ name, score }) => {
-      if (!cumulativeScores[name]) {
-        cumulativeScores[name] = 0;
-      }
-      cumulativeScores[name] += score;
-    });
+  weeklyScores.forEach(score => {
+    if (!cumulativeScores[score.name]) {
+      cumulativeScores[score.name] = 0;
+    }
+    cumulativeScores[score.name] += score.score;
   });
 
   return Object.entries(cumulativeScores).map(([name, score]) => ({ name, score }));
