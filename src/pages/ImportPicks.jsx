@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,14 +6,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { supabase } from '../lib/supabase';
-import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/scoreCalculations';
+import { usePicks, useAddPick, useUpdatePick } from '../integrations/supabase';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState("1");
-  const [savedPicks, setSavedPicks] = useState([]);
+
+  const { data: savedPicks, isLoading, isError } = usePicks();
+  const addPick = useAddPick();
+  const updatePick = useUpdatePick();
 
   const teamNameMapping = {
     "Thumbz": "Murder Hornets",
@@ -28,24 +30,6 @@ const ImportPicks = () => {
     "kailamartinez": "Mile High Melonheads",
     "Econley19": "Seattle Prestiges",
     "Detroilet": "D-Town Swirlies"
-  };
-
-  useEffect(() => {
-    loadSavedPicks();
-  }, [selectedWeek]);
-
-  const loadSavedPicks = async () => {
-    const { data, error } = await supabase
-      .from('picks')
-      .select('*')
-      .eq('week', selectedWeek);
-    
-    if (error) {
-      console.error('Error loading picks:', error);
-      toast.error('Failed to load picks');
-    } else {
-      setSavedPicks(data);
-    }
   };
 
   const handleInputChange = (e) => {
@@ -74,28 +58,28 @@ const ImportPicks = () => {
   const savePicks = async () => {
     const picksToSave = parsedPicks.length > 0 ? parsedPicks : savedPicks;
     
-    const { data, error } = await supabase
-      .from('picks')
-      .upsert(picksToSave.map(pick => ({
-        week: selectedWeek,
-        name: pick.name,
-        pick: pick.pick
-      })));
-
-    if (error) {
-      console.error('Error saving picks:', error);
-      toast.error('Failed to save picks');
-    } else {
-      toast.success(`Picks saved successfully for Week ${selectedWeek}!`);
-      loadSavedPicks();
+    for (const pick of picksToSave) {
+      const existingPick = savedPicks?.find(p => p.name === pick.name && p.week === parseInt(selectedWeek));
+      if (existingPick) {
+        await updatePick.mutateAsync({ id: existingPick.id, ...pick, week: parseInt(selectedWeek) });
+      } else {
+        await addPick.mutateAsync({ ...pick, week: parseInt(selectedWeek) });
+      }
     }
+
+    toast.success(`Picks saved successfully for Week ${selectedWeek}!`);
   };
 
   const handlePickEdit = (index, newPick) => {
-    const updatedPicks = [...savedPicks];
+    const updatedPicks = [...(parsedPicks.length > 0 ? parsedPicks : savedPicks)];
     updatedPicks[index].pick = newPick;
-    setSavedPicks(updatedPicks);
+    setParsedPicks(updatedPicks);
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error loading picks</div>;
+
+  const displayPicks = parsedPicks.length > 0 ? parsedPicks : savedPicks?.filter(pick => pick.week === parseInt(selectedWeek)) || [];
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -138,7 +122,7 @@ const ImportPicks = () => {
           </CardContent>
         </Card>
         
-        {(parsedPicks.length > 0 || savedPicks.length > 0) && (
+        {displayPicks.length > 0 && (
           <Card className="bg-card">
             <CardHeader>
               <CardTitle className="text-foreground">
@@ -154,7 +138,7 @@ const ImportPicks = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(parsedPicks.length > 0 ? parsedPicks : savedPicks).map((pick, index) => (
+                  {displayPicks.map((pick, index) => (
                     <TableRow key={index}>
                       <TableCell className="text-foreground">{pick.name}</TableCell>
                       <TableCell className="text-foreground">
