@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { supabase } from '../lib/supabase';
+import { useGames, useAddGame, useUpdateGame } from '../integrations/supabase';
 import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/scoreCalculations';
 
 const GameInput = ({ game, onInputChange, onWinnerChange }) => (
@@ -14,22 +14,22 @@ const GameInput = ({ game, onInputChange, onWinnerChange }) => (
     <h3 className="text-lg font-semibold mb-2 text-foreground">Game {game.id}</h3>
     <div className="grid grid-cols-2 gap-4 mb-2">
       <div>
-        <Label htmlFor={`home-team-${game.id}`} className="text-foreground">Home Team</Label>
+        <Label htmlFor={`home_team-${game.id}`} className="text-foreground">Home Team</Label>
         <Input
-          id={`home-team-${game.id}`}
-          value={game.homeTeam}
-          onChange={(e) => onInputChange(game.id, 'homeTeam', e.target.value)}
+          id={`home_team-${game.id}`}
+          value={game.home_team}
+          onChange={(e) => onInputChange(game.id, 'home_team', e.target.value)}
           placeholder="Enter home team"
           required
           className="bg-secondary text-foreground"
         />
       </div>
       <div>
-        <Label htmlFor={`away-team-${game.id}`} className="text-foreground">Away Team</Label>
+        <Label htmlFor={`away_team-${game.id}`} className="text-foreground">Away Team</Label>
         <Input
-          id={`away-team-${game.id}`}
-          value={game.awayTeam}
-          onChange={(e) => onInputChange(game.id, 'awayTeam', e.target.value)}
+          id={`away_team-${game.id}`}
+          value={game.away_team}
+          onChange={(e) => onInputChange(game.id, 'away_team', e.target.value)}
           placeholder="Enter away team"
           required
           className="bg-secondary text-foreground"
@@ -56,38 +56,25 @@ const GameInput = ({ game, onInputChange, onWinnerChange }) => (
 const SetupGames = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [games, setGames] = useState([
-    { id: 1, homeTeam: '', awayTeam: '', winner: null },
-    { id: 2, homeTeam: '', awayTeam: '', winner: null },
-    { id: 3, homeTeam: '', awayTeam: '', winner: null },
+    { id: 1, home_team: '', away_team: '', winner: null },
+    { id: 2, home_team: '', away_team: '', winner: null },
+    { id: 3, home_team: '', away_team: '', winner: null },
   ]);
 
+  const { data: fetchedGames, refetch } = useGames();
+  const addGame = useAddGame();
+  const updateGame = useUpdateGame();
+
   useEffect(() => {
-    loadGames();
-  }, [selectedWeek]);
-
-  const loadGames = async () => {
-    const { data, error } = await supabase
-      .from('games')
-      .select('*')
-      .eq('week', selectedWeek);
-    
-    if (error) {
-      console.error('Error loading games:', error);
-      toast.error('Failed to load games');
-    } else if (data.length > 0) {
-      setGames(data);
-    } else {
-      setGames([
-        { id: 1, homeTeam: '', awayTeam: '', winner: null },
-        { id: 2, homeTeam: '', awayTeam: '', winner: null },
-        { id: 3, homeTeam: '', awayTeam: '', winner: null },
-      ]);
+    if (fetchedGames) {
+      const weekGames = fetchedGames.filter(game => game.week === parseInt(selectedWeek));
+      setGames(weekGames.length > 0 ? weekGames : games);
     }
-  };
+  }, [fetchedGames, selectedWeek]);
 
-  const handleInputChange = (id, team, value) => {
+  const handleInputChange = (id, field, value) => {
     setGames(games.map(game => 
-      game.id === id ? { ...game, [team]: value } : game
+      game.id === id ? { ...game, [field]: value } : game
     ));
   };
 
@@ -100,67 +87,17 @@ const SetupGames = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const { data, error } = await supabase
-      .from('games')
-      .upsert(games.map(game => ({
-        ...game,
-        week: selectedWeek
-      })));
-
-    if (error) {
-      console.error('Error saving games:', error);
-      toast.error('Failed to save games');
-    } else {
-      toast.success(`Games for Week ${selectedWeek} submitted successfully!`);
-      
-      // Calculate and save scores
-      const { data: picks, error: picksError } = await supabase
-        .from('picks')
-        .select('*')
-        .eq('week', selectedWeek);
-
-      if (picksError) {
-        console.error('Error loading picks:', picksError);
+    for (const game of games) {
+      const gameData = { ...game, week: parseInt(selectedWeek) };
+      if (game.id) {
+        await updateGame.mutateAsync(gameData);
       } else {
-        const results = games.map(game => ({
-          id: game.id,
-          winner: game.winner === 'home' ? game.homeTeam : game.awayTeam
-        }));
-        const weekScores = calculateWeeklyScores(games, picks, results);
-        
-        const { error: scoresError } = await supabase
-          .from('scores')
-          .upsert(weekScores.map(score => ({
-            ...score,
-            week: selectedWeek
-          })));
-
-        if (scoresError) {
-          console.error('Error saving scores:', scoresError);
-        } else {
-          // Update cumulative scores
-          const { data: allScores, error: allScoresError } = await supabase
-            .from('scores')
-            .select('*');
-
-          if (allScoresError) {
-            console.error('Error loading all scores:', allScoresError);
-          } else {
-            const cumulativeScores = calculateCumulativeScores(allScores);
-            
-            const { error: cumulativeError } = await supabase
-              .from('cumulative_scores')
-              .upsert(cumulativeScores);
-
-            if (cumulativeError) {
-              console.error('Error saving cumulative scores:', cumulativeError);
-            } else {
-              toast.success('Scores updated successfully!');
-            }
-          }
-        }
+        await addGame.mutateAsync(gameData);
       }
     }
+
+    toast.success(`Games for Week ${selectedWeek} submitted successfully!`);
+    refetch();
   };
 
   return (
@@ -196,7 +133,7 @@ const SetupGames = () => {
                   onWinnerChange={handleWinnerChange}
                 />
               ))}
-              <Button type="submit" className="w-full bg-primary text-primary-foreground">Save Games and Calculate Scores</Button>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground">Save Games</Button>
             </form>
           </CardContent>
         </Card>
