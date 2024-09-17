@@ -7,20 +7,6 @@ const fromSupabase = async (query) => {
     return data;
 };
 
-/*
-### cumulative_scores
-
-| name       | type                     | format    | required |
-|------------|--------------------------|-----------|----------|
-| id         | integer                  | integer   | true     |
-| name       | character varying(255)   | string    | true     |
-| score      | integer                  | integer   | true     |
-| created_at | timestamp with time zone | string    | false    |
-| updated_at | timestamp with time zone | string    | false    |
-
-No foreign key relationships identified.
-*/
-
 export const useCumulativeScores = () => useQuery({
     queryKey: ['cumulative_scores'],
     queryFn: () => fromSupabase(supabase.from('cumulative_scores').select('*')),
@@ -29,6 +15,7 @@ export const useCumulativeScores = () => useQuery({
 export const useCumulativeScoreById = (id) => useQuery({
     queryKey: ['cumulative_scores', id],
     queryFn: () => fromSupabase(supabase.from('cumulative_scores').select('*').eq('id', id).single()),
+    enabled: !!id, // Only run the query if id is provided
 });
 
 export const useAddCumulativeScore = () => {
@@ -44,7 +31,32 @@ export const useAddCumulativeScore = () => {
 export const useUpdateCumulativeScore = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, ...updateData }) => fromSupabase(supabase.from('cumulative_scores').update(updateData).eq('id', id)),
+        mutationFn: async ({ name, score }) => {
+            const { data: existingScore, error: fetchError } = await supabase
+                .from('cumulative_scores')
+                .select('*')
+                .eq('name', name)
+                .single();
+
+            if (fetchError && fetchError.code !== 'PGRST116') {
+                throw fetchError;
+            }
+
+            if (existingScore) {
+                const { data, error } = await supabase
+                    .from('cumulative_scores')
+                    .update({ score: existingScore.score + score })
+                    .eq('name', name);
+                if (error) throw error;
+                return data;
+            } else {
+                const { data, error } = await supabase
+                    .from('cumulative_scores')
+                    .insert([{ name, score }]);
+                if (error) throw error;
+                return data;
+            }
+        },
         onSuccess: () => {
             queryClient.invalidateQueries('cumulative_scores');
         },
