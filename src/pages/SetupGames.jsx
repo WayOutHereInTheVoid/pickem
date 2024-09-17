@@ -6,8 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { useGames, useAddGame, useUpdateGame } from '../integrations/supabase';
-import { calculateWeeklyScores, calculateCumulativeScores } from '../utils/scoreCalculations';
+import { useGames, useAddGame, useUpdateGame, usePicks, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
 
 const GameInput = ({ game, onInputChange, onWinnerChange }) => (
   <div className="mb-4">
@@ -61,9 +60,12 @@ const SetupGames = () => {
     { id: 3, home_team: '', away_team: '', winner: null },
   ]);
 
-  const { data: fetchedGames, refetch } = useGames();
+  const { data: fetchedGames, refetch: refetchGames } = useGames();
+  const { data: picks, refetch: refetchPicks } = usePicks();
   const addGame = useAddGame();
   const updateGame = useUpdateGame();
+  const addScore = useAddScore();
+  const updateCumulativeScore = useUpdateCumulativeScore();
 
   useEffect(() => {
     if (fetchedGames) {
@@ -84,6 +86,18 @@ const SetupGames = () => {
     ));
   };
 
+  const calculateScores = (games, picks) => {
+    const weekScores = {};
+    picks.forEach(pick => {
+      const game = games.find(g => g.home_team === pick.pick || g.away_team === pick.pick);
+      if (game && game.winner) {
+        const correctPick = game.winner === 'home' ? game.home_team : game.away_team;
+        weekScores[pick.name] = (weekScores[pick.name] || 0) + (pick.pick === correctPick ? 1 : 0);
+      }
+    });
+    return weekScores;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -96,8 +110,32 @@ const SetupGames = () => {
       }
     }
 
-    toast.success(`Games for Week ${selectedWeek} submitted successfully!`);
-    refetch();
+    const weekPicks = picks.filter(pick => pick.week === parseInt(selectedWeek));
+    const weekScores = calculateScores(games, weekPicks);
+
+    for (const [name, score] of Object.entries(weekScores)) {
+      await addScore.mutateAsync({
+        week: parseInt(selectedWeek),
+        name,
+        score
+      });
+
+      const existingCumulativeScore = await updateCumulativeScore.mutateAsync({
+        name,
+        score: { increment: score }
+      });
+
+      if (!existingCumulativeScore) {
+        await updateCumulativeScore.mutateAsync({
+          name,
+          score
+        });
+      }
+    }
+
+    toast.success(`Games and scores for Week ${selectedWeek} submitted successfully!`);
+    refetchGames();
+    refetchPicks();
   };
 
   return (
@@ -133,7 +171,7 @@ const SetupGames = () => {
                   onWinnerChange={handleWinnerChange}
                 />
               ))}
-              <Button type="submit" className="w-full bg-primary text-primary-foreground">Save Games</Button>
+              <Button type="submit" className="w-full bg-primary text-primary-foreground">Save Games and Calculate Scores</Button>
             </form>
           </CardContent>
         </Card>
