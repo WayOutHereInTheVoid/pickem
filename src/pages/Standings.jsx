@@ -5,72 +5,50 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { supabase } from '../lib/supabase';
+import { useGames, usePicks, useScores, useCumulativeScores } from '../integrations/supabase';
 
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
-  const [standings, setStandings] = useState({
-    weekly: [],
-    cumulative: []
-  });
+  const [standings, setStandings] = useState({ weekly: [], cumulative: [] });
   const [weeklyData, setWeeklyData] = useState([]);
   const [seasonTrendData, setSeasonTrendData] = useState([]);
 
+  const { data: games } = useGames();
+  const { data: picks } = usePicks();
+  const { data: scores } = useScores();
+  const { data: cumulativeScores } = useCumulativeScores();
+
   useEffect(() => {
-    fetchStandings();
-  }, [selectedWeek]);
+    if (games && picks && scores && cumulativeScores) {
+      const weekGames = games.filter(game => game.week === parseInt(selectedWeek));
+      const weekPicks = picks.filter(pick => pick.week === parseInt(selectedWeek));
+      const weekScores = scores.filter(score => score.week === parseInt(selectedWeek));
 
-  const fetchStandings = async () => {
-    const { data: weeklyScores, error: weeklyError } = await supabase
-      .from('scores')
-      .select('*')
-      .eq('week', selectedWeek);
+      // Calculate weekly standings
+      const weeklyStandings = weekScores
+        .sort((a, b) => b.score - a.score)
+        .map((entry, index) => ({ ...entry, rank: index + 1 }));
 
-    const { data: cumulativeScores, error: cumulativeError } = await supabase
-      .from('cumulative_scores')
-      .select('*');
+      // Calculate cumulative standings
+      const cumulativeStandings = cumulativeScores
+        .sort((a, b) => b.score - a.score)
+        .map((entry, index) => ({ ...entry, rank: index + 1 }));
 
-    if (weeklyError) {
-      console.error('Error fetching weekly scores:', weeklyError);
-    }
-
-    if (cumulativeError) {
-      console.error('Error fetching cumulative scores:', cumulativeError);
-    }
-
-    if (weeklyScores && cumulativeScores) {
       setStandings({
-        weekly: weeklyScores
-          .sort((a, b) => b.score - a.score)
-          .map((entry, index) => ({ ...entry, rank: index + 1 })),
-        cumulative: cumulativeScores
-          .sort((a, b) => b.score - a.score)
-          .map((entry, index) => ({ ...entry, rank: index + 1 }))
+        weekly: weeklyStandings,
+        cumulative: cumulativeStandings
       });
 
-      setWeeklyData(weeklyScores);
+      setWeeklyData(weeklyStandings);
 
       // Prepare season trend data
-      const { data: allScores, error: allScoresError } = await supabase
-        .from('scores')
-        .select('*');
-
-      if (allScoresError) {
-        console.error('Error fetching all scores:', allScoresError);
-      } else {
-        const trendData = [];
-        allScores.forEach(score => {
-          const existingEntry = trendData.find(entry => entry.name === score.name);
-          if (existingEntry) {
-            existingEntry[`Week ${score.week}`] = score.score;
-          } else {
-            trendData.push({ name: score.name, [`Week ${score.week}`]: score.score });
-          }
-        });
-        setSeasonTrendData(trendData);
-      }
+      const trendData = cumulativeScores.map(score => ({
+        name: score.name,
+        score: score.score
+      }));
+      setSeasonTrendData(trendData);
     }
-  };
+  }, [selectedWeek, games, picks, scores, cumulativeScores]);
 
   const StandingsTable = ({ data }) => (
     <Table>
@@ -165,9 +143,7 @@ const Standings = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                {[...Array(16)].map((_, i) => (
-                  <Line key={i} type="monotone" dataKey={`Week ${i + 1}`} stroke={`#${Math.floor(Math.random()*16777215).toString(16)}`} />
-                ))}
+                <Line type="monotone" dataKey="score" stroke="#7ee787" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
