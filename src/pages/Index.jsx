@@ -6,15 +6,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { exportResultsToCSV } from '../utils/exportResults';
+import { useCumulativeScores } from '../integrations/supabase';
 
 const Index = () => {
-  const [cumulativeScores, setCumulativeScores] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState("1");
-
-  useEffect(() => {
-    const scores = JSON.parse(localStorage.getItem('cumulativeScores') || '[]');
-    setCumulativeScores(scores.sort((a, b) => b.score - a.score).slice(0, 5));
-  }, []);
+  const { data: cumulativeScores, isLoading, isError } = useCumulativeScores();
 
   const DashboardCard = ({ title, description, linkTo }) => {
     return (
@@ -103,7 +99,11 @@ const Index = () => {
             <CardTitle className="text-2xl font-semibold text-foreground">Leaderboard</CardTitle>
           </CardHeader>
           <CardContent>
-            {cumulativeScores.length > 0 ? (
+            {isLoading ? (
+              <p className="text-center text-muted-foreground">Loading scores...</p>
+            ) : isError ? (
+              <p className="text-center text-muted-foreground">Error loading scores. Please try again.</p>
+            ) : cumulativeScores && cumulativeScores.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -113,13 +113,16 @@ const Index = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cumulativeScores.map((score, index) => (
-                    <TableRow key={score.name}>
-                      <TableCell className="font-medium text-foreground">{index + 1}</TableCell>
-                      <TableCell className="text-foreground">{score.name}</TableCell>
-                      <TableCell className="text-right text-foreground">{score.score}</TableCell>
-                    </TableRow>
-                  ))}
+                  {cumulativeScores
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, 5)
+                    .map((score, index) => (
+                      <TableRow key={score.name}>
+                        <TableCell className="font-medium text-foreground">{index + 1}</TableCell>
+                        <TableCell className="text-foreground">{score.name}</TableCell>
+                        <TableCell className="text-right text-foreground">{score.score}</TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             ) : (
