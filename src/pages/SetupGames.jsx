@@ -101,41 +101,39 @@ const SetupGames = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    for (const game of games) {
-      const gameData = { ...game, week: parseInt(selectedWeek) };
-      if (game.id) {
-        await updateGame.mutateAsync(gameData);
-      } else {
-        await addGame.mutateAsync(gameData);
+    try {
+      for (const game of games) {
+        const gameData = { ...game, week: parseInt(selectedWeek) };
+        if (game.id) {
+          await updateGame.mutateAsync(gameData);
+        } else {
+          await addGame.mutateAsync(gameData);
+        }
       }
-    }
 
-    const weekPicks = picks.filter(pick => pick.week === parseInt(selectedWeek));
-    const weekScores = calculateScores(games, weekPicks);
+      const weekPicks = picks.filter(pick => pick.week === parseInt(selectedWeek));
+      const weekScores = calculateScores(games, weekPicks);
 
-    for (const [name, score] of Object.entries(weekScores)) {
-      await addScore.mutateAsync({
-        week: parseInt(selectedWeek),
-        name,
-        score
-      });
+      for (const [name, score] of Object.entries(weekScores)) {
+        await addScore.mutateAsync({
+          week: parseInt(selectedWeek),
+          name,
+          score
+        });
 
-      const existingCumulativeScore = await updateCumulativeScore.mutateAsync({
-        name,
-        score: { increment: score }
-      });
-
-      if (!existingCumulativeScore) {
         await updateCumulativeScore.mutateAsync({
           name,
           score
         });
       }
-    }
 
-    toast.success(`Games and scores for Week ${selectedWeek} submitted successfully!`);
-    refetchGames();
-    refetchPicks();
+      toast.success(`Games and scores for Week ${selectedWeek} submitted successfully!`);
+      refetchGames();
+      refetchPicks();
+    } catch (error) {
+      console.error('Error submitting games and scores:', error);
+      toast.error('Failed to submit games and scores. Please try again.');
+    }
   };
 
   return (
