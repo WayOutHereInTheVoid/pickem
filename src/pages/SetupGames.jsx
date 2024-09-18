@@ -70,7 +70,15 @@ const SetupGames = () => {
   useEffect(() => {
     if (fetchedGames) {
       const weekGames = fetchedGames.filter(game => game.week === parseInt(selectedWeek));
-      setGames(weekGames.length > 0 ? weekGames : games);
+      if (weekGames.length > 0) {
+        setGames(weekGames);
+      } else {
+        setGames([
+          { id: null, home_team: '', away_team: '', winner: null },
+          { id: null, home_team: '', away_team: '', winner: null },
+          { id: null, home_team: '', away_team: '', winner: null },
+        ]);
+      }
     }
   }, [fetchedGames, selectedWeek]);
 
@@ -102,17 +110,26 @@ const SetupGames = () => {
     e.preventDefault();
     
     try {
+      const updatedGames = [];
       for (const game of games) {
         const gameData = { ...game, week: parseInt(selectedWeek) };
+        let updatedGame;
         if (game.id) {
-          await updateGame.mutateAsync(gameData);
+          const { data, error } = await updateGame.mutateAsync(gameData);
+          if (error) throw error;
+          updatedGame = data[0];
         } else {
-          await addGame.mutateAsync(gameData);
+          const { data, error } = await addGame.mutateAsync(gameData);
+          if (error) throw error;
+          updatedGame = data[0];
         }
+        updatedGames.push(updatedGame);
       }
 
+      setGames(updatedGames);
+
       const weekPicks = picks.filter(pick => pick.week === parseInt(selectedWeek));
-      const weekScores = calculateScores(games, weekPicks);
+      const weekScores = calculateScores(updatedGames, weekPicks);
 
       for (const [name, score] of Object.entries(weekScores)) {
         await addScore.mutateAsync({
@@ -163,7 +180,7 @@ const SetupGames = () => {
               </div>
               {games.map((game) => (
                 <GameInput 
-                  key={game.id} 
+                  key={game.id || game.tempId} 
                   game={game} 
                   onInputChange={handleInputChange}
                   onWinnerChange={handleWinnerChange}
