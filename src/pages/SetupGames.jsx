@@ -108,13 +108,18 @@ const SetupGames = () => {
     try {
       const updatedGames = [];
       for (const game of games) {
+        if (!game.home_team || !game.away_team) {
+          throw new Error(`Please fill in both teams for Game ${game.id}`);
+        }
         const gameData = { ...game, week: parseInt(selectedWeek) };
         let updatedGame;
-        if (typeof game.id === 'number') {
+        if (game.id && typeof game.id !== 'number') {
+          // This is an existing game, update it
           const { data, error } = await updateGame.mutateAsync(gameData);
           if (error) throw error;
           updatedGame = data[0];
         } else {
+          // This is a new game, add it
           const { id, ...newGameData } = gameData;
           const { data, error } = await addGame.mutateAsync(newGameData);
           if (error) throw error;
@@ -125,7 +130,7 @@ const SetupGames = () => {
 
       setGames(updatedGames);
 
-      const weekPicks = picks.filter(pick => pick.week === parseInt(selectedWeek));
+      const weekPicks = picks?.filter(pick => pick.week === parseInt(selectedWeek)) || [];
       const weekScores = calculateScores(updatedGames, weekPicks);
 
       for (const [name, score] of Object.entries(weekScores)) {
@@ -146,7 +151,7 @@ const SetupGames = () => {
       refetchPicks();
     } catch (error) {
       console.error('Error submitting games and scores:', error);
-      toast.error('Failed to submit games and scores. Please try again.');
+      toast.error(`Failed to submit games and scores: ${error.message}`);
     }
   };
 
