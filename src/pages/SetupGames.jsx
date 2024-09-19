@@ -10,7 +10,7 @@ import { useGames, useAddGame, useUpdateGame, usePicks, useAddScore, useUpdateCu
 
 const GameInput = ({ game, onInputChange, onWinnerChange }) => (
   <div className="mb-4">
-    <h3 className="text-lg font-semibold mb-2 text-foreground">Game {game.id || 'New'}</h3>
+    <h3 className="text-lg font-semibold mb-2 text-foreground">Game {game.id}</h3>
     <div className="grid grid-cols-2 gap-4 mb-2">
       <div>
         <Label htmlFor={`home_team-${game.id}`} className="text-foreground">Home Team</Label>
@@ -54,11 +54,7 @@ const GameInput = ({ game, onInputChange, onWinnerChange }) => (
 
 const SetupGames = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
-  const [games, setGames] = useState([
-    { id: 'new1', home_team: '', away_team: '', winner: null },
-    { id: 'new2', home_team: '', away_team: '', winner: null },
-    { id: 'new3', home_team: '', away_team: '', winner: null },
-  ]);
+  const [games, setGames] = useState([]);
 
   const { data: fetchedGames, refetch: refetchGames } = useGames();
   const { data: picks, refetch: refetchPicks } = usePicks();
@@ -74,9 +70,9 @@ const SetupGames = () => {
         setGames(weekGames);
       } else {
         setGames([
-          { id: 'new1', home_team: '', away_team: '', winner: null },
-          { id: 'new2', home_team: '', away_team: '', winner: null },
-          { id: 'new3', home_team: '', away_team: '', winner: null },
+          { id: 1, home_team: '', away_team: '', winner: null },
+          { id: 2, home_team: '', away_team: '', winner: null },
+          { id: 3, home_team: '', away_team: '', winner: null },
         ]);
       }
     }
@@ -114,13 +110,13 @@ const SetupGames = () => {
       for (const game of games) {
         const gameData = { ...game, week: parseInt(selectedWeek) };
         let updatedGame;
-        if (typeof game.id === 'string' && game.id.startsWith('new')) {
-          const { id, ...newGameData } = gameData;
-          const { data, error } = await addGame.mutateAsync(newGameData);
+        if (typeof game.id === 'number') {
+          const { data, error } = await updateGame.mutateAsync(gameData);
           if (error) throw error;
           updatedGame = data[0];
         } else {
-          const { data, error } = await updateGame.mutateAsync(gameData);
+          const { id, ...newGameData } = gameData;
+          const { data, error } = await addGame.mutateAsync(newGameData);
           if (error) throw error;
           updatedGame = data[0];
         }
