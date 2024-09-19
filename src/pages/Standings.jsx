@@ -41,13 +41,13 @@ const Standings = () => {
 
   const handleExport = async () => {
     try {
-      const csvContent = await exportWeeklyData(parseInt(selectedWeek));
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const htmlContent = await exportWeeklyData(parseInt(selectedWeek));
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
       const link = document.createElement("a");
       if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
-        link.setAttribute("download", `week_${selectedWeek}_results.csv`);
+        link.setAttribute("download", `week_${selectedWeek}_results.html`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();

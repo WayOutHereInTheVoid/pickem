@@ -18,19 +18,6 @@ export const exportWeeklyData = async (week) => {
     .from('cumulative_scores')
     .select('*');
 
-  // Generate CSV content
-  let csvContent = `Week ${week} Results\n\n`;
-
-  // Add matchups with winners
-  csvContent += "Matchups:\n";
-  games.forEach(game => {
-    const winner = game.winner === 'home' ? game.home_team : game.away_team;
-    csvContent += `${game.home_team} vs ${game.away_team}: ${winner} won\n`;
-  });
-
-  csvContent += "\nParticipant Scores:\n";
-  csvContent += "Participant,Weekly Score,Cumulative Score\n";
-
   // Combine weekly and cumulative scores
   const combinedScores = weeklyScores.map(weeklyScore => {
     const cumulativeScore = cumulativeScores.find(cs => cs.name === weeklyScore.name);
@@ -44,10 +31,63 @@ export const exportWeeklyData = async (week) => {
   // Sort combined scores by cumulative score (descending)
   combinedScores.sort((a, b) => b.cumulativeScore - a.cumulativeScore);
 
-  // Add participant scores to CSV
-  combinedScores.forEach(score => {
-    csvContent += `${score.name},${score.weeklyScore},${score.cumulativeScore}\n`;
-  });
+  // Generate HTML content
+  let htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Week ${week} Results - Football Pick 'Em League</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2 { color: #2c3e50; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .matchup { margin-bottom: 10px; }
+        .winner { font-weight: bold; color: #27ae60; }
+      </style>
+    </head>
+    <body>
+      <h1>Football Pick 'Em League - Week ${week} Results</h1>
+      
+      <h2>Matchups:</h2>
+      ${games.map(game => {
+        const winner = game.winner === 'home' ? game.home_team : game.away_team;
+        return `
+          <div class="matchup">
+            ${game.home_team} vs ${game.away_team}: 
+            <span class="winner">${winner}</span> won
+          </div>
+        `;
+      }).join('')}
+      
+      <h2>Participant Scores:</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Participant</th>
+            <th>Weekly Score</th>
+            <th>Cumulative Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${combinedScores.map((score, index) => `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${score.name}</td>
+              <td>${score.weeklyScore}</td>
+              <td>${score.cumulativeScore}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </body>
+    </html>
+  `;
 
-  return csvContent;
+  return htmlContent;
 };
