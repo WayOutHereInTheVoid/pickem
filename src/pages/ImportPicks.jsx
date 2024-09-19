@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { usePicks, useAddPick, useGames, useAddGame, useUpdateGame } from '../integrations/supabase';
+import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
@@ -16,11 +16,10 @@ const ImportPicks = () => {
   const [parsedGames, setParsedGames] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState("1");
 
-  const { data: savedPicks, isLoading, isError } = usePicks();
   const addPick = useAddPick();
-  const { data: savedGames } = useGames();
   const addGame = useAddGame();
-  const updateGame = useUpdateGame();
+  const addScore = useAddScore();
+  const updateCumulativeScore = useUpdateCumulativeScore();
 
   const teamNameMapping = {
     "Thumbz": "Murder Hornets",
@@ -46,18 +45,16 @@ const ImportPicks = () => {
     const picks = [];
     const games = [];
     let currentTeam = '';
-    let gameIndex = 0;
 
     lines.forEach(line => {
       line = line.trim();
       if (line.startsWith('"') && line.endsWith('"')) {
         currentTeam = line.replace(/"/g, '');
-        if (gameIndex % 2 === 0) {
+        if (games.length % 2 === 0) {
           games.push({ home_team: currentTeam, away_team: '', winner: null });
         } else {
-          games[Math.floor(gameIndex / 2)].away_team = currentTeam;
+          games[games.length - 1].away_team = currentTeam;
         }
-        gameIndex++;
       } else if (line && currentTeam) {
         picks.push({ name: teamNameMapping[line] || line, pick: currentTeam });
       }
@@ -76,16 +73,23 @@ const ImportPicks = () => {
     ));
   };
 
+  const calculateScores = (games, picks) => {
+    const weekScores = {};
+    picks.forEach(pick => {
+      const game = games.find(g => g.home_team === pick.pick || g.away_team === pick.pick);
+      if (game && game.winner) {
+        const correctPick = game.winner === 'home' ? game.home_team : game.away_team;
+        weekScores[pick.name] = (weekScores[pick.name] || 0) + (pick.pick === correctPick ? 1 : 0);
+      }
+    });
+    return weekScores;
+  };
+
   const savePicks = async () => {
     try {
       // Save games
       for (const game of parsedGames) {
-        const gameData = { ...game, week: parseInt(selectedWeek) };
-        if (game.id) {
-          await updateGame.mutateAsync(gameData);
-        } else {
-          await addGame.mutateAsync(gameData);
-        }
+        await addGame.mutateAsync({ ...game, week: parseInt(selectedWeek) });
       }
 
       // Save picks
@@ -93,21 +97,27 @@ const ImportPicks = () => {
         await addPick.mutateAsync({ ...pick, week: parseInt(selectedWeek) });
       }
 
-      toast.success(`Picks and games saved successfully for Week ${selectedWeek}!`);
+      // Calculate and save scores
+      const weekScores = calculateScores(parsedGames, parsedPicks);
+      for (const [name, score] of Object.entries(weekScores)) {
+        await addScore.mutateAsync({
+          week: parseInt(selectedWeek),
+          name,
+          score
+        });
+
+        await updateCumulativeScore.mutateAsync({
+          name,
+          score
+        });
+      }
+
+      toast.success(`Picks, games, and scores saved successfully for Week ${selectedWeek}!`);
     } catch (error) {
-      console.error('Error saving picks and games:', error);
-      toast.error(`Failed to save picks and games: ${error.message}`);
+      console.error('Error saving data:', error);
+      toast.error(`Failed to save data: ${error.message}`);
     }
   };
-
-  const handlePickEdit = (index, newPick) => {
-    const updatedPicks = [...parsedPicks];
-    updatedPicks[index].pick = newPick;
-    setParsedPicks(updatedPicks);
-  };
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error loading picks</div>;
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -198,19 +208,13 @@ const ImportPicks = () => {
                   {parsedPicks.map((pick, index) => (
                     <TableRow key={index}>
                       <TableCell className="text-foreground">{pick.name}</TableCell>
-                      <TableCell className="text-foreground">
-                        <Input
-                          value={pick.pick}
-                          onChange={(e) => handlePickEdit(index, e.target.value)}
-                          className="bg-secondary text-foreground"
-                        />
-                      </TableCell>
+                      <TableCell className="text-foreground">{pick.pick}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
               <Button onClick={savePicks} className="w-full mt-4 bg-primary text-primary-foreground">
-                Save Picks and Games
+                Save Picks, Games, and Calculate Scores
               </Button>
             </CardContent>
           </Card>

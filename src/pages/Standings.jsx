@@ -20,8 +20,6 @@ const Standings = () => {
 
   useEffect(() => {
     if (games && picks && scores && cumulativeScores) {
-      const weekGames = games.filter(game => game.week === parseInt(selectedWeek));
-      const weekPicks = picks.filter(pick => pick.week === parseInt(selectedWeek));
       const weekScores = scores.filter(score => score.week === parseInt(selectedWeek));
 
       // Calculate weekly standings
@@ -40,13 +38,7 @@ const Standings = () => {
       });
 
       setWeeklyData(weeklyStandings);
-
-      // Prepare season trend data
-      const trendData = cumulativeScores.map(score => ({
-        name: score.name,
-        score: score.score
-      }));
-      setSeasonTrendData(trendData);
+      setSeasonTrendData(cumulativeStandings);
     }
   }, [selectedWeek, games, picks, scores, cumulativeScores]);
 
