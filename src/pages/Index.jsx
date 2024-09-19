@@ -59,7 +59,6 @@ const Index = () => {
                 <TableBody>
                   {cumulativeScores
                     .sort((a, b) => b.score - a.score)
-                    .slice(0, 5)
                     .map((score, index) => (
                       <TableRow key={score.name}>
                         <TableCell className="font-medium text-foreground">{index + 1}</TableCell>

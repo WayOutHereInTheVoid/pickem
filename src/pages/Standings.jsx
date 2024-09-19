@@ -4,14 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { useGames, usePicks, useScores, useCumulativeScores } from '../integrations/supabase';
 
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [standings, setStandings] = useState({ weekly: [], cumulative: [] });
-  const [weeklyData, setWeeklyData] = useState([]);
-  const [seasonTrendData, setSeasonTrendData] = useState([]);
 
   const { data: games } = useGames();
   const { data: picks } = usePicks();
@@ -36,9 +33,6 @@ const Standings = () => {
         weekly: weeklyStandings,
         cumulative: cumulativeStandings
       });
-
-      setWeeklyData(weeklyStandings);
-      setSeasonTrendData(cumulativeStandings);
     }
   }, [selectedWeek, games, picks, scores, cumulativeScores]);
 
@@ -104,40 +98,6 @@ const Standings = () => {
                 <StandingsTable data={standings.cumulative} />
               </TabsContent>
             </Tabs>
-          </CardContent>
-        </Card>
-        <Card className="mt-6 bg-card">
-          <CardHeader>
-            <CardTitle className="text-foreground">Weekly Scores Comparison</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={weeklyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="score" fill="#7ee787" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card className="mt-6 bg-card">
-          <CardHeader>
-            <CardTitle className="text-foreground">Season Score Trends</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={seasonTrendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="score" stroke="#7ee787" />
-              </LineChart>
-            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
