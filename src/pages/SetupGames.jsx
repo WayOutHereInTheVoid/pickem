@@ -66,15 +66,7 @@ const SetupGames = () => {
   useEffect(() => {
     if (fetchedGames) {
       const weekGames = fetchedGames.filter(game => game.week === parseInt(selectedWeek));
-      if (weekGames.length > 0) {
-        setGames(weekGames);
-      } else {
-        setGames([
-          { id: 1, home_team: '', away_team: '', winner: null },
-          { id: 2, home_team: '', away_team: '', winner: null },
-          { id: 3, home_team: '', away_team: '', winner: null },
-        ]);
-      }
+      setGames(weekGames.length > 0 ? weekGames : Array(3).fill().map((_, i) => ({ id: i + 1, home_team: '', away_team: '', winner: null })));
     }
   }, [fetchedGames, selectedWeek]);
 
@@ -113,13 +105,11 @@ const SetupGames = () => {
         }
         const gameData = { ...game, week: parseInt(selectedWeek) };
         let updatedGame;
-        if (game.id && typeof game.id !== 'number') {
-          // This is an existing game, update it
+        if (game.id && typeof game.id === 'number') {
           const { data, error } = await updateGame.mutateAsync(gameData);
           if (error) throw error;
           updatedGame = data[0];
         } else {
-          // This is a new game, add it
           const { id, ...newGameData } = gameData;
           const { data, error } = await addGame.mutateAsync(newGameData);
           if (error) throw error;
