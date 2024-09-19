@@ -4,7 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { useGames, usePicks, useScores, useCumulativeScores } from '../integrations/supabase';
+import { exportWeeklyData } from '../utils/exportWeeklyData';
+import { toast } from "sonner";
 
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
@@ -36,6 +39,27 @@ const Standings = () => {
     }
   }, [selectedWeek, games, picks, scores, cumulativeScores]);
 
+  const handleExport = async () => {
+    try {
+      const csvContent = await exportWeeklyData(parseInt(selectedWeek));
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `week_${selectedWeek}_results.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      toast.success(`Week ${selectedWeek} data exported successfully!`);
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      toast.error('Failed to export data. Please try again.');
+    }
+  };
+
   const StandingsTable = ({ data }) => (
     <Table>
       <TableHeader>
@@ -66,19 +90,26 @@ const Standings = () => {
             <CardTitle className="text-foreground">Select Week</CardTitle>
           </CardHeader>
           <CardContent>
-            <Label htmlFor="week-select" className="text-foreground">Week</Label>
-            <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-              <SelectTrigger id="week-select" className="bg-secondary text-foreground">
-                <SelectValue placeholder="Select week" />
-              </SelectTrigger>
-              <SelectContent>
-                {[...Array(16)].map((_, i) => (
-                  <SelectItem key={i + 1} value={(i + 1).toString()}>
-                    Week {i + 1}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center space-x-4">
+              <div className="flex-grow">
+                <Label htmlFor="week-select" className="text-foreground">Week</Label>
+                <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+                  <SelectTrigger id="week-select" className="bg-secondary text-foreground">
+                    <SelectValue placeholder="Select week" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[...Array(16)].map((_, i) => (
+                      <SelectItem key={i + 1} value={(i + 1).toString()}>
+                        Week {i + 1}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={handleExport} className="bg-primary text-primary-foreground">
+                Export Week {selectedWeek} Data
+              </Button>
+            </div>
           </CardContent>
         </Card>
         <Card className="bg-card">
