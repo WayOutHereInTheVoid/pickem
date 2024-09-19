@@ -10,12 +10,12 @@ import { useGames, useAddGame, useUpdateGame, usePicks, useAddScore, useUpdateCu
 
 const GameInput = ({ game, onInputChange, onWinnerChange }) => (
   <div className="mb-4">
-    <h3 className="text-lg font-semibold mb-2 text-foreground">Game {game.id}</h3>
+    <h3 className="text-lg font-semibold mb-2 text-foreground">Game {game.id || 'New'}</h3>
     <div className="grid grid-cols-2 gap-4 mb-2">
       <div>
-        <Label htmlFor={`home_team-${game.id}`} className="text-foreground">Home Team</Label>
+        <Label htmlFor={`home_team-${game.id || 'new'}`} className="text-foreground">Home Team</Label>
         <Input
-          id={`home_team-${game.id}`}
+          id={`home_team-${game.id || 'new'}`}
           value={game.home_team}
           onChange={(e) => onInputChange(game.id, 'home_team', e.target.value)}
           placeholder="Enter home team"
@@ -24,9 +24,9 @@ const GameInput = ({ game, onInputChange, onWinnerChange }) => (
         />
       </div>
       <div>
-        <Label htmlFor={`away_team-${game.id}`} className="text-foreground">Away Team</Label>
+        <Label htmlFor={`away_team-${game.id || 'new'}`} className="text-foreground">Away Team</Label>
         <Input
-          id={`away_team-${game.id}`}
+          id={`away_team-${game.id || 'new'}`}
           value={game.away_team}
           onChange={(e) => onInputChange(game.id, 'away_team', e.target.value)}
           placeholder="Enter away team"
@@ -41,12 +41,12 @@ const GameInput = ({ game, onInputChange, onWinnerChange }) => (
       className="text-foreground"
     >
       <div className="flex items-center space-x-2">
-        <RadioGroupItem value="home" id={`home-win-${game.id}`} />
-        <Label htmlFor={`home-win-${game.id}`}>Home Team Wins</Label>
+        <RadioGroupItem value="home" id={`home-win-${game.id || 'new'}`} />
+        <Label htmlFor={`home-win-${game.id || 'new'}`}>Home Team Wins</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <RadioGroupItem value="away" id={`away-win-${game.id}`} />
-        <Label htmlFor={`away-win-${game.id}`}>Away Team Wins</Label>
+        <RadioGroupItem value="away" id={`away-win-${game.id || 'new'}`} />
+        <Label htmlFor={`away-win-${game.id || 'new'}`}>Away Team Wins</Label>
       </div>
     </RadioGroup>
   </div>
@@ -55,9 +55,9 @@ const GameInput = ({ game, onInputChange, onWinnerChange }) => (
 const SetupGames = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [games, setGames] = useState([
-    { id: 1, home_team: '', away_team: '', winner: null },
-    { id: 2, home_team: '', away_team: '', winner: null },
-    { id: 3, home_team: '', away_team: '', winner: null },
+    { id: 'new1', home_team: '', away_team: '', winner: null },
+    { id: 'new2', home_team: '', away_team: '', winner: null },
+    { id: 'new3', home_team: '', away_team: '', winner: null },
   ]);
 
   const { data: fetchedGames, refetch: refetchGames } = useGames();
@@ -74,22 +74,22 @@ const SetupGames = () => {
         setGames(weekGames);
       } else {
         setGames([
-          { id: null, home_team: '', away_team: '', winner: null },
-          { id: null, home_team: '', away_team: '', winner: null },
-          { id: null, home_team: '', away_team: '', winner: null },
+          { id: 'new1', home_team: '', away_team: '', winner: null },
+          { id: 'new2', home_team: '', away_team: '', winner: null },
+          { id: 'new3', home_team: '', away_team: '', winner: null },
         ]);
       }
     }
   }, [fetchedGames, selectedWeek]);
 
   const handleInputChange = (id, field, value) => {
-    setGames(games.map(game => 
+    setGames(prevGames => prevGames.map(game => 
       game.id === id ? { ...game, [field]: value } : game
     ));
   };
 
   const handleWinnerChange = (id, winner) => {
-    setGames(games.map(game =>
+    setGames(prevGames => prevGames.map(game =>
       game.id === id ? { ...game, winner } : game
     ));
   };
@@ -114,12 +114,13 @@ const SetupGames = () => {
       for (const game of games) {
         const gameData = { ...game, week: parseInt(selectedWeek) };
         let updatedGame;
-        if (game.id) {
+        if (typeof game.id === 'number') {
           const { data, error } = await updateGame.mutateAsync(gameData);
           if (error) throw error;
           updatedGame = data[0];
         } else {
-          const { data, error } = await addGame.mutateAsync(gameData);
+          const { id, ...newGameData } = gameData;
+          const { data, error } = await addGame.mutateAsync(newGameData);
           if (error) throw error;
           updatedGame = data[0];
         }
@@ -180,7 +181,7 @@ const SetupGames = () => {
               </div>
               {games.map((game) => (
                 <GameInput 
-                  key={game.id || game.tempId} 
+                  key={game.id} 
                   game={game} 
                   onInputChange={handleInputChange}
                   onWinnerChange={handleWinnerChange}
