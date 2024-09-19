@@ -37,7 +37,7 @@ const GameInput = ({ game, onInputChange, onWinnerChange }) => (
     </div>
     <RadioGroup
       onValueChange={(value) => onWinnerChange(game.id, value)}
-      value={game.winner}
+      value={game.winner || ''}
       className="text-foreground"
     >
       <div className="flex items-center space-x-2">
@@ -108,14 +108,16 @@ const SetupGames = () => {
         if (game.id && typeof game.id === 'number') {
           const { data, error } = await updateGame.mutateAsync(gameData);
           if (error) throw error;
-          updatedGame = data[0];
+          updatedGame = data?.[0] || null;
         } else {
           const { id, ...newGameData } = gameData;
           const { data, error } = await addGame.mutateAsync(newGameData);
           if (error) throw error;
-          updatedGame = data[0];
+          updatedGame = data?.[0] || null;
         }
-        updatedGames.push(updatedGame);
+        if (updatedGame) {
+          updatedGames.push(updatedGame);
+        }
       }
 
       setGames(updatedGames);
