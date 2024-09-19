@@ -13,9 +13,9 @@ const GameInput = ({ game, onInputChange, onWinnerChange }) => (
     <h3 className="text-lg font-semibold mb-2 text-foreground">Game {game.id || 'New'}</h3>
     <div className="grid grid-cols-2 gap-4 mb-2">
       <div>
-        <Label htmlFor={`home_team-${game.id || 'new'}`} className="text-foreground">Home Team</Label>
+        <Label htmlFor={`home_team-${game.id}`} className="text-foreground">Home Team</Label>
         <Input
-          id={`home_team-${game.id || 'new'}`}
+          id={`home_team-${game.id}`}
           value={game.home_team}
           onChange={(e) => onInputChange(game.id, 'home_team', e.target.value)}
           placeholder="Enter home team"
@@ -24,9 +24,9 @@ const GameInput = ({ game, onInputChange, onWinnerChange }) => (
         />
       </div>
       <div>
-        <Label htmlFor={`away_team-${game.id || 'new'}`} className="text-foreground">Away Team</Label>
+        <Label htmlFor={`away_team-${game.id}`} className="text-foreground">Away Team</Label>
         <Input
-          id={`away_team-${game.id || 'new'}`}
+          id={`away_team-${game.id}`}
           value={game.away_team}
           onChange={(e) => onInputChange(game.id, 'away_team', e.target.value)}
           placeholder="Enter away team"
@@ -41,12 +41,12 @@ const GameInput = ({ game, onInputChange, onWinnerChange }) => (
       className="text-foreground"
     >
       <div className="flex items-center space-x-2">
-        <RadioGroupItem value="home" id={`home-win-${game.id || 'new'}`} />
-        <Label htmlFor={`home-win-${game.id || 'new'}`}>Home Team Wins</Label>
+        <RadioGroupItem value="home" id={`home-win-${game.id}`} />
+        <Label htmlFor={`home-win-${game.id}`}>Home Team Wins</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <RadioGroupItem value="away" id={`away-win-${game.id || 'new'}`} />
-        <Label htmlFor={`away-win-${game.id || 'new'}`}>Away Team Wins</Label>
+        <RadioGroupItem value="away" id={`away-win-${game.id}`} />
+        <Label htmlFor={`away-win-${game.id}`}>Away Team Wins</Label>
       </div>
     </RadioGroup>
   </div>
@@ -114,13 +114,13 @@ const SetupGames = () => {
       for (const game of games) {
         const gameData = { ...game, week: parseInt(selectedWeek) };
         let updatedGame;
-        if (typeof game.id === 'number') {
-          const { data, error } = await updateGame.mutateAsync(gameData);
+        if (typeof game.id === 'string' && game.id.startsWith('new')) {
+          const { id, ...newGameData } = gameData;
+          const { data, error } = await addGame.mutateAsync(newGameData);
           if (error) throw error;
           updatedGame = data[0];
         } else {
-          const { id, ...newGameData } = gameData;
-          const { data, error } = await addGame.mutateAsync(newGameData);
+          const { data, error } = await updateGame.mutateAsync(gameData);
           if (error) throw error;
           updatedGame = data[0];
         }
