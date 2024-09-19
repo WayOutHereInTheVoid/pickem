@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
+import ParsedGames from '../components/ParsedGames';
+import ParsedPicks from '../components/ParsedPicks';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
@@ -50,7 +51,7 @@ const ImportPicks = () => {
       line = line.trim();
       if (line.startsWith('"') && line.endsWith('"')) {
         currentTeam = line.replace(/"/g, '');
-        if (games.length % 2 === 0) {
+        if (games.length === 0 || games[games.length - 1].away_team) {
           games.push({ home_team: currentTeam, away_team: '', winner: null });
         } else {
           games[games.length - 1].away_team = currentTeam;
@@ -87,17 +88,14 @@ const ImportPicks = () => {
 
   const savePicks = async () => {
     try {
-      // Save games
       for (const game of parsedGames) {
         await addGame.mutateAsync({ ...game, week: parseInt(selectedWeek) });
       }
 
-      // Save picks
       for (const pick of parsedPicks) {
         await addPick.mutateAsync({ ...pick, week: parseInt(selectedWeek) });
       }
 
-      // Calculate and save scores
       const weekScores = calculateScores(parsedGames, parsedPicks);
       for (const [name, score] of Object.entries(weekScores)) {
         await addScore.mutateAsync({
@@ -161,63 +159,11 @@ const ImportPicks = () => {
         </Card>
         
         {parsedGames.length > 0 && (
-          <Card className="mb-6 bg-card">
-            <CardHeader>
-              <CardTitle className="text-foreground">Parsed Games</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {parsedGames.map((game, index) => (
-                <div key={index} className="mb-4">
-                  <h3 className="text-lg font-semibold mb-2 text-foreground">
-                    {game.home_team} vs {game.away_team}
-                  </h3>
-                  <RadioGroup
-                    onValueChange={(value) => handleWinnerChange(index, value)}
-                    value={game.winner || ''}
-                    className="text-foreground"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="home" id={`home-win-${index}`} />
-                      <Label htmlFor={`home-win-${index}`}>{game.home_team} Wins</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="away" id={`away-win-${index}`} />
-                      <Label htmlFor={`away-win-${index}`}>{game.away_team} Wins</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <ParsedGames games={parsedGames} onWinnerChange={handleWinnerChange} />
         )}
         
         {parsedPicks.length > 0 && (
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="text-foreground">Parsed Picks</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-foreground">Team Name</TableHead>
-                    <TableHead className="text-foreground">Pick</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {parsedPicks.map((pick, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="text-foreground">{pick.name}</TableCell>
-                      <TableCell className="text-foreground">{pick.pick}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <Button onClick={savePicks} className="w-full mt-4 bg-primary text-primary-foreground">
-                Save Picks, Games, and Calculate Scores
-              </Button>
-            </CardContent>
-          </Card>
+          <ParsedPicks picks={parsedPicks} onSave={savePicks} />
         )}
       </div>
     </div>
