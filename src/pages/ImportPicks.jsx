@@ -6,16 +6,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { usePicks, useAddPick, useUpdatePick } from '../integrations/supabase';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { usePicks, useAddPick, useGames, useAddGame, useUpdateGame } from '../integrations/supabase';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
+  const [parsedGames, setParsedGames] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState("1");
 
   const { data: savedPicks, isLoading, isError } = usePicks();
   const addPick = useAddPick();
-  const updatePick = useUpdatePick();
+  const { data: savedGames } = useGames();
+  const addGame = useAddGame();
+  const updateGame = useUpdateGame();
 
   const teamNameMapping = {
     "Thumbz": "Murder Hornets",
@@ -39,47 +44,70 @@ const ImportPicks = () => {
   const parsePollResults = () => {
     const lines = pollResults.split('\n');
     const picks = [];
+    const games = [];
     let currentTeam = '';
+    let gameIndex = 0;
 
     lines.forEach(line => {
       line = line.trim();
       if (line.startsWith('"') && line.endsWith('"')) {
         currentTeam = line.replace(/"/g, '');
-      } else if (line && currentTeam && !line.includes('vs')) {
+        if (gameIndex % 2 === 0) {
+          games.push({ home_team: currentTeam, away_team: '', winner: null });
+        } else {
+          games[Math.floor(gameIndex / 2)].away_team = currentTeam;
+        }
+        gameIndex++;
+      } else if (line && currentTeam) {
         picks.push({ name: teamNameMapping[line] || line, pick: currentTeam });
       }
     });
 
     setParsedPicks(picks);
+    setParsedGames(games);
     console.log('Parsed picks:', picks);
-    toast.success(`Successfully parsed ${picks.length} picks`);
+    console.log('Parsed games:', games);
+    toast.success(`Successfully parsed ${picks.length} picks and ${games.length} games`);
+  };
+
+  const handleWinnerChange = (index, winner) => {
+    setParsedGames(prevGames => prevGames.map((game, i) =>
+      i === index ? { ...game, winner } : game
+    ));
   };
 
   const savePicks = async () => {
-    const picksToSave = parsedPicks.length > 0 ? parsedPicks : savedPicks;
-    
-    for (const pick of picksToSave) {
-      const existingPick = savedPicks?.find(p => p.name === pick.name && p.week === parseInt(selectedWeek));
-      if (existingPick) {
-        await updatePick.mutateAsync({ id: existingPick.id, ...pick, week: parseInt(selectedWeek) });
-      } else {
+    try {
+      // Save games
+      for (const game of parsedGames) {
+        const gameData = { ...game, week: parseInt(selectedWeek) };
+        if (game.id) {
+          await updateGame.mutateAsync(gameData);
+        } else {
+          await addGame.mutateAsync(gameData);
+        }
+      }
+
+      // Save picks
+      for (const pick of parsedPicks) {
         await addPick.mutateAsync({ ...pick, week: parseInt(selectedWeek) });
       }
-    }
 
-    toast.success(`Picks saved successfully for Week ${selectedWeek}!`);
+      toast.success(`Picks and games saved successfully for Week ${selectedWeek}!`);
+    } catch (error) {
+      console.error('Error saving picks and games:', error);
+      toast.error(`Failed to save picks and games: ${error.message}`);
+    }
   };
 
   const handlePickEdit = (index, newPick) => {
-    const updatedPicks = [...(parsedPicks.length > 0 ? parsedPicks : savedPicks)];
+    const updatedPicks = [...parsedPicks];
     updatedPicks[index].pick = newPick;
     setParsedPicks(updatedPicks);
   };
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error loading picks</div>;
-
-  const displayPicks = parsedPicks.length > 0 ? parsedPicks : savedPicks?.filter(pick => pick.week === parseInt(selectedWeek)) || [];
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -117,17 +145,46 @@ const ImportPicks = () => {
               className="mb-4 bg-secondary text-foreground"
             />
             <Button onClick={parsePollResults} className="w-full bg-primary text-primary-foreground">
-              Parse Picks
+              Parse Picks and Games
             </Button>
           </CardContent>
         </Card>
         
-        {displayPicks.length > 0 && (
+        {parsedGames.length > 0 && (
+          <Card className="mb-6 bg-card">
+            <CardHeader>
+              <CardTitle className="text-foreground">Parsed Games</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {parsedGames.map((game, index) => (
+                <div key={index} className="mb-4">
+                  <h3 className="text-lg font-semibold mb-2 text-foreground">
+                    {game.home_team} vs {game.away_team}
+                  </h3>
+                  <RadioGroup
+                    onValueChange={(value) => handleWinnerChange(index, value)}
+                    value={game.winner || ''}
+                    className="text-foreground"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="home" id={`home-win-${index}`} />
+                      <Label htmlFor={`home-win-${index}`}>{game.home_team} Wins</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="away" id={`away-win-${index}`} />
+                      <Label htmlFor={`away-win-${index}`}>{game.away_team} Wins</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+        
+        {parsedPicks.length > 0 && (
           <Card className="bg-card">
             <CardHeader>
-              <CardTitle className="text-foreground">
-                {parsedPicks.length > 0 ? 'Parsed Picks' : `Saved Picks for Week ${selectedWeek}`}
-              </CardTitle>
+              <CardTitle className="text-foreground">Parsed Picks</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
@@ -138,7 +195,7 @@ const ImportPicks = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {displayPicks.map((pick, index) => (
+                  {parsedPicks.map((pick, index) => (
                     <TableRow key={index}>
                       <TableCell className="text-foreground">{pick.name}</TableCell>
                       <TableCell className="text-foreground">
@@ -153,7 +210,7 @@ const ImportPicks = () => {
                 </TableBody>
               </Table>
               <Button onClick={savePicks} className="w-full mt-4 bg-primary text-primary-foreground">
-                Save Picks
+                Save Picks and Games
               </Button>
             </CardContent>
           </Card>
