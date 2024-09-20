@@ -13,20 +13,24 @@ export const exportWeeklyData = async (week) => {
     .select('*')
     .eq('week', week);
 
-  // Fetch cumulative scores
+  // Fetch cumulative scores up to and including the selected week
   const { data: cumulativeScores } = await supabase
-    .from('cumulative_scores')
-    .select('*');
+    .from('scores')
+    .select('name, score')
+    .lte('week', week);
+
+  // Calculate cumulative scores
+  const cumulativeScoresMap = cumulativeScores.reduce((acc, score) => {
+    acc[score.name] = (acc[score.name] || 0) + score.score;
+    return acc;
+  }, {});
 
   // Combine weekly and cumulative scores
-  const combinedScores = weeklyScores.map(weeklyScore => {
-    const cumulativeScore = cumulativeScores.find(cs => cs.name === weeklyScore.name);
-    return {
-      name: weeklyScore.name,
-      weeklyScore: weeklyScore.score,
-      cumulativeScore: cumulativeScore ? cumulativeScore.score : 0
-    };
-  });
+  const combinedScores = weeklyScores.map(weeklyScore => ({
+    name: weeklyScore.name,
+    weeklyScore: weeklyScore.score,
+    cumulativeScore: cumulativeScoresMap[weeklyScore.name] || 0
+  }));
 
   // Sort combined scores by cumulative score (descending)
   combinedScores.sort((a, b) => b.cumulativeScore - a.cumulativeScore);
@@ -59,7 +63,7 @@ export const exportWeeklyData = async (week) => {
         return `
           <div class="matchup">
             ${game.home_team} vs ${game.away_team}: 
-            <span class="winner">${winner}</span> won
+            <span class="winner">${winner}</span>
           </div>
         `;
       }).join('')}
@@ -71,7 +75,7 @@ export const exportWeeklyData = async (week) => {
             <th>Rank</th>
             <th>Participant</th>
             <th>Weekly Score</th>
-            <th>Cumulative Score</th>
+            <th>Cumulative Score (Through Week ${week})</th>
           </tr>
         </thead>
         <tbody>

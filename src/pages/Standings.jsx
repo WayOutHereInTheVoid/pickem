@@ -27,8 +27,14 @@ const Standings = () => {
         .sort((a, b) => b.score - a.score)
         .map((entry, index) => ({ ...entry, rank: index + 1 }));
 
-      // Calculate cumulative standings
+      // Calculate cumulative standings up to the selected week
       const cumulativeStandings = cumulativeScores
+        .map(entry => ({
+          ...entry,
+          score: scores
+            .filter(score => score.name === entry.name && score.week <= parseInt(selectedWeek))
+            .reduce((sum, score) => sum + score.score, 0)
+        }))
         .sort((a, b) => b.score - a.score)
         .map((entry, index) => ({ ...entry, rank: index + 1 }));
 
