@@ -28,14 +28,14 @@ const Index = () => {
         <h1 className="text-4xl font-bold mb-8 text-foreground">Football Pick 'Em League Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <DashboardCard
-            title="Import Picks"
-            description="Import picks from poll results"
-            linkTo="/import-picks"
-          />
-          <DashboardCard
             title="View Standings"
             description="See weekly and cumulative standings"
             linkTo="/standings"
+          />
+          <DashboardCard
+            title="Manager Page"
+            description="Access management features (login required)"
+            linkTo="/manager"
           />
         </div>
         <Card className="bg-card">
