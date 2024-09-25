@@ -26,16 +26,11 @@ const Index = () => {
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-8 text-foreground">Football Pick 'Em League Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
           <DashboardCard
             title="View Standings"
             description="See weekly and cumulative standings"
             linkTo="/standings"
-          />
-          <DashboardCard
-            title="Manager Page"
-            description="Access management features (login required)"
-            linkTo="/manager"
           />
         </div>
         <Card className="bg-card">
