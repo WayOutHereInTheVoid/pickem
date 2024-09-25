@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useSupabaseAuth } from '../integrations/supabase';
 import ImportPicks from './ImportPicks';
+import { toast } from "sonner";
 
 const ManagerPage = () => {
   const [email, setEmail] = useState('');
@@ -16,14 +17,17 @@ const ManagerPage = () => {
     e.preventDefault();
     try {
       await login(email, password);
+      toast.success("Logged in successfully");
     } catch (error) {
       console.error('Error logging in:', error.message);
+      toast.error(`Login failed: ${error.message}`);
     }
   };
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
+    toast.success("Logged out successfully");
   };
 
   if (!session) {
@@ -69,7 +73,6 @@ const ManagerPage = () => {
           Logout
         </Button>
         <ImportPicks />
-        {/* Add more management features here in the future */}
       </div>
     </div>
   );

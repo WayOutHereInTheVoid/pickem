@@ -45,13 +45,20 @@ export const SupabaseAuthProviderInner = ({ children }) => {
       email,
       password,
     });
-    if (error) throw error;
+    if (error) {
+      console.error('Login error:', error);
+      throw new Error(error.message);
+    }
     setSession(data.session);
     return data;
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Logout error:', error);
+      throw new Error(error.message);
+    }
     setSession(null);
     queryClient.invalidateQueries('user');
     setLoading(false);
