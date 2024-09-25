@@ -1,8 +1,17 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { navItems } from '../nav-items';
+import { useSupabaseAuth } from '../integrations/supabase/auth';
+import { Button } from "@/components/ui/button";
+import { LogOutIcon } from 'lucide-react';
 
 const Sidebar = () => {
+  const { session, logout } = useSupabaseAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <div className="w-16 bg-secondary flex flex-col items-center py-4 space-y-4">
       {navItems.map((item) => (
@@ -18,6 +27,16 @@ const Sidebar = () => {
           {item.icon}
         </NavLink>
       ))}
+      {session && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleLogout}
+          className="mt-auto text-muted-foreground hover:text-primary transition-colors duration-200"
+        >
+          <LogOutIcon className="h-4 w-4" />
+        </Button>
+      )}
     </div>
   );
 };
