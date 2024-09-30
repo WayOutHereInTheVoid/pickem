@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useGames, usePicks, useScores, useCumulativeScores } from '../integrations/supabase';
 import { exportWeeklyData } from '../utils/exportWeeklyData';
 import { toast } from "sonner";
+import NFLMatchups from '../components/NFLMatchups';
 
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
@@ -118,7 +119,10 @@ const Standings = () => {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-card">
+        
+        <NFLMatchups week={parseInt(selectedWeek)} />
+        
+        <Card className="bg-card mt-6">
           <CardHeader>
             <CardTitle className="text-foreground">League Standings - Week {selectedWeek}</CardTitle>
           </CardHeader>

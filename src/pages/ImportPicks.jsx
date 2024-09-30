@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
 import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
+import NFLMatchups from '../components/NFLMatchups';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
@@ -117,6 +115,7 @@ const ImportPicks = () => {
     }
   };
 
+
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
@@ -140,6 +139,9 @@ const ImportPicks = () => {
             </Select>
           </CardContent>
         </Card>
+        
+        <NFLMatchups week={parseInt(selectedWeek)} />
+        
         <Card className="mb-6 bg-card">
           <CardHeader>
             <CardTitle className="text-foreground">Paste Poll Results</CardTitle>
