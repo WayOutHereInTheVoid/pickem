@@ -11,10 +11,10 @@ const Index = () => {
   const DashboardCard = ({ title, description, linkTo }) => (
     <Card className="bg-card hover:bg-secondary transition-colors duration-200">
       <CardHeader>
-        <CardTitle className="text-2xl font-semibold text-foreground">{title}</CardTitle>
+        <CardTitle className="text-xl md:text-2xl font-semibold text-foreground">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground mb-4">{description}</p>
+        <p className="text-sm md:text-base text-muted-foreground mb-4">{description}</p>
         <Link to={linkTo}>
           <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Go to {title}</Button>
         </Link>
@@ -23,26 +23,26 @@ const Index = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-foreground">Football Pick 'Em League Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
-          <DashboardCard
-            title="View Standings"
-            description="See weekly and cumulative standings"
-            linkTo="/standings"
-          />
-        </div>
-        <Card className="bg-card">
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold text-foreground">Leaderboard</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <p className="text-center text-muted-foreground">Loading scores...</p>
-            ) : isError ? (
-              <p className="text-center text-muted-foreground">Error loading scores. Please try again.</p>
-            ) : cumulativeScores && cumulativeScores.length > 0 ? (
+    <div className="space-y-6">
+      <h1 className="text-2xl md:text-4xl font-bold text-foreground">Football Pick 'Em League Dashboard</h1>
+      <div className="grid grid-cols-1 gap-4">
+        <DashboardCard
+          title="View Standings"
+          description="See weekly and cumulative standings"
+          linkTo="/standings"
+        />
+      </div>
+      <Card className="bg-card">
+        <CardHeader>
+          <CardTitle className="text-xl md:text-2xl font-semibold text-foreground">Leaderboard</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-center text-muted-foreground">Loading scores...</p>
+          ) : isError ? (
+            <p className="text-center text-muted-foreground">Error loading scores. Please try again.</p>
+          ) : cumulativeScores && cumulativeScores.length > 0 ? (
+            <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -63,12 +63,12 @@ const Index = () => {
                     ))}
                 </TableBody>
               </Table>
-            ) : (
-              <p className="text-center text-muted-foreground">No scores available. Import picks to see the leaderboard.</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground">No scores available. Import picks to see the leaderboard.</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

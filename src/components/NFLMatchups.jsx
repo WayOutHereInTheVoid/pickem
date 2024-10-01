@@ -9,41 +9,43 @@ const NFLMatchups = ({ matches }) => {
         <CardTitle className="text-foreground">NFL Matchups</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-foreground">Away Team</TableHead>
-              <TableHead className="text-foreground">Home Team</TableHead>
-              <TableHead className="text-foreground">Score</TableHead>
-              <TableHead className="text-foreground">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {matches.map((match, index) => {
-              const homeTeam = match.homeTeam.displayName;
-              const awayTeam = match.awayTeam.displayName;
-              const score = match.state.score.current;
-              const status = match.state.description;
-              
-              let displayScore;
-              if (score) {
-                const [awayScore, homeScore] = score.split('-');
-                displayScore = `${homeScore} - ${awayScore}`;
-              } else {
-                displayScore = 'Not started';
-              }
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-foreground">Away</TableHead>
+                <TableHead className="text-foreground">Home</TableHead>
+                <TableHead className="text-foreground">Score</TableHead>
+                <TableHead className="text-foreground">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {matches.map((match, index) => {
+                const homeTeam = match.homeTeam.displayName;
+                const awayTeam = match.awayTeam.displayName;
+                const score = match.state.score.current;
+                const status = match.state.description;
+                
+                let displayScore;
+                if (score) {
+                  const [awayScore, homeScore] = score.split('-');
+                  displayScore = `${homeScore} - ${awayScore}`;
+                } else {
+                  displayScore = 'Not started';
+                }
 
-              return (
-                <TableRow key={index}>
-                  <TableCell className="text-foreground">{awayTeam}</TableCell>
-                  <TableCell className="text-foreground">{homeTeam}</TableCell>
-                  <TableCell className="text-foreground">{displayScore}</TableCell>
-                  <TableCell className="text-foreground">{status}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                return (
+                  <TableRow key={index}>
+                    <TableCell className="text-foreground text-sm">{awayTeam}</TableCell>
+                    <TableCell className="text-foreground text-sm">{homeTeam}</TableCell>
+                    <TableCell className="text-foreground text-sm">{displayScore}</TableCell>
+                    <TableCell className="text-foreground text-sm">{status}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
