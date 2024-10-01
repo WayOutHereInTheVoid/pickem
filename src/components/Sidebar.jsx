@@ -23,12 +23,12 @@ const Sidebar = () => {
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden fixed top-4 left-4 z-50"
+        className="md:hidden fixed top-4 right-4 z-50"
         onClick={toggleSidebar}
       >
         {isOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
       </Button>
-      <div className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out fixed md:static top-0 left-0 h-full w-64 md:w-16 bg-secondary flex flex-col items-center py-4 space-y-4 z-40`}>
+      <div className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out fixed md:static top-0 left-0 h-full w-48 md:w-16 bg-secondary flex flex-col items-center py-4 space-y-4 z-40`}>
         {navItems.map((item) => (
           <NavLink
             key={item.to}
