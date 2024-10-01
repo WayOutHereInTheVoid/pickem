@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { supabase } from '../integrations/supabase/supabase';
 
 const nflWeeks2024 = {
   1: { start: '2024-09-05', end: '2024-09-10' },
@@ -54,4 +55,33 @@ export async function fetchWeekMatches(week) {
   }
 
   return allMatches;
+}
+
+export async function getCachedOrFetchWeekMatches(week) {
+  // Check if we have cached data
+  const { data: cachedData, error } = await supabase
+    .from('nfl_matches_cache')
+    .select('*')
+    .eq('week', week)
+    .single();
+
+  if (cachedData && !error) {
+    const cacheAge = new Date() - new Date(cachedData.updated_at);
+    const cacheAgeHours = cacheAge / (1000 * 60 * 60);
+
+    // If cache is less than 6 hours old, return cached data
+    if (cacheAgeHours < 6) {
+      return JSON.parse(cachedData.matches);
+    }
+  }
+
+  // If no cache or cache is old, fetch new data
+  const matches = await fetchWeekMatches(week);
+
+  // Update cache
+  await supabase
+    .from('nfl_matches_cache')
+    .upsert({ week, matches: JSON.stringify(matches) }, { onConflict: 'week' });
+
+  return matches;
 }

@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
 import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
+import NFLMatchups from '../components/NFLMatchups';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
@@ -140,6 +141,9 @@ const ImportPicks = () => {
             </Select>
           </CardContent>
         </Card>
+        
+        <NFLMatchups week={parseInt(selectedWeek)} />
+
         <Card className="mb-6 bg-card">
           <CardHeader>
             <CardTitle className="text-foreground">Paste Poll Results</CardTitle>
