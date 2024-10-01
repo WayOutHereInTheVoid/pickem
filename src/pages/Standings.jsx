@@ -68,9 +68,16 @@ const Standings = () => {
   };
 
   const getRankChangeIcon = (change) => {
-    if (change > 0) return <ArrowUpIcon className="h-4 w-4 text-accent" />;
+    if (change > 0) return <ArrowUpIcon className="h-4 w-4 text-[#00B8D4]" />;
     if (change < 0) return <ArrowDownIcon className="h-4 w-4 text-primary" />;
-    return <MinusIcon className="h-4 w-4 text-muted-foreground" />;
+    return <MinusIcon className="h-4 w-4 text-secondary" />;
+  };
+
+  const getRowStyle = (index) => {
+    if (index === 0) return "bg-gradient-to-r from-primary via-accent to-[#00B8D4] text-background font-bold";
+    if (index === 1) return "bg-gradient-to-r from-primary/80 via-accent/80 to-[#00B8D4]/80 text-background font-semibold";
+    if (index === 2) return "bg-gradient-to-r from-primary/60 via-accent/60 to-[#00B8D4]/60 text-background";
+    return index % 2 === 0 ? 'bg-background/50' : 'bg-background';
   };
 
   const StandingsTable = ({ data }) => (
@@ -85,8 +92,8 @@ const Standings = () => {
       </TableHeader>
       <TableBody>
         {data.map((entry, index) => (
-          <TableRow key={entry.name} className={index % 2 === 0 ? 'bg-secondary/50' : 'bg-secondary'}>
-            <TableCell className="font-medium text-foreground">{entry.rank}</TableCell>
+          <TableRow key={entry.name} className={getRowStyle(index)}>
+            <TableCell className="font-medium text-[#00B8D4]">{entry.rank}</TableCell>
             <TableCell className="text-foreground font-semibold">{entry.name}</TableCell>
             <TableCell className="text-right text-foreground">{entry.score}</TableCell>
             <TableCell className="text-right">
@@ -102,7 +109,7 @@ const Standings = () => {
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-foreground">2024 TRL Pick'em Standings</h1>
-        <Card className="mb-6 bg-secondary">
+        <Card className="mb-6 bg-background border border-primary/20">
           <CardHeader>
             <CardTitle className="text-foreground">Select Week</CardTitle>
           </CardHeader>
@@ -111,7 +118,7 @@ const Standings = () => {
               <div className="flex-grow">
                 <Label htmlFor="week-select" className="text-foreground">Week</Label>
                 <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-                  <SelectTrigger id="week-select" className="bg-secondary text-foreground">
+                  <SelectTrigger id="week-select" className="bg-background text-foreground border-primary/20">
                     <SelectValue placeholder="Select week" />
                   </SelectTrigger>
                   <SelectContent>
@@ -123,22 +130,22 @@ const Standings = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleExport} className="bg-primary text-primary-foreground">
+              <Button onClick={handleExport} className="bg-primary text-primary-foreground hover:bg-accent transition-colors duration-300">
                 Export Week {selectedWeek} Data
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-secondary mt-6">
+        <Card className="bg-background mt-6 border border-primary/20">
           <CardHeader>
             <CardTitle className="text-foreground bg-primary/10 p-4 rounded-t-lg">League Standings - Week {selectedWeek}</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="weekly" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="weekly">Weekly</TabsTrigger>
-                <TabsTrigger value="cumulative">Cumulative</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 bg-background">
+                <TabsTrigger value="weekly" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Weekly</TabsTrigger>
+                <TabsTrigger value="cumulative" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Cumulative</TabsTrigger>
               </TabsList>
               <TabsContent value="weekly">
                 <StandingsTable data={standings.weekly} />
