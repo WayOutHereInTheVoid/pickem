@@ -62,16 +62,15 @@ export async function getCachedOrFetchWeekMatches(week) {
   const { data: cachedData, error } = await supabase
     .from('nfl_matches_cache')
     .select('*')
-    .eq('week', week)
-    .single();
+    .eq('week', week);
 
-  if (cachedData && !error) {
-    const cacheAge = new Date() - new Date(cachedData.updated_at);
+  if (cachedData && cachedData.length > 0 && !error) {
+    const cacheAge = new Date() - new Date(cachedData[0].updated_at);
     const cacheAgeHours = cacheAge / (1000 * 60 * 60);
 
     // If cache is less than 6 hours old, return cached data
     if (cacheAgeHours < 6) {
-      return JSON.parse(cachedData.matches);
+      return JSON.parse(cachedData[0].matches);
     }
   }
 
