@@ -80,7 +80,7 @@ const Standings = () => {
           <TableRow key={entry.name} className={index < 3 ? 'gradient-text font-bold' : ''}>
             <TableCell className="font-medium text-accent">{entry.rank}</TableCell>
             <TableCell className="text-foreground">{entry.name}</TableCell>
-            <TableCell className="text-right text-foreground">{entry.score}</TableCell>
+            <TableCell className="text-right text-foreground text-2xl font-bold">{entry.score}</TableCell>
           </TableRow>
         ))}
       </TableBody>

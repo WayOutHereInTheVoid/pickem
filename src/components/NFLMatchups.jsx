@@ -37,12 +37,12 @@ const NFLMatchups = ({ matches }) => {
                 <div className="grid grid-cols-3 items-center mb-2">
                   <div className="text-center">
                     <span className="font-semibold text-black">{awayTeam}</span>
-                    <div className={`mt-1 ${scoreColors.away}`}>{awayScore}</div>
+                    <div className={`mt-1 ${scoreColors.away} text-2xl font-bold`}>{awayScore}</div>
                   </div>
                   <span className="text-xs text-muted-foreground text-center">@</span>
                   <div className="text-center">
                     <span className="font-semibold text-black">{homeTeam}</span>
-                    <div className={`mt-1 ${scoreColors.home}`}>{homeScore}</div>
+                    <div className={`mt-1 ${scoreColors.home} text-2xl font-bold`}>{homeScore}</div>
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground text-center mt-2">{status}</div>
