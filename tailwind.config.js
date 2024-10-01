@@ -21,44 +21,41 @@ module.exports = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#0C1445",
-        foreground: "#E8E9F3",
+        background: "#1E1E1E",
+        foreground: "#FFFFFF",
         primary: {
-          DEFAULT: "#FFD700",
-          foreground: "#0C1445",
+          DEFAULT: "#FF5722",
+          foreground: "#1E1E1E",
         },
         secondary: {
-          DEFAULT: "#1C2754",
-          foreground: "#E8E9F3",
+          DEFAULT: "#2D2D2D",
+          foreground: "#FFFFFF",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#1C2754",
-          foreground: "#E8E9F3",
+          DEFAULT: "#2D2D2D",
+          foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#4CAF50",
-          foreground: "#E8E9F3",
+          DEFAULT: "#00BCD4",
+          foreground: "#1E1E1E",
         },
         popover: {
-          DEFAULT: "#0C1445",
-          foreground: "#E8E9F3",
+          DEFAULT: "#1E1E1E",
+          foreground: "#FFFFFF",
         },
         card: {
-          DEFAULT: "#1C2754",
-          foreground: "#E8E9F3",
+          DEFAULT: "#2D2D2D",
+          foreground: "#FFFFFF",
         },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-      },
-      fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Noto Sans', 'Helvetica', 'Arial', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji'],
       },
       keyframes: {
         "accordion-down": {
