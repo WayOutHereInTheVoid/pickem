@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCumulativeScores } from '../integrations/supabase';
+import { ArrowUpIcon, ArrowDownIcon, MinusIcon } from 'lucide-react';
 
 const Index = () => {
   const { data: cumulativeScores, isLoading, isError } = useCumulativeScores();
 
   const DashboardCard = ({ title, description, linkTo }) => (
-    <Card className="bg-card hover:bg-secondary transition-colors duration-200">
+    <Card className="bg-secondary hover:bg-secondary/90 transition-colors duration-200">
       <CardHeader>
         <CardTitle className="text-xl md:text-2xl font-semibold text-foreground">{title}</CardTitle>
       </CardHeader>
@@ -22,6 +23,12 @@ const Index = () => {
     </Card>
   );
 
+  const getRankChangeIcon = (change) => {
+    if (change > 0) return <ArrowUpIcon className="h-4 w-4 text-teal-500" />;
+    if (change < 0) return <ArrowDownIcon className="h-4 w-4 text-primary" />;
+    return <MinusIcon className="h-4 w-4 text-muted-foreground" />;
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl md:text-4xl font-bold text-foreground">2024 TRL Pick'em Dashboard</h1>
@@ -32,9 +39,9 @@ const Index = () => {
           linkTo="/standings"
         />
       </div>
-      <Card className="bg-card">
+      <Card className="bg-secondary">
         <CardHeader>
-          <CardTitle className="text-xl md:text-2xl font-semibold text-foreground">Leaderboard</CardTitle>
+          <CardTitle className="text-xl md:text-2xl font-semibold text-foreground bg-primary/10 p-4 rounded-t-lg">Leaderboard</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -45,20 +52,24 @@ const Index = () => {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-foreground">Rank</TableHead>
-                    <TableHead className="text-foreground">Team Name</TableHead>
-                    <TableHead className="text-right text-foreground">Score</TableHead>
+                  <TableRow className="bg-primary/20">
+                    <TableHead className="text-foreground font-bold">Rank</TableHead>
+                    <TableHead className="text-foreground font-bold">Team Name</TableHead>
+                    <TableHead className="text-right text-foreground font-bold">Score</TableHead>
+                    <TableHead className="text-right text-foreground font-bold">Change</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {cumulativeScores
                     .sort((a, b) => b.score - a.score)
                     .map((score, index) => (
-                      <TableRow key={score.name}>
+                      <TableRow key={score.name} className={index % 2 === 0 ? 'bg-secondary/50' : 'bg-secondary'}>
                         <TableCell className="font-medium text-foreground">{index + 1}</TableCell>
-                        <TableCell className="text-foreground">{score.name}</TableCell>
+                        <TableCell className="text-foreground font-semibold">{score.name}</TableCell>
                         <TableCell className="text-right text-foreground">{score.score}</TableCell>
+                        <TableCell className="text-right">
+                          {getRankChangeIcon(score.rankChange)}
+                        </TableCell>
                       </TableRow>
                     ))}
                 </TableBody>
