@@ -24,7 +24,7 @@ const Index = () => {
   );
 
   const getRankChangeIcon = (change) => {
-    if (change > 0) return <ArrowUpIcon className="h-4 w-4 text-teal-500" />;
+    if (change > 0) return <ArrowUpIcon className="h-4 w-4 text-accent" />;
     if (change < 0) return <ArrowDownIcon className="h-4 w-4 text-primary" />;
     return <MinusIcon className="h-4 w-4 text-muted-foreground" />;
   };
