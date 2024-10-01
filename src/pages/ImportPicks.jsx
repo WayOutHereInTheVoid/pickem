@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
+import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useCumulativeScores, useUpdateCumulativeScore } from '../integrations/supabase';
 import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
 import NFLMatchups from '../components/NFLMatchups';
@@ -21,6 +21,7 @@ const ImportPicks = () => {
   const addGame = useAddGame();
   const addScore = useAddScore();
   const updateCumulativeScore = useUpdateCumulativeScore();
+  const { data: cumulativeScores } = useCumulativeScores();
 
   useEffect(() => {
     const fetchNFLMatches = async () => {
@@ -118,17 +119,23 @@ const ImportPicks = () => {
           score
         });
 
-        // Fetch current cumulative score
-        const { data: currentScore } = await updateCumulativeScore.mutateAsync({
-          name,
-          score: 0 // This will be added to the current score
-        });
+        // Find the existing cumulative score for the player
+        const existingScore = cumulativeScores?.find(cs => cs.name === name);
 
-        // Update cumulative score
-        await updateCumulativeScore.mutateAsync({
-          name,
-          score: (currentScore?.score || 0) + score
-        });
+        if (existingScore) {
+          // Update existing cumulative score
+          await updateCumulativeScore.mutateAsync({
+            id: existingScore.id,
+            name,
+            score: existingScore.score + score
+          });
+        } else {
+          // Create new cumulative score entry
+          await updateCumulativeScore.mutateAsync({
+            name,
+            score
+          });
+        }
       }
 
       toast.success(`Picks, games, and scores saved successfully for Week ${selectedWeek}!`);
