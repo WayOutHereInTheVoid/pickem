@@ -23,7 +23,7 @@ const Sidebar = () => {
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden fixed top-4 left-4 z-50"
+        className="md:hidden fixed top-4 left-4 z-50 text-foreground hover:text-primary"
         onClick={toggleSidebar}
       >
         {isOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
@@ -34,7 +34,7 @@ const Sidebar = () => {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `text-muted-foreground hover:text-primary transition-colors duration-200 ${
+              `text-foreground hover:text-primary transition-colors duration-200 ${
                 isActive ? 'text-primary' : ''
               }`
             }
@@ -48,7 +48,7 @@ const Sidebar = () => {
             variant="ghost"
             size="icon"
             onClick={handleLogout}
-            className="mt-auto text-muted-foreground hover:text-primary transition-colors duration-200"
+            className="mt-auto text-foreground hover:text-primary transition-colors duration-200"
           >
             <LogOutIcon className="h-4 w-4" />
           </Button>
