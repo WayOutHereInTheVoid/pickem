@@ -4,14 +4,6 @@ import { SupabaseAuthProvider, useSupabaseAuth, SupabaseAuthUI } from './auth.js
 
 // Import hooks
 import {
-  useNFLMatchesCache,
-  useNFLMatchesCaches,
-  useAddNFLMatchesCache,
-  useUpdateNFLMatchesCache,
-  useDeleteNFLMatchesCache
-} from './hooks/nfl_matches_cache.js';
-
-import {
   usePick,
   usePicks,
   useAddPick,
@@ -49,11 +41,6 @@ export {
   SupabaseAuthProvider,
   useSupabaseAuth,
   SupabaseAuthUI,
-  useNFLMatchesCache,
-  useNFLMatchesCaches,
-  useAddNFLMatchesCache,
-  useUpdateNFLMatchesCache,
-  useDeleteNFLMatchesCache,
   usePick,
   usePicks,
   useAddPick,
