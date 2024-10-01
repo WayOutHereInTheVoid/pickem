@@ -2,6 +2,15 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const NFLMatchups = ({ matches }) => {
+  const getScoreColor = (homeScore, awayScore) => {
+    if (homeScore > awayScore) {
+      return { home: 'text-green-500', away: 'text-red-500' };
+    } else if (awayScore > homeScore) {
+      return { home: 'text-red-500', away: 'text-green-500' };
+    }
+    return { home: 'text-primary', away: 'text-primary' }; // Tie or no score
+  };
+
   return (
     <Card className="bg-card">
       <CardHeader>
@@ -21,17 +30,19 @@ const NFLMatchups = ({ matches }) => {
               [homeScore, awayScore] = score.split('-');
             }
 
+            const scoreColors = getScoreColor(parseInt(homeScore), parseInt(awayScore));
+
             return (
               <div key={index} className="bg-secondary p-3 rounded-lg text-sm">
                 <div className="grid grid-cols-3 items-center mb-2">
                   <div className="text-center">
                     <span className="font-semibold">{awayTeam}</span>
-                    <div className="text-primary mt-1">{awayScore}</div>
+                    <div className={`mt-1 ${scoreColors.away}`}>{awayScore}</div>
                   </div>
                   <span className="text-xs text-muted-foreground text-center">@</span>
                   <div className="text-center">
                     <span className="font-semibold">{homeTeam}</span>
-                    <div className="text-primary mt-1">{homeScore}</div>
+                    <div className={`mt-1 ${scoreColors.home}`}>{homeScore}</div>
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground text-center mt-2">{status}</div>
