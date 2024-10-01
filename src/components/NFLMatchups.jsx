@@ -4,11 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const NFLMatchups = ({ matches }) => {
   const getScoreColor = (homeScore, awayScore) => {
     if (homeScore > awayScore) {
-      return { home: 'text-green-500', away: 'text-red-500' };
+      return { home: 'text-accent', away: 'text-primary' };
     } else if (awayScore > homeScore) {
-      return { home: 'text-red-500', away: 'text-green-500' };
+      return { home: 'text-primary', away: 'text-accent' };
     }
-    return { home: 'text-primary', away: 'text-primary' }; // Tie or no score
+    return { home: 'text-foreground', away: 'text-foreground' }; // Tie or no score
   };
 
   return (
