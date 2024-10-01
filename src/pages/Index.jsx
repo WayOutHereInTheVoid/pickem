@@ -24,7 +24,7 @@ const Index = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl md:text-4xl font-bold text-foreground">Football Pick 'Em League Dashboard</h1>
+      <h1 className="text-2xl md:text-4xl font-bold text-foreground">2024 TRL Pick'em Dashboard</h1>
       <div className="grid grid-cols-1 gap-4">
         <DashboardCard
           title="View Standings"

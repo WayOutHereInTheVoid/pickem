@@ -90,7 +90,7 @@ const Standings = () => {
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-foreground">Standings</h1>
+        <h1 className="text-3xl font-bold mb-6 text-foreground">2024 TRL Pick'em Standings</h1>
         <Card className="mb-6 bg-card">
           <CardHeader>
             <CardTitle className="text-foreground">Select Week</CardTitle>
