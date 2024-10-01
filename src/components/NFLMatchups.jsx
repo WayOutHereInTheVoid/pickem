@@ -18,7 +18,7 @@ const NFLMatchups = ({ matches }) => {
             let homeScore = 'N/A';
             let awayScore = 'N/A';
             if (score) {
-              [awayScore, homeScore] = score.split('-');
+              [homeScore, awayScore] = score.split('-');
             }
 
             return (
