@@ -15,25 +15,26 @@ const NFLMatchups = ({ matches }) => {
             const score = match.state.score.current;
             const status = match.state.description;
             
-            let displayScore;
+            let homeScore = 'N/A';
+            let awayScore = 'N/A';
             if (score) {
-              const [awayScore, homeScore] = score.split('-');
-              displayScore = `${homeScore} - ${awayScore}`;
-            } else {
-              displayScore = 'Not started';
+              [awayScore, homeScore] = score.split('-');
             }
 
             return (
               <div key={index} className="bg-secondary p-3 rounded-lg text-sm">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-semibold">{awayTeam}</span>
-                  <span className="text-xs text-muted-foreground">@</span>
-                  <span className="font-semibold">{homeTeam}</span>
+                <div className="grid grid-cols-3 items-center mb-2">
+                  <div className="text-center">
+                    <span className="font-semibold">{awayTeam}</span>
+                    <div className="text-primary mt-1">{awayScore}</div>
+                  </div>
+                  <span className="text-xs text-muted-foreground text-center">@</span>
+                  <div className="text-center">
+                    <span className="font-semibold">{homeTeam}</span>
+                    <div className="text-primary mt-1">{homeScore}</div>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-primary">{displayScore}</span>
-                  <span className="text-xs text-muted-foreground">{status}</span>
-                </div>
+                <div className="text-xs text-muted-foreground text-center mt-2">{status}</div>
               </div>
             );
           })}
