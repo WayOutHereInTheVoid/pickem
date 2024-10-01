@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,17 +7,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
 import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
+import NFLMatchups from '../components/NFLMatchups';
+import { getCachedOrFetchWeekMatches } from '../utils/nflApi';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
   const [parsedGames, setParsedGames] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState("1");
+  const [nflMatches, setNflMatches] = useState([]);
 
   const addPick = useAddPick();
   const addGame = useAddGame();
   const addScore = useAddScore();
   const updateCumulativeScore = useUpdateCumulativeScore();
+
+  useEffect(() => {
+    const fetchNFLMatches = async () => {
+      const matches = await getCachedOrFetchWeekMatches(parseInt(selectedWeek));
+      setNflMatches(matches);
+    };
+
+    fetchNFLMatches();
+  }, [selectedWeek]);
 
   const teamNameMapping = {
     "Thumbz": "Murder Hornets",
@@ -155,6 +167,8 @@ const ImportPicks = () => {
             </Button>
           </CardContent>
         </Card>
+        
+        <NFLMatchups matches={nflMatches} />
         
         {parsedGames.length > 0 && (
           <ParsedGames games={parsedGames} onWinnerChange={handleWinnerChange} />
