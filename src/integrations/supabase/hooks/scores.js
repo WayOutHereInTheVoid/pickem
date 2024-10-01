@@ -21,14 +21,14 @@ const fromSupabase = async (query) => {
 No foreign key relationships identified.
 */
 
+export const useScore = (id) => useQuery({
+    queryKey: ['scores', id],
+    queryFn: () => fromSupabase(supabase.from('scores').select('*').eq('id', id).single()),
+});
+
 export const useScores = () => useQuery({
     queryKey: ['scores'],
     queryFn: () => fromSupabase(supabase.from('scores').select('*')),
-});
-
-export const useScoreById = (id) => useQuery({
-    queryKey: ['scores', id],
-    queryFn: () => fromSupabase(supabase.from('scores').select('*').eq('id', id).single()),
 });
 
 export const useAddScore = () => {
@@ -36,7 +36,7 @@ export const useAddScore = () => {
     return useMutation({
         mutationFn: (newScore) => fromSupabase(supabase.from('scores').insert([newScore])),
         onSuccess: () => {
-            queryClient.invalidateQueries('scores');
+            queryClient.invalidateQueries({ queryKey: ['scores'] });
         },
     });
 };
@@ -46,7 +46,7 @@ export const useUpdateScore = () => {
     return useMutation({
         mutationFn: ({ id, ...updateData }) => fromSupabase(supabase.from('scores').update(updateData).eq('id', id)),
         onSuccess: () => {
-            queryClient.invalidateQueries('scores');
+            queryClient.invalidateQueries({ queryKey: ['scores'] });
         },
     });
 };
@@ -56,7 +56,7 @@ export const useDeleteScore = () => {
     return useMutation({
         mutationFn: (id) => fromSupabase(supabase.from('scores').delete().eq('id', id)),
         onSuccess: () => {
-            queryClient.invalidateQueries('scores');
+            queryClient.invalidateQueries({ queryKey: ['scores'] });
         },
     });
 };

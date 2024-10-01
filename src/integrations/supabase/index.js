@@ -2,10 +2,76 @@
 import { supabase } from './supabase.js';
 import { SupabaseAuthProvider, useSupabaseAuth, SupabaseAuthUI } from './auth.jsx';
 
-// Export all the imported functions and objects from .auth and .hooks/
+// Import hooks
+import {
+  useNFLMatchesCache,
+  useNFLMatchesCaches,
+  useAddNFLMatchesCache,
+  useUpdateNFLMatchesCache,
+  useDeleteNFLMatchesCache
+} from './hooks/nfl_matches_cache.js';
+
+import {
+  usePick,
+  usePicks,
+  useAddPick,
+  useUpdatePick,
+  useDeletePick
+} from './hooks/picks.js';
+
+import {
+  useCumulativeScore,
+  useCumulativeScores,
+  useAddCumulativeScore,
+  useUpdateCumulativeScore,
+  useDeleteCumulativeScore
+} from './hooks/cumulative_scores.js';
+
+import {
+  useGame,
+  useGames,
+  useAddGame,
+  useUpdateGame,
+  useDeleteGame
+} from './hooks/games.js';
+
+import {
+  useScore,
+  useScores,
+  useAddScore,
+  useUpdateScore,
+  useDeleteScore
+} from './hooks/scores.js';
+
+// Export all the imported functions and objects
 export {
   supabase,
   SupabaseAuthProvider,
   useSupabaseAuth,
   SupabaseAuthUI,
+  useNFLMatchesCache,
+  useNFLMatchesCaches,
+  useAddNFLMatchesCache,
+  useUpdateNFLMatchesCache,
+  useDeleteNFLMatchesCache,
+  usePick,
+  usePicks,
+  useAddPick,
+  useUpdatePick,
+  useDeletePick,
+  useCumulativeScore,
+  useCumulativeScores,
+  useAddCumulativeScore,
+  useUpdateCumulativeScore,
+  useDeleteCumulativeScore,
+  useGame,
+  useGames,
+  useAddGame,
+  useUpdateGame,
+  useDeleteGame,
+  useScore,
+  useScores,
+  useAddScore,
+  useUpdateScore,
+  useDeleteScore
 };

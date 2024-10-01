@@ -22,14 +22,14 @@ const fromSupabase = async (query) => {
 No foreign key relationships identified.
 */
 
+export const useGame = (id) => useQuery({
+    queryKey: ['games', id],
+    queryFn: () => fromSupabase(supabase.from('games').select('*').eq('id', id).single()),
+});
+
 export const useGames = () => useQuery({
     queryKey: ['games'],
     queryFn: () => fromSupabase(supabase.from('games').select('*')),
-});
-
-export const useGameById = (id) => useQuery({
-    queryKey: ['games', id],
-    queryFn: () => fromSupabase(supabase.from('games').select('*').eq('id', id).single()),
 });
 
 export const useAddGame = () => {
@@ -37,7 +37,7 @@ export const useAddGame = () => {
     return useMutation({
         mutationFn: (newGame) => fromSupabase(supabase.from('games').insert([newGame])),
         onSuccess: () => {
-            queryClient.invalidateQueries('games');
+            queryClient.invalidateQueries({ queryKey: ['games'] });
         },
     });
 };
@@ -47,7 +47,7 @@ export const useUpdateGame = () => {
     return useMutation({
         mutationFn: ({ id, ...updateData }) => fromSupabase(supabase.from('games').update(updateData).eq('id', id)),
         onSuccess: () => {
-            queryClient.invalidateQueries('games');
+            queryClient.invalidateQueries({ queryKey: ['games'] });
         },
     });
 };
@@ -57,7 +57,7 @@ export const useDeleteGame = () => {
     return useMutation({
         mutationFn: (id) => fromSupabase(supabase.from('games').delete().eq('id', id)),
         onSuccess: () => {
-            queryClient.invalidateQueries('games');
+            queryClient.invalidateQueries({ queryKey: ['games'] });
         },
     });
 };

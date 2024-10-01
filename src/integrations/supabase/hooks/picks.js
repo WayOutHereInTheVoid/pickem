@@ -21,14 +21,14 @@ const fromSupabase = async (query) => {
 No foreign key relationships identified.
 */
 
+export const usePick = (id) => useQuery({
+    queryKey: ['picks', id],
+    queryFn: () => fromSupabase(supabase.from('picks').select('*').eq('id', id).single()),
+});
+
 export const usePicks = () => useQuery({
     queryKey: ['picks'],
     queryFn: () => fromSupabase(supabase.from('picks').select('*')),
-});
-
-export const usePickById = (id) => useQuery({
-    queryKey: ['picks', id],
-    queryFn: () => fromSupabase(supabase.from('picks').select('*').eq('id', id).single()),
 });
 
 export const useAddPick = () => {
@@ -36,7 +36,7 @@ export const useAddPick = () => {
     return useMutation({
         mutationFn: (newPick) => fromSupabase(supabase.from('picks').insert([newPick])),
         onSuccess: () => {
-            queryClient.invalidateQueries('picks');
+            queryClient.invalidateQueries({ queryKey: ['picks'] });
         },
     });
 };
@@ -46,7 +46,7 @@ export const useUpdatePick = () => {
     return useMutation({
         mutationFn: ({ id, ...updateData }) => fromSupabase(supabase.from('picks').update(updateData).eq('id', id)),
         onSuccess: () => {
-            queryClient.invalidateQueries('picks');
+            queryClient.invalidateQueries({ queryKey: ['picks'] });
         },
     });
 };
@@ -56,7 +56,7 @@ export const useDeletePick = () => {
     return useMutation({
         mutationFn: (id) => fromSupabase(supabase.from('picks').delete().eq('id', id)),
         onSuccess: () => {
-            queryClient.invalidateQueries('picks');
+            queryClient.invalidateQueries({ queryKey: ['picks'] });
         },
     });
 };
