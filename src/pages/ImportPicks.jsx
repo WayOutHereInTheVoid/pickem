@@ -97,25 +97,37 @@ const ImportPicks = () => {
 
   const savePicks = async () => {
     try {
+      const weekNumber = parseInt(selectedWeek);
+      if (isNaN(weekNumber)) {
+        throw new Error("Invalid week number");
+      }
+
       for (const game of parsedGames) {
-        await addGame.mutateAsync({ ...game, week: parseInt(selectedWeek) });
+        await addGame.mutateAsync({ ...game, week: weekNumber });
       }
 
       for (const pick of parsedPicks) {
-        await addPick.mutateAsync({ ...pick, week: parseInt(selectedWeek) });
+        await addPick.mutateAsync({ ...pick, week: weekNumber });
       }
 
       const weekScores = calculateScores(parsedGames, parsedPicks);
       for (const [name, score] of Object.entries(weekScores)) {
         await addScore.mutateAsync({
-          week: parseInt(selectedWeek),
+          week: weekNumber,
           name,
           score
         });
 
+        // Fetch current cumulative score
+        const { data: currentScore } = await updateCumulativeScore.mutateAsync({
+          name,
+          score: 0 // This will be added to the current score
+        });
+
+        // Update cumulative score
         await updateCumulativeScore.mutateAsync({
           name,
-          score
+          score: (currentScore?.score || 0) + score
         });
       }
 
