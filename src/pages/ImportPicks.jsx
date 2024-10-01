@@ -127,57 +127,55 @@ const ImportPicks = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-foreground">Import Picks</h1>
-        <Card className="mb-6 bg-card">
-          <CardHeader>
-            <CardTitle className="text-foreground">Select Week</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-              <SelectTrigger className="w-[180px] bg-secondary text-foreground">
-                <SelectValue placeholder="Select week" />
-              </SelectTrigger>
-              <SelectContent>
-                {[...Array(16)].map((_, i) => (
-                  <SelectItem key={i + 1} value={(i + 1).toString()}>
-                    Week {i + 1}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
-        
-        <Card className="mb-6 bg-card">
-          <CardHeader>
-            <CardTitle className="text-foreground">Paste Poll Results</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              placeholder="Paste poll results here..."
-              value={pollResults}
-              onChange={handleInputChange}
-              rows={10}
-              className="mb-4 bg-secondary text-foreground"
-            />
-            <Button onClick={parsePollResults} className="w-full bg-primary text-primary-foreground">
-              Parse Picks and Games
-            </Button>
-          </CardContent>
-        </Card>
-        
-        <NFLMatchups matches={nflMatches} />
-        
-        {parsedGames.length > 0 && (
-          <ParsedGames games={parsedGames} onWinnerChange={handleWinnerChange} />
-        )}
-        
-        {parsedPicks.length > 0 && (
-          <ParsedPicks picks={parsedPicks} onSave={savePicks} />
-        )}
-      </div>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold mb-6 text-foreground">Import Picks</h1>
+      <Card className="bg-card">
+        <CardHeader>
+          <CardTitle className="text-foreground">Select Week</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+            <SelectTrigger className="w-full bg-secondary text-foreground">
+              <SelectValue placeholder="Select week" />
+            </SelectTrigger>
+            <SelectContent>
+              {[...Array(16)].map((_, i) => (
+                <SelectItem key={i + 1} value={(i + 1).toString()}>
+                  Week {i + 1}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+      
+      <Card className="bg-card">
+        <CardHeader>
+          <CardTitle className="text-foreground">Paste Poll Results</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            placeholder="Paste poll results here..."
+            value={pollResults}
+            onChange={handleInputChange}
+            rows={10}
+            className="mb-4 bg-secondary text-foreground"
+          />
+          <Button onClick={parsePollResults} className="w-full bg-primary text-primary-foreground">
+            Parse Picks and Games
+          </Button>
+        </CardContent>
+      </Card>
+      
+      <NFLMatchups matches={nflMatches} />
+      
+      {parsedGames.length > 0 && (
+        <ParsedGames games={parsedGames} onWinnerChange={handleWinnerChange} />
+      )}
+      
+      {parsedPicks.length > 0 && (
+        <ParsedPicks picks={parsedPicks} onSave={savePicks} />
+      )}
     </div>
   );
 };

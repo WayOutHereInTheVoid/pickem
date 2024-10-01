@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const NFLMatchups = ({ matches }) => {
   return (
@@ -9,42 +8,35 @@ const NFLMatchups = ({ matches }) => {
         <CardTitle className="text-foreground">NFL Matchups</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-foreground">Away</TableHead>
-                <TableHead className="text-foreground">Home</TableHead>
-                <TableHead className="text-foreground">Score</TableHead>
-                <TableHead className="text-foreground">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {matches.map((match, index) => {
-                const homeTeam = match.homeTeam.displayName;
-                const awayTeam = match.awayTeam.displayName;
-                const score = match.state.score.current;
-                const status = match.state.description;
-                
-                let displayScore;
-                if (score) {
-                  const [awayScore, homeScore] = score.split('-');
-                  displayScore = `${homeScore} - ${awayScore}`;
-                } else {
-                  displayScore = 'Not started';
-                }
+        <div className="grid grid-cols-1 gap-4">
+          {matches.map((match, index) => {
+            const homeTeam = match.homeTeam.displayName;
+            const awayTeam = match.awayTeam.displayName;
+            const score = match.state.score.current;
+            const status = match.state.description;
+            
+            let displayScore;
+            if (score) {
+              const [awayScore, homeScore] = score.split('-');
+              displayScore = `${homeScore} - ${awayScore}`;
+            } else {
+              displayScore = 'Not started';
+            }
 
-                return (
-                  <TableRow key={index}>
-                    <TableCell className="text-foreground text-sm">{awayTeam}</TableCell>
-                    <TableCell className="text-foreground text-sm">{homeTeam}</TableCell>
-                    <TableCell className="text-foreground text-sm">{displayScore}</TableCell>
-                    <TableCell className="text-foreground text-sm">{status}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+            return (
+              <div key={index} className="bg-secondary p-3 rounded-lg text-sm">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-semibold">{awayTeam}</span>
+                  <span className="text-xs text-muted-foreground">@</span>
+                  <span className="font-semibold">{homeTeam}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-primary">{displayScore}</span>
+                  <span className="text-xs text-muted-foreground">{status}</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>
