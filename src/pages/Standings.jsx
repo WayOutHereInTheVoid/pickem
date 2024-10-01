@@ -76,9 +76,9 @@ const Standings = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((entry) => (
-          <TableRow key={entry.name}>
-            <TableCell className="font-medium text-foreground">{entry.rank}</TableCell>
+        {data.map((entry, index) => (
+          <TableRow key={entry.name} className={index < 3 ? 'gradient-text font-bold' : ''}>
+            <TableCell className="font-medium text-accent">{entry.rank}</TableCell>
             <TableCell className="text-foreground">{entry.name}</TableCell>
             <TableCell className="text-right text-foreground">{entry.score}</TableCell>
           </TableRow>
@@ -91,7 +91,7 @@ const Standings = () => {
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-foreground">2024 TRL Pick'em Standings</h1>
-        <Card className="mb-6 bg-card">
+        <Card className="mb-6 bg-background">
           <CardHeader>
             <CardTitle className="text-foreground">Select Week</CardTitle>
           </CardHeader>
@@ -100,7 +100,7 @@ const Standings = () => {
               <div className="flex-grow">
                 <Label htmlFor="week-select" className="text-foreground">Week</Label>
                 <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-                  <SelectTrigger id="week-select" className="bg-secondary text-foreground">
+                  <SelectTrigger id="week-select" className="bg-secondary/10 text-foreground">
                     <SelectValue placeholder="Select week" />
                   </SelectTrigger>
                   <SelectContent>
@@ -112,22 +112,22 @@ const Standings = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleExport} className="bg-primary text-primary-foreground">
+              <Button onClick={handleExport} className="bg-primary text-primary-foreground hover:bg-accent button-hover">
                 Export Week {selectedWeek} Data
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card mt-6">
+        <Card className="bg-background mt-6">
           <CardHeader>
             <CardTitle className="text-foreground">League Standings - Week {selectedWeek}</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="weekly" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="weekly">Weekly</TabsTrigger>
-                <TabsTrigger value="cumulative">Cumulative</TabsTrigger>
+                <TabsTrigger value="weekly" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Weekly</TabsTrigger>
+                <TabsTrigger value="cumulative" className="text-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Cumulative</TabsTrigger>
               </TabsList>
               <TabsContent value="weekly">
                 <StandingsTable data={standings.weekly} />
