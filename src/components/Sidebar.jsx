@@ -23,7 +23,7 @@ const Sidebar = () => {
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden fixed top-4 right-4 z-50"
+        className="md:hidden fixed top-4 left-4 z-50"
         onClick={toggleSidebar}
       >
         {isOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
