@@ -7,6 +7,21 @@ const fromSupabase = async (query) => {
     return data;
 };
 
+/*
+### games
+
+| name       | type                     | format    | required |
+|------------|--------------------------|-----------|----------|
+| id         | integer                  | integer   | true     |
+| week       | integer                  | integer   | true     |
+| home_team  | character varying(255)   | string    | true     |
+| away_team  | character varying(255)   | string    | true     |
+| winner     | character varying(255)   | string    | false    |
+| created_at | timestamp with time zone | string    | false    |
+
+No foreign key relationships identified.
+*/
+
 export const useGame = (id) => useQuery({
     queryKey: ['games', id],
     queryFn: () => fromSupabase(supabase.from('games').select('*').eq('id', id).single()),
@@ -20,14 +35,9 @@ export const useGames = () => useQuery({
 export const useAddGame = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (newGame) => {
-            const { data, error } = await supabase.from('games').insert([newGame]).select();
-            if (error) throw error;
-            return data[0];
-        },
-        onSuccess: (data) => {
+        mutationFn: (newGame) => fromSupabase(supabase.from('games').insert([newGame])),
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['games'] });
-            return data;
         },
     });
 };
@@ -35,11 +45,7 @@ export const useAddGame = () => {
 export const useUpdateGame = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, ...updateData }) => {
-            const { data, error } = await supabase.from('games').update(updateData).eq('id', id).select();
-            if (error) throw error;
-            return data[0];
-        },
+        mutationFn: ({ id, ...updateData }) => fromSupabase(supabase.from('games').update(updateData).eq('id', id)),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['games'] });
         },

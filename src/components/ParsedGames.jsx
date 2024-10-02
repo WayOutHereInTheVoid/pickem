@@ -11,7 +11,7 @@ const ParsedGames = ({ games, onWinnerChange }) => {
       </CardHeader>
       <CardContent>
         {games.map((game, index) => (
-          <div key={game.id || index} className="mb-4">
+          <div key={index} className="mb-4">
             <h3 className="text-lg font-semibold mb-2 text-foreground">
               {game.home_team} vs {game.away_team}
             </h3>
@@ -21,12 +21,12 @@ const ParsedGames = ({ games, onWinnerChange }) => {
               className="text-foreground"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="home" id={`home-win-${game.id || index}`} />
-                <Label htmlFor={`home-win-${game.id || index}`}>{game.home_team} Wins</Label>
+                <RadioGroupItem value="home" id={`home-win-${index}`} />
+                <Label htmlFor={`home-win-${index}`}>{game.home_team} Wins</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="away" id={`away-win-${game.id || index}`} />
-                <Label htmlFor={`away-win-${game.id || index}`}>{game.away_team} Wins</Label>
+                <RadioGroupItem value="away" id={`away-win-${index}`} />
+                <Label htmlFor={`away-win-${index}`}>{game.away_team} Wins</Label>
               </div>
             </RadioGroup>
           </div>

@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useCumulativeScores, useUpdateCumulativeScore, useUpdateGame } from '../integrations/supabase';
+import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
 import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
 import NFLMatchups from '../components/NFLMatchups';
@@ -19,10 +19,8 @@ const ImportPicks = () => {
 
   const addPick = useAddPick();
   const addGame = useAddGame();
-  const updateGame = useUpdateGame();
   const addScore = useAddScore();
   const updateCumulativeScore = useUpdateCumulativeScore();
-  const { data: cumulativeScores } = useCumulativeScores();
 
   useEffect(() => {
     const fetchNFLMatches = async () => {
@@ -79,28 +77,10 @@ const ImportPicks = () => {
     toast.success(`Successfully parsed ${picks.length} picks and ${games.length} games`);
   };
 
-  const handleWinnerChange = async (index, winner) => {
-    const updatedGames = [...parsedGames];
-    updatedGames[index].winner = winner;
-    setParsedGames(updatedGames);
-
-    const gameToUpdate = updatedGames[index];
-    if (!gameToUpdate.id) {
-      console.error('Game ID is undefined. Cannot update the winner.');
-      toast.error('Failed to update winner: Game ID is missing');
-      return;
-    }
-
-    try {
-      await updateGame.mutateAsync({
-        id: gameToUpdate.id,
-        winner: winner
-      });
-      toast.success(`Winner updated for ${gameToUpdate.home_team} vs ${gameToUpdate.away_team}`);
-    } catch (error) {
-      console.error('Error updating game winner:', error);
-      toast.error(`Failed to update winner: ${error.message}`);
-    }
+  const handleWinnerChange = (index, winner) => {
+    setParsedGames(prevGames => prevGames.map((game, i) =>
+      i === index ? { ...game, winner } : game
+    ));
   };
 
   const calculateScores = (games, picks) => {
@@ -122,21 +102,9 @@ const ImportPicks = () => {
         throw new Error("Invalid week number");
       }
 
-      for (let i = 0; i < parsedGames.length; i++) {
-        const game = parsedGames[i];
-        const { data: newGame } = await addGame.mutateAsync({
-          week: weekNumber,
-          home_team: game.home_team,
-          away_team: game.away_team,
-          winner: game.winner
-        });
-
-        // Update the parsedGames array with the new game ID
-        parsedGames[i].id = newGame.id;
+      for (const game of parsedGames) {
+        await addGame.mutateAsync({ ...game, week: weekNumber });
       }
-
-      // Update the state with the new game IDs
-      setParsedGames([...parsedGames]);
 
       for (const pick of parsedPicks) {
         await addPick.mutateAsync({ ...pick, week: weekNumber });
@@ -150,20 +118,17 @@ const ImportPicks = () => {
           score
         });
 
-        const existingScore = cumulativeScores?.find(cs => cs.name === name);
+        // Fetch current cumulative score
+        const { data: currentScore } = await updateCumulativeScore.mutateAsync({
+          name,
+          score: 0 // This will be added to the current score
+        });
 
-        if (existingScore) {
-          await updateCumulativeScore.mutateAsync({
-            id: existingScore.id,
-            name,
-            score: existingScore.score + score
-          });
-        } else {
-          await updateCumulativeScore.mutateAsync({
-            name,
-            score
-          });
-        }
+        // Update cumulative score
+        await updateCumulativeScore.mutateAsync({
+          name,
+          score: (currentScore?.score || 0) + score
+        });
       }
 
       toast.success(`Picks, games, and scores saved successfully for Week ${selectedWeek}!`);
