@@ -86,7 +86,7 @@ const ImportPicks = () => {
 
     const gameToUpdate = updatedGames[index];
     if (!gameToUpdate.id) {
-      console.error('Game ID is undefined. Cannot update the game.');
+      console.error('Game ID is undefined. Cannot update the winner.');
       toast.error('Failed to update winner: Game ID is missing');
       return;
     }
@@ -122,22 +122,21 @@ const ImportPicks = () => {
         throw new Error("Invalid week number");
       }
 
-      for (const game of parsedGames) {
-        const { data: existingGame } = await addGame.mutateAsync({
+      for (let i = 0; i < parsedGames.length; i++) {
+        const game = parsedGames[i];
+        const { data: newGame } = await addGame.mutateAsync({
           week: weekNumber,
           home_team: game.home_team,
           away_team: game.away_team,
           winner: game.winner
         });
 
-        if (existingGame && existingGame[0]) {
-          game.id = existingGame[0].id;
-          await updateGame.mutateAsync({
-            id: existingGame[0].id,
-            winner: game.winner
-          });
-        }
+        // Update the parsedGames array with the new game ID
+        parsedGames[i].id = newGame.id;
       }
+
+      // Update the state with the new game IDs
+      setParsedGames([...parsedGames]);
 
       for (const pick of parsedPicks) {
         await addPick.mutateAsync({ ...pick, week: weekNumber });
