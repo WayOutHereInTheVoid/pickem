@@ -102,34 +102,38 @@ const ImportPicks = () => {
         throw new Error("Invalid week number");
       }
 
-      for (const game of parsedGames) {
-        await addGame.mutateAsync({ ...game, week: weekNumber });
-      }
+      // Save games first
+      const savedGames = await Promise.all(parsedGames.map(game => 
+        addGame.mutateAsync({ ...game, week: weekNumber })
+      ));
 
-      for (const pick of parsedPicks) {
-        await addPick.mutateAsync({ ...pick, week: weekNumber });
-      }
+      // Save picks for all participants
+      await Promise.all(parsedPicks.map(pick => 
+        addPick.mutateAsync({ ...pick, week: weekNumber })
+      ));
 
-      const weekScores = calculateScores(parsedGames, parsedPicks);
-      for (const [name, score] of Object.entries(weekScores)) {
-        await addScore.mutateAsync({
+      // Calculate and save scores
+      const weekScores = calculateScores(savedGames, parsedPicks);
+      await Promise.all(Object.entries(weekScores).map(([name, score]) => 
+        addScore.mutateAsync({
           week: weekNumber,
           name,
           score
-        });
+        })
+      ));
 
-        // Fetch current cumulative score
+      // Update cumulative scores
+      await Promise.all(Object.entries(weekScores).map(async ([name, score]) => {
         const { data: currentScore } = await updateCumulativeScore.mutateAsync({
           name,
-          score: 0 // This will be added to the current score
+          score: 0 // This will fetch the current score
         });
 
-        // Update cumulative score
         await updateCumulativeScore.mutateAsync({
           name,
           score: (currentScore?.score || 0) + score
         });
-      }
+      }));
 
       toast.success(`Picks, games, and scores saved successfully for Week ${selectedWeek}!`);
     } catch (error) {
