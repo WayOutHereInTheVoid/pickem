@@ -84,13 +84,19 @@ const ImportPicks = () => {
     updatedGames[index].winner = winner;
     setParsedGames(updatedGames);
 
+    const gameToUpdate = updatedGames[index];
+    if (!gameToUpdate.id) {
+      console.error('Game ID is undefined. Cannot update the game.');
+      toast.error('Failed to update winner: Game ID is missing');
+      return;
+    }
+
     try {
-      // Update the game in Supabase
       await updateGame.mutateAsync({
-        id: updatedGames[index].id,
+        id: gameToUpdate.id,
         winner: winner
       });
-      toast.success(`Winner updated for ${updatedGames[index].home_team} vs ${updatedGames[index].away_team}`);
+      toast.success(`Winner updated for ${gameToUpdate.home_team} vs ${gameToUpdate.away_team}`);
     } catch (error) {
       console.error('Error updating game winner:', error);
       toast.error(`Failed to update winner: ${error.message}`);
@@ -124,8 +130,8 @@ const ImportPicks = () => {
           winner: game.winner
         });
 
-        // If the game already exists, update it with the current winner
         if (existingGame && existingGame[0]) {
+          game.id = existingGame[0].id;
           await updateGame.mutateAsync({
             id: existingGame[0].id,
             winner: game.winner
@@ -145,18 +151,15 @@ const ImportPicks = () => {
           score
         });
 
-        // Find the existing cumulative score for the player
         const existingScore = cumulativeScores?.find(cs => cs.name === name);
 
         if (existingScore) {
-          // Update existing cumulative score
           await updateCumulativeScore.mutateAsync({
             id: existingScore.id,
             name,
             score: existingScore.score + score
           });
         } else {
-          // Create new cumulative score entry
           await updateCumulativeScore.mutateAsync({
             name,
             score
@@ -223,7 +226,6 @@ const ImportPicks = () => {
       )}
     </div>
   );
-
 };
 
 export default ImportPicks;
