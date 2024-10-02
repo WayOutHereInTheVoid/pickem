@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
+import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useUpdateCumulativeScore, useCumulativeScores } from '../integrations/supabase';
 import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
 import NFLMatchups from '../components/NFLMatchups';
@@ -22,6 +22,8 @@ const ImportPicks = () => {
   const addScore = useAddScore();
   const updateCumulativeScore = useUpdateCumulativeScore();
   const { data: existingGames } = useGames();
+  const { data: existingPicks } = usePicks();
+  const { data: existingCumulativeScores } = useCumulativeScores();
 
   useEffect(() => {
     const fetchNFLMatches = async () => {
@@ -88,6 +90,12 @@ const ImportPicks = () => {
     console.log('Calculating scores with games:', games);
     console.log('Calculating scores with picks:', picks);
     const weekScores = {};
+    
+    // Initialize scores for all participants
+    Object.values(teamNameMapping).forEach(name => {
+      weekScores[name] = 0;
+    });
+
     picks.forEach(pick => {
       const game = games.find(g => g.home_team === pick.pick || g.away_team === pick.pick);
       if (game && game.winner) {
@@ -95,6 +103,7 @@ const ImportPicks = () => {
         weekScores[pick.name] = (weekScores[pick.name] || 0) + (pick.pick === correctPick ? 1 : 0);
       }
     });
+    
     console.log('Calculated week scores:', weekScores);
     return weekScores;
   };
@@ -117,31 +126,23 @@ const ImportPicks = () => {
         addPick.mutateAsync({ ...pick, week: weekNumber })
       ));
 
-      // Fetch all games for the current week to ensure we have complete data
-      const allWeekGames = existingGames.filter(game => game.week === weekNumber);
-      console.log('All week games:', allWeekGames);
+      // Calculate scores using parsedGames
+      const weekScores = calculateScores(parsedGames, parsedPicks);
 
-      // Calculate and save scores
-      const weekScores = calculateScores(allWeekGames, parsedPicks);
+      // Save weekly scores and update cumulative scores
       await Promise.all(Object.entries(weekScores).map(async ([name, score]) => {
         try {
+          // Save weekly score
           await addScore.mutateAsync({
             week: weekNumber,
             name,
             score
           });
           console.log(`Weekly score saved for ${name}: ${score}`);
-        } catch (error) {
-          console.error(`Error saving weekly score for ${name}:`, error);
-        }
-      }));
 
-      // Update cumulative scores
-      await Promise.all(Object.entries(weekScores).map(async ([name, weekScore]) => {
-        try {
-          const { data: currentCumulativeScore } = await useScores().queryFn();
-          const existingScore = currentCumulativeScore.find(s => s.name === name)?.score || 0;
-          const newCumulativeScore = existingScore + weekScore;
+          // Update cumulative score
+          const existingCumulativeScore = existingCumulativeScores?.find(s => s.name === name)?.score || 0;
+          const newCumulativeScore = existingCumulativeScore + score;
 
           await updateCumulativeScore.mutateAsync({
             name,
@@ -149,7 +150,7 @@ const ImportPicks = () => {
           });
           console.log(`Cumulative score updated for ${name}: ${newCumulativeScore}`);
         } catch (error) {
-          console.error(`Error updating cumulative score for ${name}:`, error);
+          console.error(`Error saving scores for ${name}:`, error);
         }
       }));
 
