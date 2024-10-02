@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useCumulativeScores, useUpdateCumulativeScore } from '../integrations/supabase';
+import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useCumulativeScores, useUpdateCumulativeScore, useUpdateGame } from '../integrations/supabase';
 import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
 import NFLMatchups from '../components/NFLMatchups';
@@ -19,6 +19,7 @@ const ImportPicks = () => {
 
   const addPick = useAddPick();
   const addGame = useAddGame();
+  const updateGame = useUpdateGame();
   const addScore = useAddScore();
   const updateCumulativeScore = useUpdateCumulativeScore();
   const { data: cumulativeScores } = useCumulativeScores();
@@ -78,10 +79,22 @@ const ImportPicks = () => {
     toast.success(`Successfully parsed ${picks.length} picks and ${games.length} games`);
   };
 
-  const handleWinnerChange = (index, winner) => {
-    setParsedGames(prevGames => prevGames.map((game, i) =>
-      i === index ? { ...game, winner } : game
-    ));
+  const handleWinnerChange = async (index, winner) => {
+    const updatedGames = [...parsedGames];
+    updatedGames[index].winner = winner;
+    setParsedGames(updatedGames);
+
+    try {
+      // Update the game in Supabase
+      await updateGame.mutateAsync({
+        id: updatedGames[index].id,
+        winner: winner
+      });
+      toast.success(`Winner updated for ${updatedGames[index].home_team} vs ${updatedGames[index].away_team}`);
+    } catch (error) {
+      console.error('Error updating game winner:', error);
+      toast.error(`Failed to update winner: ${error.message}`);
+    }
   };
 
   const calculateScores = (games, picks) => {
@@ -104,7 +117,20 @@ const ImportPicks = () => {
       }
 
       for (const game of parsedGames) {
-        await addGame.mutateAsync({ ...game, week: weekNumber });
+        const { data: existingGame } = await addGame.mutateAsync({
+          week: weekNumber,
+          home_team: game.home_team,
+          away_team: game.away_team,
+          winner: game.winner
+        });
+
+        // If the game already exists, update it with the current winner
+        if (existingGame && existingGame[0]) {
+          await updateGame.mutateAsync({
+            id: existingGame[0].id,
+            winner: game.winner
+          });
+        }
       }
 
       for (const pick of parsedPicks) {
@@ -197,6 +223,7 @@ const ImportPicks = () => {
       )}
     </div>
   );
+
 };
 
 export default ImportPicks;
