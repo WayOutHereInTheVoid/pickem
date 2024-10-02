@@ -37,7 +37,14 @@ export const useAddCumulativeScore = () => {
 export const useUpdateCumulativeScore = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, ...updateData }) => fromSupabase(supabase.from('cumulative_scores').update(updateData).eq('id', id)),
+        mutationFn: async ({ name, score }) => {
+            const { data, error } = await supabase
+                .from('cumulative_scores')
+                .upsert({ name, score }, { onConflict: 'name' });
+            
+            if (error) throw error;
+            return data;
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['cumulative_scores'] });
         },

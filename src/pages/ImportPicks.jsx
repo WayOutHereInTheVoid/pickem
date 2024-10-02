@@ -114,25 +114,34 @@ const ImportPicks = () => {
 
       // Calculate and save scores
       const weekScores = calculateScores(savedGames, parsedPicks);
-      await Promise.all(Object.entries(weekScores).map(([name, score]) => 
-        addScore.mutateAsync({
-          week: weekNumber,
-          name,
-          score
-        })
-      ));
+      await Promise.all(Object.entries(weekScores).map(async ([name, score]) => {
+        try {
+          await addScore.mutateAsync({
+            week: weekNumber,
+            name,
+            score
+          });
+          console.log(`Weekly score saved for ${name}: ${score}`);
+        } catch (error) {
+          console.error(`Error saving weekly score for ${name}:`, error);
+        }
+      }));
 
       // Update cumulative scores
-      await Promise.all(Object.entries(weekScores).map(async ([name, score]) => {
-        const { data: currentScore } = await updateCumulativeScore.mutateAsync({
-          name,
-          score: 0 // This will fetch the current score
-        });
+      await Promise.all(Object.entries(weekScores).map(async ([name, weekScore]) => {
+        try {
+          const { data: currentCumulativeScore } = await useScores().queryFn();
+          const existingScore = currentCumulativeScore.find(s => s.name === name)?.score || 0;
+          const newCumulativeScore = existingScore + weekScore;
 
-        await updateCumulativeScore.mutateAsync({
-          name,
-          score: (currentScore?.score || 0) + score
-        });
+          await updateCumulativeScore.mutateAsync({
+            name,
+            score: newCumulativeScore
+          });
+          console.log(`Cumulative score updated for ${name}: ${newCumulativeScore}`);
+        } catch (error) {
+          console.error(`Error updating cumulative score for ${name}:`, error);
+        }
       }));
 
       toast.success(`Picks, games, and scores saved successfully for Week ${selectedWeek}!`);
