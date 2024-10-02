@@ -3,32 +3,25 @@ import { supabase } from '../supabase';
 
 const fromSupabase = async (query) => {
     const { data, error } = await query;
-    if (error) throw new Error(error.message);
+    if (error) {
+        console.error('Supabase query error:', error);
+        throw new Error(error.message);
+    }
     return data;
 };
 
-/*
-### cumulative_scores
-
-| name       | type                     | format    | required |
-|------------|--------------------------|-----------|----------|
-| id         | integer                  | integer   | true     |
-| name       | character varying(255)   | string    | true     |
-| score      | integer                  | integer   | true     |
-| created_at | timestamp with time zone | string    | false    |
-| updated_at | timestamp with time zone | string    | false    |
-
-No foreign key relationships identified.
-*/
-
-export const useCumulativeScore = (id) => useQuery({
-    queryKey: ['cumulative_scores', id],
-    queryFn: () => fromSupabase(supabase.from('cumulative_scores').select('*').eq('id', id).single()),
-});
-
 export const useCumulativeScores = () => useQuery({
     queryKey: ['cumulative_scores'],
-    queryFn: () => fromSupabase(supabase.from('cumulative_scores').select('*')),
+    queryFn: async () => {
+        try {
+            const data = await fromSupabase(supabase.from('cumulative_scores').select('*'));
+            console.log('Fetched cumulative scores:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching cumulative scores:', error);
+            throw error;
+        }
+    },
 });
 
 export const useAddCumulativeScore = () => {
