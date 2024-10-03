@@ -17,9 +17,8 @@ const App = () => (
         <TooltipProvider>
           <Router>
             <Toaster />
-            <div className="flex flex-col md:flex-row h-screen bg-background text-foreground">
-              <Sidebar />
-              <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 pt-16 md:pt-8 ml-0 md:ml-16">
+            <div className="flex h-screen bg-background text-foreground">
+              <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">
                 <Routes>
                   {navItems.map(({ to, page }) => (
                     <Route key={to} path={to} element={page} />
@@ -27,6 +26,7 @@ const App = () => (
                   <Route path="/manager" element={<ManagerPage />} />
                 </Routes>
               </main>
+              <Sidebar />
             </div>
           </Router>
         </TooltipProvider>
