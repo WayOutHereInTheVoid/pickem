@@ -22,9 +22,10 @@ module.exports = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "#1A1A1A",
-        foreground: "#F5F5F5",
+        foreground: "#F9F9F9",
         primary: {
           DEFAULT: "#FF6F00",
+          light: "#FF9E40",
           foreground: "#1A1A1A",
         },
         secondary: {
@@ -37,7 +38,7 @@ module.exports = {
         },
         muted: {
           DEFAULT: "#CCCCCC",
-          foreground: "#1A1A1A",
+          foreground: "#F9F9F9",
         },
         accent: {
           DEFAULT: "#00B8D4",
@@ -45,11 +46,11 @@ module.exports = {
         },
         popover: {
           DEFAULT: "#1A1A1A",
-          foreground: "#F5F5F5",
+          foreground: "#F9F9F9",
         },
         card: {
           DEFAULT: "#1A1A1A",
-          foreground: "#F5F5F5",
+          foreground: "#F9F9F9",
         },
       },
       borderRadius: {

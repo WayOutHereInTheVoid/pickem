@@ -5,13 +5,13 @@
 @layer base {
   :root {
     --background: 0 0% 10%;
-    --foreground: 0 0% 96%;
+    --foreground: 0 0% 98%;
 
     --card: 0 0% 10%;
-    --card-foreground: 0 0% 96%;
+    --card-foreground: 0 0% 98%;
  
     --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 96%;
+    --popover-foreground: 0 0% 98%;
  
     --primary: 28 100% 50%;
     --primary-foreground: 0 0% 10%;
@@ -20,13 +20,13 @@
     --secondary-foreground: 0 0% 10%;
  
     --muted: 0 0% 80%;
-    --muted-foreground: 0 0% 96%;
+    --muted-foreground: 0 0% 98%;
  
     --accent: 190 100% 42%;
     --accent-foreground: 0 0% 10%;
  
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 96%;
+    --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 80%;
     --input: 0 0% 80%;
@@ -41,7 +41,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-source-sans;
+    @apply bg-gradient-to-br from-background to-background/90 text-foreground font-source-sans min-h-screen;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   h1, h2, h3, h4, h5, h6 {
@@ -50,22 +50,21 @@
 }
 
 .gradient-text {
-  background: linear-gradient(45deg, #FF6F00, #D500F9, #00B8D4);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
 }
 
 .glow {
-  text-shadow: 0 0 10px #D500F9, 0 0 20px #D500F9, 0 0 30px #D500F9;
+  @apply shadow-lg shadow-primary/20;
 }
 
-.button-hover:hover {
-  background-color: #D500F9;
-  box-shadow: 0 0 10px #D500F9;
+.button-hover {
+  @apply transition-all duration-300 ease-in-out hover:shadow-md hover:shadow-primary/30;
 }
 
 .interactive:hover {
-  color: #00B8D4;
-  text-shadow: 0 0 5px #00B8D4;
+  @apply text-accent transition-colors duration-200;
+}
+
+.bg-gradient-subtle {
+  @apply bg-gradient-to-br from-background via-background/95 to-background/90;
 }
