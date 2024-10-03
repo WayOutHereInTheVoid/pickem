@@ -28,7 +28,7 @@ const Sidebar = () => {
       >
         {isOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
       </Button>
-      <div className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out fixed md:static top-0 left-0 h-full w-48 md:w-16 bg-secondary flex flex-col items-center py-4 space-y-4 z-40`}>
+      <div className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out fixed md:static top-0 left-0 h-full w-48 md:w-16 bg-accent flex flex-col items-center py-4 space-y-4 z-40`}>
         {navItems.map((item) => (
           <NavLink
             key={item.to}
