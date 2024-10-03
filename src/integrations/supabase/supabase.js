@@ -11,9 +11,9 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 // Add a simple test function to verify the connection
 export const testSupabaseConnection = async () => {
   try {
-    const { data, error } = await supabase.from('cumulative_scores').select('count()', { count: 'exact' });
+    const { data, error } = await supabase.from('cumulative_scores').select('*');
     if (error) throw error;
-    console.log('Supabase connection successful. Row count:', data[0].count);
+    console.log('Supabase connection successful. Row count:', data.length);
     return true;
   } catch (error) {
     console.error('Supabase connection failed:', error.message);
