@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useSupabaseAuth } from '../integrations/supabase';
 import ImportPicks from './ImportPicks';
 import { toast } from "sonner";
-import { LogOut, Calendar, Clipboard } from 'lucide-react';
+import { LogOut, Calendar, Clipboard, UserCog, Menu } from 'lucide-react';
 
 const ManagerPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { session, login, logout } = useSupabaseAuth();
   const navigate = useNavigate();
 
@@ -75,18 +77,39 @@ const ManagerPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-background/90 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-background to-background/90 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-foreground">Manager Dashboard</h1>
-          <Button onClick={handleLogout} className="bg-teal-500 hover:bg-teal-600 text-white transition-colors duration-300">
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
+          <div className="flex items-center">
+            <UserCog className="w-8 h-8 mr-2 text-primary" />
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Manager Dashboard</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Button onClick={handleLogout} className="bg-teal-500 hover:bg-teal-600 text-white transition-colors duration-300">
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden text-foreground"
+            >
+              <Menu className="w-6 h-6" />
+            </motion.button>
+          </div>
         </div>
+        
+        <motion.div
+          initial={false}
+          animate={{ height: isMenuOpen ? 'auto' : 0 }}
+          className="overflow-hidden md:hidden mb-4"
+        >
+          {/* Add mobile menu items here */}
+        </motion.div>
+
         <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow duration-300">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-foreground flex items-center">
+            <CardTitle className="text-xl md:text-2xl font-bold text-foreground flex items-center">
               <Calendar className="w-6 h-6 mr-2 text-primary" />
               Import Picks
             </CardTitle>

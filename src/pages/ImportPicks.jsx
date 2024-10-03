@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
 import NFLMatchups from '../components/NFLMatchups';
 import { getCachedOrFetchWeekMatches } from '../utils/nflApi';
+import { Calendar, Clipboard, Loader } from 'lucide-react';
 
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
@@ -16,13 +18,14 @@ const ImportPicks = () => {
   const [parsedGames, setParsedGames] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [nflMatches, setNflMatches] = useState([]);
+  const [isParsing, setIsParsing] = useState(false);
 
   const addPick = useAddPick();
   const addGame = useAddGame();
   const addScore = useAddScore();
   const updateCumulativeScore = useUpdateCumulativeScore();
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchNFLMatches = async () => {
       const matches = await getCachedOrFetchWeekMatches(parseInt(selectedWeek));
       setNflMatches(matches);
@@ -50,7 +53,11 @@ const ImportPicks = () => {
     setPollResults(e.target.value);
   };
 
-  const parsePollResults = () => {
+  const parsePollResults = async () => {
+    setIsParsing(true);
+    // Simulate a delay for the parsing process
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
     const lines = pollResults.split('\n');
     const picks = [];
     const games = [];
@@ -75,6 +82,7 @@ const ImportPicks = () => {
     console.log('Parsed picks:', picks);
     console.log('Parsed games:', games);
     toast.success(`Successfully parsed ${picks.length} picks and ${games.length} games`);
+    setIsParsing(false);
   };
 
   const handleWinnerChange = (index, winner) => {
@@ -128,10 +136,12 @@ const ImportPicks = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold mb-6 text-foreground">Import Picks</h1>
       <Card className="bg-card">
         <CardHeader>
-          <CardTitle className="text-foreground">Select Week</CardTitle>
+          <CardTitle className="text-foreground flex items-center">
+            <Calendar className="w-5 h-5 mr-2" />
+            Select Week
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Select value={selectedWeek} onValueChange={setSelectedWeek}>
@@ -151,7 +161,10 @@ const ImportPicks = () => {
       
       <Card className="bg-card">
         <CardHeader>
-          <CardTitle className="text-foreground">Paste Poll Results</CardTitle>
+          <CardTitle className="text-foreground flex items-center">
+            <Clipboard className="w-5 h-5 mr-2" />
+            Paste Poll Results
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Textarea
@@ -159,11 +172,27 @@ const ImportPicks = () => {
             value={pollResults}
             onChange={handleInputChange}
             rows={10}
-            className="mb-4 bg-secondary text-foreground"
+            className="mb-4 bg-secondary text-foreground focus:ring-2 focus:ring-primary transition-all duration-300"
           />
-          <Button onClick={parsePollResults} className="w-full bg-primary text-primary-foreground">
-            Parse Picks and Games
-          </Button>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button
+              onClick={parsePollResults}
+              className="w-full bg-primary text-primary-foreground hover:bg-primary-light transition-colors duration-300"
+              disabled={isParsing}
+            >
+              {isParsing ? (
+                <>
+                  <Loader className="w-4 h-4 mr-2 animate-spin" />
+                  Parsing...
+                </>
+              ) : (
+                'Parse Picks and Games'
+              )}
+            </Button>
+          </motion.div>
         </CardContent>
       </Card>
       
