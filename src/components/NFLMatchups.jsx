@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getTeamColor } from '../utils/teamColors';
 
 const NFLMatchups = ({ matches }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -58,11 +59,11 @@ const NFLMatchups = ({ matches }) => {
                   return (
                     <div key={index} className="bg-secondary p-2 rounded-lg text-xs">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold text-black">{awayTeam}</span>
+                        <span className="font-semibold" style={{ color: getTeamColor(awayTeam) }}>{awayTeam}</span>
                         <span className={`${scoreColors.away} font-bold`}>{awayScore}</span>
                       </div>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold text-black">{homeTeam}</span>
+                        <span className="font-semibold" style={{ color: getTeamColor(homeTeam) }}>{homeTeam}</span>
                         <span className={`${scoreColors.home} font-bold`}>{homeScore}</span>
                       </div>
                       <div className="text-xxs text-muted-foreground text-center">{status}</div>
