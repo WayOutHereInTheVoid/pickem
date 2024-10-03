@@ -85,7 +85,7 @@ const ManagerPage = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">Manager Dashboard</h1>
           </div>
           <div className="flex items-center space-x-4">
-            <Button onClick={handleLogout} className="bg-teal-500 hover:bg-teal-600 text-white transition-colors duration-300">
+            <Button onClick={handleLogout} className="bg-accent hover:bg-accent/90 text-accent-foreground transition-colors duration-300">
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </Button>
