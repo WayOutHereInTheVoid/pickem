@@ -38,12 +38,33 @@ export const useUpdateCumulativeScore = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ name, score }) => {
-            const { data, error } = await supabase
+            const { data: existingScore, error: fetchError } = await supabase
                 .from('cumulative_scores')
-                .upsert({ name, score }, { onConflict: 'name' });
-            
-            if (error) throw error;
-            return data;
+                .select('score')
+                .eq('name', name)
+                .single();
+
+            if (fetchError && fetchError.code !== 'PGRST116') {
+                throw fetchError;
+            }
+
+            if (existingScore) {
+                const newScore = existingScore.score + score;
+                const { data, error } = await supabase
+                    .from('cumulative_scores')
+                    .update({ score: newScore })
+                    .eq('name', name);
+                
+                if (error) throw error;
+                return data;
+            } else {
+                const { data, error } = await supabase
+                    .from('cumulative_scores')
+                    .insert({ name, score });
+                
+                if (error) throw error;
+                return data;
+            }
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['cumulative_scores'] });

@@ -55,3 +55,6 @@ CREATE TRIGGER update_cumulative_scores_updated_at
 BEFORE UPDATE ON cumulative_scores
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
+
+-- Add unique constraint to cumulative_scores table
+ALTER TABLE cumulative_scores ADD CONSTRAINT cumulative_scores_name_key UNIQUE (name);
