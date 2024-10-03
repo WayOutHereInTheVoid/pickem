@@ -21,9 +21,6 @@ const ImportPicks = () => {
   const addGame = useAddGame();
   const addScore = useAddScore();
   const updateCumulativeScore = useUpdateCumulativeScore();
-  const { data: existingGames } = useGames();
-  const { data: existingPicks } = usePicks();
-  const { data: existingCumulativeScores } = useCumulativeScores();
 
   useEffect(() => {
     const fetchNFLMatches = async () => {
@@ -87,15 +84,7 @@ const ImportPicks = () => {
   };
 
   const calculateScores = (games, picks) => {
-    console.log('Calculating scores with games:', games);
-    console.log('Calculating scores with picks:', picks);
     const weekScores = {};
-    
-    // Initialize scores for all participants
-    Object.values(teamNameMapping).forEach(name => {
-      weekScores[name] = 0;
-    });
-
     picks.forEach(pick => {
       const game = games.find(g => g.home_team === pick.pick || g.away_team === pick.pick);
       if (game && game.winner) {
@@ -103,56 +92,32 @@ const ImportPicks = () => {
         weekScores[pick.name] = (weekScores[pick.name] || 0) + (pick.pick === correctPick ? 1 : 0);
       }
     });
-    
-    console.log('Calculated week scores:', weekScores);
     return weekScores;
   };
 
   const savePicks = async () => {
     try {
-      const weekNumber = parseInt(selectedWeek);
-      if (isNaN(weekNumber)) {
-        throw new Error("Invalid week number");
+      for (const game of parsedGames) {
+        await addGame.mutateAsync({ ...game, week: parseInt(selectedWeek) });
       }
 
-      // Save games first
-      const savedGames = await Promise.all(parsedGames.map(game => 
-        addGame.mutateAsync({ ...game, week: weekNumber })
-      ));
-      console.log('Saved games:', savedGames);
+      for (const pick of parsedPicks) {
+        await addPick.mutateAsync({ ...pick, week: parseInt(selectedWeek) });
+      }
 
-      // Save picks for all participants
-      await Promise.all(parsedPicks.map(pick => 
-        addPick.mutateAsync({ ...pick, week: weekNumber })
-      ));
-
-      // Calculate scores using parsedGames
       const weekScores = calculateScores(parsedGames, parsedPicks);
+      for (const [name, score] of Object.entries(weekScores)) {
+        await addScore.mutateAsync({
+          week: parseInt(selectedWeek),
+          name,
+          score
+        });
 
-      // Save weekly scores and update cumulative scores
-      await Promise.all(Object.entries(weekScores).map(async ([name, score]) => {
-        try {
-          // Save weekly score
-          await addScore.mutateAsync({
-            week: weekNumber,
-            name,
-            score
-          });
-          console.log(`Weekly score saved for ${name}: ${score}`);
-
-          // Update cumulative score
-          const existingCumulativeScore = existingCumulativeScores?.find(s => s.name === name)?.score || 0;
-          const newCumulativeScore = existingCumulativeScore + score;
-
-          await updateCumulativeScore.mutateAsync({
-            name,
-            score: newCumulativeScore
-          });
-          console.log(`Cumulative score updated for ${name}: ${newCumulativeScore}`);
-        } catch (error) {
-          console.error(`Error saving scores for ${name}:`, error);
-        }
-      }));
+        await updateCumulativeScore.mutateAsync({
+          name,
+          score
+        });
+      }
 
       toast.success(`Picks, games, and scores saved successfully for Week ${selectedWeek}!`);
     } catch (error) {
@@ -160,7 +125,11 @@ const ImportPicks = () => {
       toast.error(`Failed to save data: ${error.message}`);
     }
   };
-
+    } catch (error) {
+      console.error('Error saving data:', error);
+      toast.error(`Failed to save data: ${error.message}`);
+    }
+  };
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold mb-6 text-foreground">Import Picks</h1>
