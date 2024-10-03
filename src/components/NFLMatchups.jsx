@@ -1,56 +1,79 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const NFLMatchups = ({ matches }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   const getScoreColor = (homeScore, awayScore) => {
     if (homeScore > awayScore) {
       return { home: 'text-accent', away: 'text-primary' };
     } else if (awayScore > homeScore) {
       return { home: 'text-primary', away: 'text-accent' };
     }
-    return { home: 'text-foreground', away: 'text-foreground' }; // Tie or no score
+    return { home: 'text-foreground', away: 'text-foreground' };
   };
+
+  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
     <Card className="bg-card">
-      <CardHeader>
-        <CardTitle className="text-foreground">NFL Matchups</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between py-2">
+        <CardTitle className="text-foreground text-lg">NFL Matchups</CardTitle>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleCollapse}
+          className="p-0 h-8 w-8"
+        >
+          {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+        </Button>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 gap-4">
-          {matches.map((match, index) => {
-            const homeTeam = match.homeTeam.displayName;
-            const awayTeam = match.awayTeam.displayName;
-            const score = match.state.score.current;
-            const status = match.state.description;
-            
-            let homeScore = 'N/A';
-            let awayScore = 'N/A';
-            if (score) {
-              [homeScore, awayScore] = score.split('-');
-            }
+      <AnimatePresence initial={false}>
+        {!isCollapsed && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CardContent className="py-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                {matches.map((match, index) => {
+                  const homeTeam = match.homeTeam.displayName;
+                  const awayTeam = match.awayTeam.displayName;
+                  const score = match.state.score.current;
+                  const status = match.state.description;
+                  
+                  let homeScore = 'N/A';
+                  let awayScore = 'N/A';
+                  if (score) {
+                    [homeScore, awayScore] = score.split('-');
+                  }
 
-            const scoreColors = getScoreColor(parseInt(homeScore), parseInt(awayScore));
+                  const scoreColors = getScoreColor(parseInt(homeScore), parseInt(awayScore));
 
-            return (
-              <div key={index} className="bg-secondary p-3 rounded-lg text-sm">
-                <div className="grid grid-cols-3 items-center mb-2">
-                  <div className="text-center">
-                    <span className="font-semibold text-black">{awayTeam}</span>
-                    <div className={`mt-1 ${scoreColors.away} text-2xl font-bold`}>{awayScore}</div>
-                  </div>
-                  <span className="text-xs text-muted-foreground text-center">@</span>
-                  <div className="text-center">
-                    <span className="font-semibold text-black">{homeTeam}</span>
-                    <div className={`mt-1 ${scoreColors.home} text-2xl font-bold`}>{homeScore}</div>
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground text-center mt-2">{status}</div>
+                  return (
+                    <div key={index} className="bg-secondary p-2 rounded-lg text-xs">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-semibold text-black">{awayTeam}</span>
+                        <span className={`${scoreColors.away} font-bold`}>{awayScore}</span>
+                      </div>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-semibold text-black">{homeTeam}</span>
+                        <span className={`${scoreColors.home} font-bold`}>{homeScore}</span>
+                      </div>
+                      <div className="text-xxs text-muted-foreground text-center">{status}</div>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
-      </CardContent>
+            </CardContent>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Card>
   );
 };
