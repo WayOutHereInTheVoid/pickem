@@ -35,9 +35,6 @@ CREATE TABLE cumulative_scores (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Add unique constraint to cumulative_scores table
-ALTER TABLE cumulative_scores ADD CONSTRAINT unique_name UNIQUE (name);
-
 -- Create indexes for faster queries
 CREATE INDEX idx_games_week ON games(week);
 CREATE INDEX idx_picks_week ON picks(week);

@@ -125,7 +125,11 @@ const ImportPicks = () => {
       toast.error(`Failed to save data: ${error.message}`);
     }
   };
-
+    } catch (error) {
+      console.error('Error saving data:', error);
+      toast.error(`Failed to save data: ${error.message}`);
+    }
+  };
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold mb-6 text-foreground">Import Picks</h1>
