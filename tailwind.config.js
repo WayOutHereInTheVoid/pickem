@@ -22,7 +22,7 @@ module.exports = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "#1A1A1A",
-        foreground: "#F9F9F9",
+        foreground: "#FFFFFF",
         primary: {
           DEFAULT: "#FF6F00",
           light: "#FF9E40",
@@ -38,7 +38,7 @@ module.exports = {
         },
         muted: {
           DEFAULT: "#CCCCCC",
-          foreground: "#F9F9F9",
+          foreground: "#FFFFFF",
         },
         accent: {
           DEFAULT: "#00B8D4",
@@ -46,11 +46,11 @@ module.exports = {
         },
         popover: {
           DEFAULT: "#1A1A1A",
-          foreground: "#F9F9F9",
+          foreground: "#FFFFFF",
         },
         card: {
           DEFAULT: "#1A1A1A",
-          foreground: "#F9F9F9",
+          foreground: "#FFFFFF",
         },
       },
       borderRadius: {
@@ -73,8 +73,7 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       fontFamily: {
-        oswald: ['Oswald', 'sans-serif'],
-        'source-sans': ['"Source Sans Pro"', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
       },
     },
   },

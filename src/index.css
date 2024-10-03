@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,10 +9,10 @@
     --background: 0 0% 10%;
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 10%;
+    --card: 0 0% 12%;
     --card-foreground: 0 0% 98%;
  
-    --popover: 0 0% 10%;
+    --popover: 0 0% 12%;
     --popover-foreground: 0 0% 98%;
  
     --primary: 28 100% 50%;
@@ -41,11 +43,11 @@
     @apply border-border;
   }
   body {
-    @apply bg-gradient-to-br from-background to-background/90 text-foreground font-source-sans min-h-screen;
+    @apply bg-gradient-to-br from-background to-background/90 text-foreground font-inter min-h-screen;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-oswald font-bold;
+    @apply font-inter font-bold;
   }
 }
 
@@ -66,5 +68,9 @@
 }
 
 .bg-gradient-subtle {
-  @apply bg-gradient-to-br from-background via-background/95 to-background/90;
+  @apply bg-gradient-to-br from-card via-card/95 to-card/90;
+}
+
+.input-focus {
+  @apply focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300;
 }

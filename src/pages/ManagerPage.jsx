@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useSupabaseAuth } from '../integrations/supabase';
 import ImportPicks from './ImportPicks';
 import { toast } from "sonner";
+import { LogOut, Calendar, Clipboard } from 'lucide-react';
 
 const ManagerPage = () => {
   const [email, setEmail] = useState('');
@@ -32,29 +33,37 @@ const ManagerPage = () => {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-background p-8">
+      <div className="min-h-screen bg-gradient-to-br from-background to-background/90 p-8">
         <div className="max-w-md mx-auto">
-          <Card className="bg-card">
+          <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader>
-              <CardTitle className="text-foreground">Manager Login</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">Manager Login</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleLogin} className="space-y-4">
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-secondary text-foreground"
-                />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-secondary text-foreground"
-                />
-                <Button type="submit" className="w-full bg-primary text-primary-foreground">
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-sm font-medium text-foreground">Email</label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-secondary text-foreground focus:ring-2 focus:ring-primary transition-all duration-300"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-sm font-medium text-foreground">Password</label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-secondary text-foreground focus:ring-2 focus:ring-primary transition-all duration-300"
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary-light transition-colors duration-300">
                   Login
                 </Button>
               </form>
@@ -66,13 +75,26 @@ const ManagerPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen bg-gradient-to-br from-background to-background/90 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-foreground">Manager Dashboard</h1>
-        <Button onClick={handleLogout} className="mb-6 bg-primary text-primary-foreground">
-          Logout
-        </Button>
-        <ImportPicks />
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-foreground">Manager Dashboard</h1>
+          <Button onClick={handleLogout} className="bg-teal-500 hover:bg-teal-600 text-white transition-colors duration-300">
+            <LogOut className="w-4 h-4 mr-2" />
+            Logout
+          </Button>
+        </div>
+        <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-foreground flex items-center">
+              <Calendar className="w-6 h-6 mr-2 text-primary" />
+              Import Picks
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ImportPicks />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
