@@ -1,33 +1,36 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader } from 'lucide-react';
 
-const ParsedPicks = ({ picks, onSave }) => {
+const ParsedPicks = ({ picks, onSave, isSaving }) => {
   return (
     <Card className="bg-card">
       <CardHeader>
         <CardTitle className="text-foreground">Parsed Picks</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-foreground">Team Name</TableHead>
-              <TableHead className="text-foreground">Pick</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {picks.map((pick, index) => (
-              <TableRow key={index}>
-                <TableCell className="text-foreground">{pick.name}</TableCell>
-                <TableCell className="text-foreground">{pick.pick}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <Button onClick={onSave} className="w-full mt-4 bg-primary text-primary-foreground">
-          Save Picks, Games, and Calculate Scores
+        <div className="space-y-2">
+          {picks.map((pick, index) => (
+            <div key={index} className="flex justify-between items-center">
+              <span className="text-foreground">{pick.name}</span>
+              <span className="text-primary">{pick.pick}</span>
+            </div>
+          ))}
+        </div>
+        <Button 
+          onClick={onSave} 
+          className="mt-4 w-full bg-primary text-primary-foreground hover:bg-primary-light transition-colors duration-300"
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <>
+              <Loader className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            'Save Picks and Calculate Scores'
+          )}
         </Button>
       </CardContent>
     </Card>

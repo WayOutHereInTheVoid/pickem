@@ -19,6 +19,7 @@ const ImportPicks = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [nflMatches, setNflMatches] = useState([]);
   const [isParsing, setIsParsing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [isNFLMatchupsCollapsed, setIsNFLMatchupsCollapsed] = useState(false);
 
   const addPick = useAddPick();
@@ -106,6 +107,7 @@ const ImportPicks = () => {
   };
 
   const savePicks = async () => {
+    setIsSaving(true);
     try {
       for (const game of parsedGames) {
         await addGame.mutateAsync({ ...game, week: parseInt(selectedWeek) });
@@ -133,6 +135,8 @@ const ImportPicks = () => {
     } catch (error) {
       console.error('Error saving data:', error);
       toast.error(`Failed to save data: ${error.message}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -205,7 +209,11 @@ const ImportPicks = () => {
       )}
       
       {parsedPicks.length > 0 && (
-        <ParsedPicks picks={parsedPicks} onSave={savePicks} />
+        <ParsedPicks 
+          picks={parsedPicks} 
+          onSave={savePicks}
+          isSaving={isSaving}
+        />
       )}
     </div>
   );
