@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getTeamColor } from '../utils/teamColors';
 
-const NFLMatchups = ({ matches }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false }) => {
+  const [isCollapsed, setIsCollapsed] = useState(initialIsCollapsed);
+
+  useEffect(() => {
+    setIsCollapsed(initialIsCollapsed);
+  }, [initialIsCollapsed]);
 
   const getScoreColor = (homeScore, awayScore) => {
     if (homeScore > awayScore) {

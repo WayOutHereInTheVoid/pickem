@@ -19,20 +19,12 @@ const ImportPicks = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [nflMatches, setNflMatches] = useState([]);
   const [isParsing, setIsParsing] = useState(false);
+  const [isNFLMatchupsCollapsed, setIsNFLMatchupsCollapsed] = useState(false);
 
   const addPick = useAddPick();
   const addGame = useAddGame();
   const addScore = useAddScore();
   const updateCumulativeScore = useUpdateCumulativeScore();
-
-  React.useEffect(() => {
-    const fetchNFLMatches = async () => {
-      const matches = await getCachedOrFetchWeekMatches(parseInt(selectedWeek));
-      setNflMatches(matches);
-    };
-
-    fetchNFLMatches();
-  }, [selectedWeek]);
 
   const teamNameMapping = {
     "Thumbz": "Murder Hornets",
@@ -48,6 +40,15 @@ const ImportPicks = () => {
     "Econley19": "Seattle Prestiges",
     "Detroilet": "D-Town Swirlies"
   };
+
+  React.useEffect(() => {
+    const fetchNFLMatches = async () => {
+      const matches = await getCachedOrFetchWeekMatches(parseInt(selectedWeek));
+      setNflMatches(matches);
+    };
+
+    fetchNFLMatches();
+  }, [selectedWeek]);
 
   const handleInputChange = (e) => {
     setPollResults(e.target.value);
@@ -83,6 +84,7 @@ const ImportPicks = () => {
     console.log('Parsed games:', games);
     toast.success(`Successfully parsed ${picks.length} picks and ${games.length} games`);
     setIsParsing(false);
+    setIsNFLMatchupsCollapsed(true); // Collapse NFL matchups after parsing
   };
 
   const handleWinnerChange = (index, winner) => {
@@ -196,7 +198,7 @@ const ImportPicks = () => {
         </CardContent>
       </Card>
       
-      <NFLMatchups matches={nflMatches} />
+      <NFLMatchups matches={nflMatches} isCollapsed={isNFLMatchupsCollapsed} />
       
       {parsedGames.length > 0 && (
         <ParsedGames games={parsedGames} onWinnerChange={handleWinnerChange} />
