@@ -6,8 +6,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const WeeklyMatchups = ({ leagueId, week, isCollapsed: initialIsCollapsed = false }) => {
   const [matchups, setMatchups] = useState([]);
-  const [teams, setTeams] = useState({});
   const [isCollapsed, setIsCollapsed] = useState(initialIsCollapsed);
+
+  const teamMap = {
+    1: "Murder Hornets",
+    2: "Black Hawk Bones",
+    3: "Sonora Sugar Skulls",
+    4: "Newfoundland Growlers",
+    5: "California Burritos",
+    6: "Kyoto Ninjas",
+    7: "Brutal Hogs",
+    8: "Southwest Aliens",
+    9: "Jesters",
+    10: "Mile High Melonheads",
+    11: "Seattle Prestiges",
+    12: "D-Town Swirlies"
+  };
 
   useEffect(() => {
     setIsCollapsed(initialIsCollapsed);
@@ -16,25 +30,11 @@ const WeeklyMatchups = ({ leagueId, week, isCollapsed: initialIsCollapsed = fals
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [matchupsResponse, usersResponse] = await Promise.all([
-          fetch(`https://api.sleeper.app/v1/league/${leagueId}/matchups/${week}`),
-          fetch(`https://api.sleeper.app/v1/league/${leagueId}/users`)
-        ]);
-
-        const [matchupsData, usersData] = await Promise.all([
-          matchupsResponse.json(),
-          usersResponse.json()
-        ]);
-
-        const teamMap = {};
-        usersData.forEach(user => {
-          teamMap[user.roster_id] = user.display_name || user.metadata.team_name || user.username;
-        });
-
-        setTeams(teamMap);
+        const response = await fetch(`https://api.sleeper.app/v1/league/${leagueId}/matchups/${week}`);
+        const matchupsData = await response.json();
         setMatchups(matchupsData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching matchups:', error);
       }
     };
 
@@ -84,8 +84,8 @@ const WeeklyMatchups = ({ leagueId, week, isCollapsed: initialIsCollapsed = fals
             <CardContent className="py-2">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                 {Object.values(groupedMatchups).map((matchup, index) => {
-                  const team1 = teams[matchup[0]?.roster_id] || 'Unknown Team';
-                  const team2 = teams[matchup[1]?.roster_id] || 'Unknown Team';
+                  const team1 = teamMap[matchup[0]?.roster_id] || 'Unknown Team';
+                  const team2 = teamMap[matchup[1]?.roster_id] || 'Unknown Team';
                   const team1Score = matchup[0]?.points || 0;
                   const team2Score = matchup[1]?.points || 0;
                   const scoreColors = getScoreColor(team1Score, team2Score);
