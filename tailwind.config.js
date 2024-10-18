@@ -74,8 +74,6 @@ module.exports = {
       },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
-        oswald: ['Oswald', 'sans-serif'],
-        'source-sans-pro': ['"Source Sans Pro"', 'sans-serif'],
       },
     },
   },
