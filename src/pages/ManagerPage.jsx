@@ -36,11 +36,6 @@ const ManagerPage = () => {
     toast.success("Logged out successfully");
   };
 
-  const getCurrentWeek = () => {
-    // This is a placeholder. You might want to implement a more sophisticated way to determine the current week
-    return parseInt(selectedWeek);
-  };
-
   if (!session) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-background/90 p-8">
@@ -138,7 +133,7 @@ const ManagerPage = () => {
           </CardContent>
         </Card>
 
-        <WeeklyMatchups leagueId="1124822402371428352" week={getCurrentWeek()} />
+        <WeeklyMatchups leagueId="1124822402371428352" week={parseInt(selectedWeek)} />
 
         <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow duration-300 mt-6">
           <CardHeader>
