@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useSupabaseAuth } from '../integrations/supabase';
 import ImportPicks from './ImportPicks';
+import WeeklyMatchups from '../components/WeeklyMatchups';
 import { toast } from "sonner";
 import { LogOut, Calendar, Clipboard, UserCog, Menu } from 'lucide-react';
 
@@ -31,6 +32,11 @@ const ManagerPage = () => {
     await logout();
     navigate('/');
     toast.success("Logged out successfully");
+  };
+
+  const getCurrentWeek = () => {
+    // This is a placeholder. You might want to implement a more sophisticated way to determine the current week
+    return 1;
   };
 
   if (!session) {
@@ -107,7 +113,9 @@ const ManagerPage = () => {
           {/* Add mobile menu items here */}
         </motion.div>
 
-        <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <WeeklyMatchups leagueId="1124822402371428352" week={getCurrentWeek()} />
+
+        <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow duration-300 mt-6">
           <CardHeader>
             <CardTitle className="text-xl md:text-2xl font-bold text-foreground flex items-center">
               <Calendar className="w-6 h-6 mr-2 text-primary" />
