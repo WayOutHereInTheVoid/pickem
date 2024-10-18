@@ -93,11 +93,11 @@ const WeeklyMatchups = ({ leagueId, week, isCollapsed: initialIsCollapsed = fals
                   return (
                     <div key={index} className="bg-secondary p-2 rounded-lg text-xs">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold">{team1}</span>
+                        <span className="font-semibold truncate mr-2">{team1}</span>
                         <span className={`${scoreColors.team1} font-bold`}>{team1Score.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold">{team2}</span>
+                        <span className="font-semibold truncate mr-2">{team2}</span>
                         <span className={`${scoreColors.team2} font-bold`}>{team2Score.toFixed(2)}</span>
                       </div>
                     </div>
