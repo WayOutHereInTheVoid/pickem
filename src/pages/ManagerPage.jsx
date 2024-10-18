@@ -9,11 +9,13 @@ import ImportPicks from './ImportPicks';
 import WeeklyMatchups from '../components/WeeklyMatchups';
 import { toast } from "sonner";
 import { LogOut, Calendar, Clipboard, UserCog, Menu } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ManagerPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [selectedWeek, setSelectedWeek] = useState("1");
   const { session, login, logout } = useSupabaseAuth();
   const navigate = useNavigate();
 
@@ -36,7 +38,7 @@ const ManagerPage = () => {
 
   const getCurrentWeek = () => {
     // This is a placeholder. You might want to implement a more sophisticated way to determine the current week
-    return 1;
+    return parseInt(selectedWeek);
   };
 
   if (!session) {
@@ -113,12 +115,35 @@ const ManagerPage = () => {
           {/* Add mobile menu items here */}
         </motion.div>
 
+        <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow duration-300 mb-6">
+          <CardHeader>
+            <CardTitle className="text-xl md:text-2xl font-bold text-foreground flex items-center">
+              <Calendar className="w-6 h-6 mr-2 text-primary" />
+              Select Week
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+              <SelectTrigger className="w-full bg-secondary text-foreground">
+                <SelectValue placeholder="Select week" />
+              </SelectTrigger>
+              <SelectContent>
+                {[...Array(16)].map((_, i) => (
+                  <SelectItem key={i + 1} value={(i + 1).toString()}>
+                    Week {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+
         <WeeklyMatchups leagueId="1124822402371428352" week={getCurrentWeek()} />
 
         <Card className="bg-card shadow-lg hover:shadow-xl transition-shadow duration-300 mt-6">
           <CardHeader>
             <CardTitle className="text-xl md:text-2xl font-bold text-foreground flex items-center">
-              <Calendar className="w-6 h-6 mr-2 text-primary" />
+              <Clipboard className="w-6 h-6 mr-2 text-primary" />
               Import Picks
             </CardTitle>
           </CardHeader>

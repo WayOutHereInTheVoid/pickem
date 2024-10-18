@@ -84,8 +84,8 @@ const WeeklyMatchups = ({ leagueId, week, isCollapsed: initialIsCollapsed = fals
             <CardContent className="py-2">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                 {Object.values(groupedMatchups).map((matchup, index) => {
-                  const team1 = teams[matchup[0]?.roster_id];
-                  const team2 = teams[matchup[1]?.roster_id];
+                  const team1 = teams[matchup[0]?.roster_id] || 'Unknown Team';
+                  const team2 = teams[matchup[1]?.roster_id] || 'Unknown Team';
                   const team1Score = matchup[0]?.points || 0;
                   const team2Score = matchup[1]?.points || 0;
                   const scoreColors = getScoreColor(team1Score, team2Score);
@@ -93,11 +93,11 @@ const WeeklyMatchups = ({ leagueId, week, isCollapsed: initialIsCollapsed = fals
                   return (
                     <div key={index} className="bg-secondary p-2 rounded-lg text-xs">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold truncate mr-2">{team1}</span>
+                        <span className="font-semibold truncate mr-2 flex-grow">{team1}</span>
                         <span className={`${scoreColors.team1} font-bold`}>{team1Score.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold truncate mr-2">{team2}</span>
+                        <span className="font-semibold truncate mr-2 flex-grow">{team2}</span>
                         <span className={`${scoreColors.team2} font-bold`}>{team2Score.toFixed(2)}</span>
                       </div>
                     </div>
