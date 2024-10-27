@@ -3,6 +3,7 @@ import { supabase } from './supabase.js';
 import { useQueryClient } from '@tanstack/react-query';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { toast } from "sonner";
 
 const SupabaseAuthContext = createContext();
 
@@ -21,47 +22,72 @@ export const SupabaseAuthProviderInner = ({ children }) => {
 
   useEffect(() => {
     const getSession = async () => {
-      setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setLoading(false);
+      try {
+        setLoading(true);
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Session error:', error);
+          toast.error('Authentication error. Please try logging in again.');
+        }
+        setSession(session);
+      } catch (error) {
+        console.error('Auth error:', error);
+        toast.error('Authentication error. Please try logging in again.');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       queryClient.invalidateQueries('user');
+      
+      if (event === 'SIGNED_OUT') {
+        toast.info('You have been signed out');
+      } else if (event === 'SIGNED_IN') {
+        toast.success('Successfully signed in');
+      }
     });
 
     getSession();
 
     return () => {
-      authListener.subscription.unsubscribe();
-      setLoading(false);
+      subscription?.unsubscribe();
     };
   }, [queryClient]);
 
   const login = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      setSession(data.session);
+      return data;
+    } catch (error) {
       console.error('Login error:', error);
-      throw new Error(error.message);
+      toast.error(error.message || 'Failed to login');
+      throw error;
     }
-    setSession(data.session);
-    return data;
   };
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      setSession(null);
+      queryClient.invalidateQueries('user');
+      setLoading(false);
+    } catch (error) {
       console.error('Logout error:', error);
-      throw new Error(error.message);
+      toast.error(error.message || 'Failed to logout');
+      throw error;
     }
-    setSession(null);
-    queryClient.invalidateQueries('user');
-    setLoading(false);
   };
 
   return (
@@ -72,7 +98,11 @@ export const SupabaseAuthProviderInner = ({ children }) => {
 };
 
 export const useSupabaseAuth = () => {
-  return useContext(SupabaseAuthContext);
+  const context = useContext(SupabaseAuthContext);
+  if (!context) {
+    throw new Error('useSupabaseAuth must be used within a SupabaseAuthProvider');
+  }
+  return context;
 };
 
 export const SupabaseAuthUI = () => (
