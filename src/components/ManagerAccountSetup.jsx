@@ -6,11 +6,19 @@ import { supabase } from '@/integrations/supabase/supabase';
 import { toast } from "sonner";
 import { KeyIcon, UserPlusIcon } from 'lucide-react';
 
+/**
+ * A component for setting up a manager account.
+ * @returns {JSX.Element}
+ */
 const ManagerAccountSetup = () => {
   const [email, setEmail] = useState('manager@nflpickem.local');
   const [password, setPassword] = useState('Manager2025!');
   const [isCreating, setIsCreating] = useState(false);
 
+  /**
+   * Creates a manager account using the provided email and password.
+   * @param {React.FormEvent<HTMLFormElement>} e - The form event.
+   */
   const createManagerAccount = async (e) => {
     e.preventDefault();
     setIsCreating(true);

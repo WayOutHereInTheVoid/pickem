@@ -1,3 +1,10 @@
+/**
+ * Calculates the weekly scores for each participant.
+ * @param {Array<object>} games - An array of game objects.
+ * @param {Array<object>} picks - An array of pick objects.
+ * @param {Array<object>} results - An array of result objects.
+ * @returns {Array<object>} An array of objects containing the weekly scores for each participant.
+ */
 export const calculateWeeklyScores = (games, picks, results) => {
   const scores = {};
 
@@ -20,6 +27,11 @@ export const calculateWeeklyScores = (games, picks, results) => {
   return Object.entries(scores).map(([name, score]) => ({ name, score }));
 };
 
+/**
+ * Calculates the cumulative scores for each participant.
+ * @param {Array<object>} weeklyScores - An array of weekly score objects.
+ * @returns {Array<object>} An array of objects containing the cumulative scores for each participant.
+ */
 export const calculateCumulativeScores = (weeklyScores) => {
   const cumulativeScores = {};
 

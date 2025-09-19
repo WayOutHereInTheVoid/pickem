@@ -2,6 +2,16 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @typedef {Object} TextareaProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * A textarea component that can be used to enter multi-line text.
+ * @param {TextareaProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Textarea = React.forwardRef(({ className, ...props }, ref) => {
   return (
     (<textarea

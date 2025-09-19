@@ -24,6 +24,12 @@ const nflWeeks2025 = {
   18: { start: '2026-01-03', end: '2026-01-05' }
 };
 
+/**
+ * Generates a range of dates between a start and end date.
+ * @param {string} start - The start date in YYYY-MM-DD format.
+ * @param {string} end - The end date in YYYY-MM-DD format.
+ * @returns {Array<string>} An array of dates in YYYY-MM-DD format.
+ */
 function generateDateRange(start, end) {
   const dates = [];
   let currentDate = new Date(start);
@@ -35,6 +41,11 @@ function generateDateRange(start, end) {
   return dates;
 }
 
+/**
+ * Fetches NFL matches for a given date from the API.
+ * @param {string} date - The date to fetch matches for in YYYY-MM-DD format.
+ * @returns {Promise<Array<object>>} A promise that resolves with an array of match objects.
+ */
 async function fetchNFLMatches(date) {
   const options = {
     method: 'GET',
@@ -58,6 +69,11 @@ async function fetchNFLMatches(date) {
   }
 }
 
+/**
+ * Gets the NFL matches for a given week, either from the cache or by fetching from the API.
+ * @param {number} week - The week to get matches for.
+ * @returns {Promise<Array<object>>} A promise that resolves with an array of match objects.
+ */
 export async function getCachedOrFetchWeekMatches(week) {
   // Check if we have cached data for this week
   const { data: cachedMatches, error } = await supabase

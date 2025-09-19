@@ -4,16 +4,43 @@ import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * A menu within a menubar.
+ */
 const MenubarMenu = MenubarPrimitive.Menu
 
+/**
+ * A group of menubar items.
+ */
 const MenubarGroup = MenubarPrimitive.Group
 
+/**
+ * A portal that renders its children into a new stacking context.
+ */
 const MenubarPortal = MenubarPrimitive.Portal
 
+/**
+ * A submenu that is displayed when a user hovers over a menubar item.
+ */
 const MenubarSub = MenubarPrimitive.Sub
 
+/**
+ * A group of radio buttons that can be used in a menubar.
+ */
 const MenubarRadioGroup = MenubarPrimitive.RadioGroup
 
+/**
+ * @typedef {Object} MenubarProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A menubar component that displays a menu of commands.
+ * This component is based on the Radix UI Menubar primitive.
+ * @param {MenubarProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Menubar = React.forwardRef(({ className, ...props }, ref) => (
   <MenubarPrimitive.Root
     ref={ref}
@@ -25,6 +52,17 @@ const Menubar = React.forwardRef(({ className, ...props }, ref) => (
 ))
 Menubar.displayName = MenubarPrimitive.Root.displayName
 
+/**
+ * @typedef {Object} MenubarTriggerProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The trigger that opens a menubar menu.
+ * @param {MenubarTriggerProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const MenubarTrigger = React.forwardRef(({ className, ...props }, ref) => (
   <MenubarPrimitive.Trigger
     ref={ref}
@@ -36,6 +74,18 @@ const MenubarTrigger = React.forwardRef(({ className, ...props }, ref) => (
 ))
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName
 
+/**
+ * @typedef {Object} MenubarSubTriggerProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {boolean} [inset] - Whether the item is inset.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The trigger that opens a submenu.
+ * @param {MenubarSubTriggerProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const MenubarSubTrigger = React.forwardRef(({ className, inset, children, ...props }, ref) => (
   <MenubarPrimitive.SubTrigger
     ref={ref}
@@ -51,6 +101,17 @@ const MenubarSubTrigger = React.forwardRef(({ className, inset, children, ...pro
 ))
 MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName
 
+/**
+ * @typedef {Object} MenubarSubContentProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The content of a submenu.
+ * @param {MenubarSubContentProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const MenubarSubContent = React.forwardRef(({ className, ...props }, ref) => (
   <MenubarPrimitive.SubContent
     ref={ref}
@@ -62,6 +123,20 @@ const MenubarSubContent = React.forwardRef(({ className, ...props }, ref) => (
 ))
 MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName
 
+/**
+ * @typedef {Object} MenubarContentProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {'start' | 'center' | 'end'} [align='start'] - The alignment of the content.
+ * @property {number} [alignOffset=-4] - The offset of the content from the trigger.
+ * @property {number} [sideOffset=8] - The offset of the content from the trigger.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The content of a menubar menu.
+ * @param {MenubarContentProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const MenubarContent = React.forwardRef((
   { className, align = "start", alignOffset = -4, sideOffset = 8, ...props },
   ref
@@ -81,6 +156,18 @@ const MenubarContent = React.forwardRef((
 ))
 MenubarContent.displayName = MenubarPrimitive.Content.displayName
 
+/**
+ * @typedef {Object} MenubarItemProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {boolean} [inset] - Whether the item is inset.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A single item in a menubar menu.
+ * @param {MenubarItemProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const MenubarItem = React.forwardRef(({ className, inset, ...props }, ref) => (
   <MenubarPrimitive.Item
     ref={ref}
@@ -93,6 +180,18 @@ const MenubarItem = React.forwardRef(({ className, inset, ...props }, ref) => (
 ))
 MenubarItem.displayName = MenubarPrimitive.Item.displayName
 
+/**
+ * @typedef {Object} MenubarCheckboxItemProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {boolean} [checked] - Whether the item is checked.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A checkbox item in a menubar menu.
+ * @param {MenubarCheckboxItemProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const MenubarCheckboxItem = React.forwardRef(({ className, children, checked, ...props }, ref) => (
   <MenubarPrimitive.CheckboxItem
     ref={ref}
@@ -112,6 +211,17 @@ const MenubarCheckboxItem = React.forwardRef(({ className, children, checked, ..
 ))
 MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName
 
+/**
+ * @typedef {Object} MenubarRadioItemProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A radio button item in a menubar menu.
+ * @param {MenubarRadioItemProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const MenubarRadioItem = React.forwardRef(({ className, children, ...props }, ref) => (
   <MenubarPrimitive.RadioItem
     ref={ref}
@@ -130,6 +240,18 @@ const MenubarRadioItem = React.forwardRef(({ className, children, ...props }, re
 ))
 MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName
 
+/**
+ * @typedef {Object} MenubarLabelProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {boolean} [inset] - Whether the item is inset.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A label for a group of menubar items.
+ * @param {MenubarLabelProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const MenubarLabel = React.forwardRef(({ className, inset, ...props }, ref) => (
   <MenubarPrimitive.Label
     ref={ref}
@@ -138,6 +260,16 @@ const MenubarLabel = React.forwardRef(({ className, inset, ...props }, ref) => (
 ))
 MenubarLabel.displayName = MenubarPrimitive.Label.displayName
 
+/**
+ * @typedef {Object} MenubarSeparatorProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * A separator between menubar items.
+ * @param {MenubarSeparatorProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const MenubarSeparator = React.forwardRef(({ className, ...props }, ref) => (
   <MenubarPrimitive.Separator
     ref={ref}
@@ -146,6 +278,17 @@ const MenubarSeparator = React.forwardRef(({ className, ...props }, ref) => (
 ))
 MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName
 
+/**
+ * @typedef {Object} MenubarShortcutProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A keyboard shortcut for a menubar item.
+ * @param {MenubarShortcutProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const MenubarShortcut = ({
   className,
   ...props

@@ -4,6 +4,17 @@ import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button";
 
+/**
+ * @typedef {Object} PaginationProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A pagination component that displays a list of pages and allows the user to navigate between them.
+ * @param {PaginationProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Pagination = ({
   className,
   ...props
@@ -16,6 +27,17 @@ const Pagination = ({
 )
 Pagination.displayName = "Pagination"
 
+/**
+ * @typedef {Object} PaginationContentProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The content of the pagination component.
+ * @param {PaginationContentProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const PaginationContent = React.forwardRef(({ className, ...props }, ref) => (
   <ul
     ref={ref}
@@ -24,11 +46,35 @@ const PaginationContent = React.forwardRef(({ className, ...props }, ref) => (
 ))
 PaginationContent.displayName = "PaginationContent"
 
+/**
+ * @typedef {Object} PaginationItemProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A single item in the pagination component.
+ * @param {PaginationItemProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const PaginationItem = React.forwardRef(({ className, ...props }, ref) => (
   <li ref={ref} className={cn("", className)} {...props} />
 ))
 PaginationItem.displayName = "PaginationItem"
 
+/**
+ * @typedef {Object} PaginationLinkProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {boolean} [isActive] - Whether the link is active.
+ * @property {'icon' | 'default'} [size='icon'] - The size of the link.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A link in the pagination component.
+ * @param {PaginationLinkProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const PaginationLink = ({
   className,
   isActive,
@@ -45,6 +91,16 @@ const PaginationLink = ({
 )
 PaginationLink.displayName = "PaginationLink"
 
+/**
+ * @typedef {Object} PaginationPreviousProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * The previous page link in the pagination component.
+ * @param {PaginationPreviousProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const PaginationPrevious = ({
   className,
   ...props
@@ -60,6 +116,16 @@ const PaginationPrevious = ({
 )
 PaginationPrevious.displayName = "PaginationPrevious"
 
+/**
+ * @typedef {Object} PaginationNextProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * The next page link in the pagination component.
+ * @param {PaginationNextProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const PaginationNext = ({
   className,
   ...props
@@ -75,6 +141,16 @@ const PaginationNext = ({
 )
 PaginationNext.displayName = "PaginationNext"
 
+/**
+ * @typedef {Object} PaginationEllipsisProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * An ellipsis in the pagination component.
+ * @param {PaginationEllipsisProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const PaginationEllipsis = ({
   className,
   ...props

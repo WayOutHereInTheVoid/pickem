@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button"
 
 const CarouselContext = React.createContext(null)
 
+/**
+ * A hook to access the carousel context.
+ * @returns {object} The carousel context.
+ * @throws {Error} If used outside of a Carousel component.
+ */
 function useCarousel() {
   const context = React.useContext(CarouselContext)
 
@@ -17,6 +22,22 @@ function useCarousel() {
   return context
 }
 
+/**
+ * @typedef {Object} CarouselProps
+ * @property {'horizontal' | 'vertical'} [orientation='horizontal'] - The orientation of the carousel.
+ * @property {object} [opts] - Options for the embla-carousel-react hook.
+ * @property {function} [setApi] - A function to set the carousel API.
+ * @property {Array<object>} [plugins] - An array of plugins for the embla-carousel-react hook.
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A carousel component that allows users to scroll through a set of items.
+ * This component is based on the embla-carousel-react library.
+ * @param {CarouselProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Carousel = React.forwardRef((
   {
     orientation = "horizontal",
@@ -112,6 +133,17 @@ const Carousel = React.forwardRef((
 })
 Carousel.displayName = "Carousel"
 
+/**
+ * @typedef {Object} CarouselContentProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The content of the carousel.
+ * @param {CarouselContentProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CarouselContent = React.forwardRef(({ className, ...props }, ref) => {
   const { carouselRef, orientation } = useCarousel()
 
@@ -130,6 +162,17 @@ const CarouselContent = React.forwardRef(({ className, ...props }, ref) => {
 })
 CarouselContent.displayName = "CarouselContent"
 
+/**
+ * @typedef {Object} CarouselItemProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A single item in the carousel.
+ * @param {CarouselItemProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CarouselItem = React.forwardRef(({ className, ...props }, ref) => {
   const { orientation } = useCarousel()
 
@@ -148,6 +191,18 @@ const CarouselItem = React.forwardRef(({ className, ...props }, ref) => {
 })
 CarouselItem.displayName = "CarouselItem"
 
+/**
+ * @typedef {Object} CarouselPreviousProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {'outline'} [variant='outline'] - The variant of the button.
+ * @property {'icon'} [size='icon'] - The size of the button.
+ */
+
+/**
+ * The previous button for the carousel.
+ * @param {CarouselPreviousProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CarouselPrevious = React.forwardRef(({ className, variant = "outline", size = "icon", ...props }, ref) => {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel()
 
@@ -169,6 +224,18 @@ const CarouselPrevious = React.forwardRef(({ className, variant = "outline", siz
 })
 CarouselPrevious.displayName = "CarouselPrevious"
 
+/**
+ * @typedef {Object} CarouselNextProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {'outline'} [variant='outline'] - The variant of the button.
+ * @property {'icon'} [size='icon'] - The size of the button.
+ */
+
+/**
+ * The next button for the carousel.
+ * @param {CarouselNextProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CarouselNext = React.forwardRef(({ className, variant = "outline", size = "icon", ...props }, ref) => {
   const { orientation, scrollNext, canScrollNext } = useCarousel()
 

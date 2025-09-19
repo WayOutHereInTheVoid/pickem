@@ -1,3 +1,7 @@
+/**
+ * A mapping of NFL team names to their primary colors.
+ * @type {Object.<string, string>}
+ */
 const teamColors = {
   "Arizona Cardinals": "#97233F",
   "Atlanta Falcons": "#A71930",
@@ -33,6 +37,11 @@ const teamColors = {
   "Washington Commanders": "#5A1414"
 };
 
+/**
+ * Gets the primary color for a given NFL team.
+ * @param {string} teamName - The name of the team.
+ * @returns {string} The hex code for the team's primary color.
+ */
 export const getTeamColor = (teamName) => {
   return teamColors[teamName] || '#000000'; // Default to black if team not found
 };

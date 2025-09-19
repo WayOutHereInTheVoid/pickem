@@ -5,15 +5,25 @@ import { Button } from "@/components/ui/button";
 import { useSupabaseAuth } from '../integrations/supabase';
 import { LogOutIcon, MenuIcon, XIcon, ChevronRightIcon } from 'lucide-react';
 
+/**
+ * A sidebar component that displays navigation links.
+ * @returns {JSX.Element}
+ */
 const Sidebar = () => {
   const { session, logout } = useSupabaseAuth();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
+  /**
+   * Handles the logout process.
+   */
   const handleLogout = async () => {
     await logout();
   };
 
+  /**
+   * Toggles the sidebar open and closed.
+   */
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };

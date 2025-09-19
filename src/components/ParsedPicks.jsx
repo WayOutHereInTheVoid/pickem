@@ -3,6 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader } from 'lucide-react';
 
+/**
+ * @typedef {Object} ParsedPicksProps
+ * @property {Array<object>} picks - An array of pick objects.
+ * @property {function} onSave - A callback function that is called when the save button is clicked.
+ * @property {boolean} isSaving - Whether the picks are currently being saved.
+ */
+
+/**
+ * A component that displays a list of parsed picks and allows the user to save them.
+ * @param {ParsedPicksProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ParsedPicks = ({ picks, onSave, isSaving }) => {
   return (
     <Card className="bg-card">

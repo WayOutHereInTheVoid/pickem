@@ -8,6 +8,10 @@ import {
 } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 
+/**
+ * A toaster component that displays toast messages.
+ * @returns {JSX.Element}
+ */
 export function Toaster() {
   const { toasts } = useToast()
 

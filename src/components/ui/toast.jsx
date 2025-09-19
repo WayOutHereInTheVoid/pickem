@@ -5,8 +5,21 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * A provider for the toast component.
+ */
 const ToastProvider = ToastPrimitives.Provider
 
+/**
+ * @typedef {Object} ToastViewportProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * The viewport for the toast component.
+ * @param {ToastViewportProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ToastViewport = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Viewport
     ref={ref}
@@ -34,6 +47,18 @@ const toastVariants = cva(
   }
 )
 
+/**
+ * @typedef {Object} ToastProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {'default' | 'destructive'} [variant] - The variant of the toast.
+ */
+
+/**
+ * A toast component that displays a message to the user.
+ * This component is based on the Radix UI Toast primitive.
+ * @param {ToastProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Toast = React.forwardRef(({ className, variant, ...props }, ref) => {
   return (
     (<ToastPrimitives.Root
@@ -44,6 +69,17 @@ const Toast = React.forwardRef(({ className, variant, ...props }, ref) => {
 })
 Toast.displayName = ToastPrimitives.Root.displayName
 
+/**
+ * @typedef {Object} ToastActionProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * An action that can be taken on a toast.
+ * @param {ToastActionProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ToastAction = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Action
     ref={ref}
@@ -55,6 +91,16 @@ const ToastAction = React.forwardRef(({ className, ...props }, ref) => (
 ))
 ToastAction.displayName = ToastPrimitives.Action.displayName
 
+/**
+ * @typedef {Object} ToastCloseProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * The button that closes a toast.
+ * @param {ToastCloseProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ToastClose = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Close
     ref={ref}
@@ -69,11 +115,33 @@ const ToastClose = React.forwardRef(({ className, ...props }, ref) => (
 ))
 ToastClose.displayName = ToastPrimitives.Close.displayName
 
+/**
+ * @typedef {Object} ToastTitleProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The title of a toast.
+ * @param {ToastTitleProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ToastTitle = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Title ref={ref} className={cn("text-sm font-semibold", className)} {...props} />
 ))
 ToastTitle.displayName = ToastPrimitives.Title.displayName
 
+/**
+ * @typedef {Object} ToastDescriptionProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The description of a toast.
+ * @param {ToastDescriptionProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ToastDescription = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Description ref={ref} className={cn("text-sm opacity-90", className)} {...props} />
 ))

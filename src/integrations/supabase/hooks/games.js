@@ -1,6 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../supabase';
 
+/**
+ * A helper function to execute a Supabase query and handle errors.
+ * @param {Promise} query - The Supabase query to execute.
+ * @returns {Promise<any>} A promise that resolves with the data from the query.
+ * @throws {Error} If the query returns an error.
+ */
 const fromSupabase = async (query) => {
     const { data, error } = await query;
     if (error) throw new Error(error.message);
@@ -22,16 +28,29 @@ const fromSupabase = async (query) => {
 No foreign key relationships identified.
 */
 
+/**
+ * A hook for fetching a single game.
+ * @param {number} id - The ID of the game to fetch.
+ * @returns {import('@tanstack/react-query').UseQueryResult} The result of the query.
+ */
 export const useGame = (id) => useQuery({
     queryKey: ['games', id],
     queryFn: () => fromSupabase(supabase.from('games').select('*').eq('id', id).single()),
 });
 
+/**
+ * A hook for fetching all games.
+ * @returns {import('@tanstack/react-query').UseQueryResult} The result of the query.
+ */
 export const useGames = () => useQuery({
     queryKey: ['games'],
     queryFn: () => fromSupabase(supabase.from('games').select('*')),
 });
 
+/**
+ * A hook for adding a new game.
+ * @returns {import('@tanstack/react-query').UseMutationResult} The result of the mutation.
+ */
 export const useAddGame = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -42,6 +61,10 @@ export const useAddGame = () => {
     });
 };
 
+/**
+ * A hook for updating a game.
+ * @returns {import('@tanstack/react-query').UseMutationResult} The result of the mutation.
+ */
 export const useUpdateGame = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -52,6 +75,10 @@ export const useUpdateGame = () => {
     });
 };
 
+/**
+ * A hook for deleting a game.
+ * @returns {import('@tanstack/react-query').UseMutationResult} The result of the mutation.
+ */
 export const useDeleteGame = () => {
     const queryClient = useQueryClient();
     return useMutation({

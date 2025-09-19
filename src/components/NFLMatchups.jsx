@@ -5,6 +5,17 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getTeamColor } from '../utils/teamColors';
 
+/**
+ * @typedef {Object} NFLMatchupsProps
+ * @property {Array<object>} matches - An array of match objects.
+ * @property {boolean} [isCollapsed=false] - Whether the component is collapsed by default.
+ */
+
+/**
+ * A component that displays a list of NFL matchups.
+ * @param {NFLMatchupsProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false }) => {
   const [isCollapsed, setIsCollapsed] = useState(initialIsCollapsed);
 
@@ -12,6 +23,12 @@ const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false }) => {
     setIsCollapsed(initialIsCollapsed);
   }, [initialIsCollapsed]);
 
+  /**
+   * Gets the color for the score based on which team is winning.
+   * @param {number} homeScore - The home team's score.
+   * @param {number} awayScore - The away team's score.
+   * @returns {{home: string, away: string}} The colors for the scores.
+   */
   const getScoreColor = (homeScore, awayScore) => {
     if (homeScore > awayScore) {
       return { home: 'text-accent', away: 'text-primary' };
@@ -21,6 +38,9 @@ const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false }) => {
     return { home: 'text-foreground', away: 'text-foreground' };
   };
 
+  /**
+   * Toggles the collapsed state of the component.
+   */
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (

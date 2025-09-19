@@ -1,5 +1,10 @@
 import { supabase } from '../lib/supabase';
 
+/**
+ * Exports the weekly data to an HTML file.
+ * @param {number} week - The week to export the data for.
+ * @returns {Promise<string>} A promise that resolves with the HTML content.
+ */
 export const exportWeeklyData = async (week) => {
   // Fetch games for the selected week
   const { data: games } = await supabase

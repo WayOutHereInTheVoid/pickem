@@ -3,6 +3,13 @@ import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @typedef {Object} BadgeProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {'default' | 'secondary' | 'destructive' | 'outline'} [variant] - The variant of the badge.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
 const badgeVariants = cva(
   "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
@@ -23,6 +30,11 @@ const badgeVariants = cva(
   }
 )
 
+/**
+ * A component that displays a short, important message.
+ * @param {BadgeProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 function Badge({
   className,
   variant,

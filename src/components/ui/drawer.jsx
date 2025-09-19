@@ -3,6 +3,18 @@ import { Drawer as DrawerPrimitive } from "vaul"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @typedef {Object} DrawerProps
+ * @property {boolean} [shouldScaleBackground=true] - Whether the background should be scaled when the drawer is open.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A drawer component that slides in from the side of the screen.
+ * This component is based on the vaul library.
+ * @param {DrawerProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Drawer = ({
   shouldScaleBackground = true,
   ...props
@@ -11,12 +23,31 @@ const Drawer = ({
 )
 Drawer.displayName = "Drawer"
 
+/**
+ * The trigger that opens the drawer.
+ */
 const DrawerTrigger = DrawerPrimitive.Trigger
 
+/**
+ * A portal that renders its children into a new stacking context.
+ */
 const DrawerPortal = DrawerPrimitive.Portal
 
+/**
+ * The button that closes the drawer.
+ */
 const DrawerClose = DrawerPrimitive.Close
 
+/**
+ * @typedef {Object} DrawerOverlayProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * A layer that covers the inert portion of the view when the drawer is open.
+ * @param {DrawerOverlayProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const DrawerOverlay = React.forwardRef(({ className, ...props }, ref) => (
   <DrawerPrimitive.Overlay
     ref={ref}
@@ -25,6 +56,17 @@ const DrawerOverlay = React.forwardRef(({ className, ...props }, ref) => (
 ))
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 
+/**
+ * @typedef {Object} DrawerContentProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The main content of the drawer.
+ * @param {DrawerContentProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const DrawerContent = React.forwardRef(({ className, children, ...props }, ref) => (
   <DrawerPortal>
     <DrawerOverlay />
@@ -42,6 +84,17 @@ const DrawerContent = React.forwardRef(({ className, children, ...props }, ref) 
 ))
 DrawerContent.displayName = "DrawerContent"
 
+/**
+ * @typedef {Object} DrawerHeaderProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The header of the drawer.
+ * @param {DrawerHeaderProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const DrawerHeader = ({
   className,
   ...props
@@ -52,6 +105,17 @@ const DrawerHeader = ({
 )
 DrawerHeader.displayName = "DrawerHeader"
 
+/**
+ * @typedef {Object} DrawerFooterProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The footer of the drawer.
+ * @param {DrawerFooterProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const DrawerFooter = ({
   className,
   ...props
@@ -60,6 +124,17 @@ const DrawerFooter = ({
 )
 DrawerFooter.displayName = "DrawerFooter"
 
+/**
+ * @typedef {Object} DrawerTitleProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The title of the drawer.
+ * @param {DrawerTitleProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const DrawerTitle = React.forwardRef(({ className, ...props }, ref) => (
   <DrawerPrimitive.Title
     ref={ref}
@@ -68,6 +143,17 @@ const DrawerTitle = React.forwardRef(({ className, ...props }, ref) => (
 ))
 DrawerTitle.displayName = DrawerPrimitive.Title.displayName
 
+/**
+ * @typedef {Object} DrawerDescriptionProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The description of the drawer.
+ * @param {DrawerDescriptionProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const DrawerDescription = React.forwardRef(({ className, ...props }, ref) => (
   <DrawerPrimitive.Description
     ref={ref}

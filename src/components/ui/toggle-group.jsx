@@ -9,6 +9,20 @@ const ToggleGroupContext = React.createContext({
   variant: "default",
 })
 
+/**
+ * @typedef {Object} ToggleGroupProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {'default' | 'outline'} [variant] - The variant of the toggle group.
+ * @property {'default' | 'sm' | 'lg'} [size] - The size of the toggle group.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A group of toggle buttons.
+ * This component is based on the Radix UI Toggle Group primitive.
+ * @param {ToggleGroupProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ToggleGroup = React.forwardRef(({ className, variant, size, children, ...props }, ref) => (
   <ToggleGroupPrimitive.Root
     ref={ref}
@@ -22,6 +36,19 @@ const ToggleGroup = React.forwardRef(({ className, variant, size, children, ...p
 
 ToggleGroup.displayName = ToggleGroupPrimitive.Root.displayName
 
+/**
+ * @typedef {Object} ToggleGroupItemProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {'default' | 'outline'} [variant] - The variant of the toggle item.
+ * @property {'default' | 'sm' | 'lg'} [size] - The size of the toggle item.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A single item in a toggle group.
+ * @param {ToggleGroupItemProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ToggleGroupItem = React.forwardRef(({ className, children, variant, size, ...props }, ref) => {
   const context = React.useContext(ToggleGroupContext)
 

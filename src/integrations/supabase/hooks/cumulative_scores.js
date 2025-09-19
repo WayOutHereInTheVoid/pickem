@@ -1,6 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../supabase';
 
+/**
+ * A helper function to execute a Supabase query and handle errors.
+ * @param {Promise} query - The Supabase query to execute.
+ * @returns {Promise<any>} A promise that resolves with the data from the query.
+ * @throws {Error} If the query returns an error.
+ */
 const fromSupabase = async (query) => {
     const { data, error } = await query;
     if (error) {
@@ -10,6 +16,10 @@ const fromSupabase = async (query) => {
     return data;
 };
 
+/**
+ * A hook for fetching the cumulative scores.
+ * @returns {import('@tanstack/react-query').UseQueryResult} The result of the query.
+ */
 export const useCumulativeScores = () => useQuery({
     queryKey: ['cumulative_scores'],
     queryFn: async () => {
@@ -24,6 +34,10 @@ export const useCumulativeScores = () => useQuery({
     },
 });
 
+/**
+ * A hook for adding a new cumulative score.
+ * @returns {import('@tanstack/react-query').UseMutationResult} The result of the mutation.
+ */
 export const useAddCumulativeScore = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -34,6 +48,10 @@ export const useAddCumulativeScore = () => {
     });
 };
 
+/**
+ * A hook for updating a cumulative score.
+ * @returns {import('@tanstack/react-query').UseMutationResult} The result of the mutation.
+ */
 export const useUpdateCumulativeScore = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -72,6 +90,10 @@ export const useUpdateCumulativeScore = () => {
     });
 };
 
+/**
+ * A hook for deleting a cumulative score.
+ * @returns {import('@tanstack/react-query').UseMutationResult} The result of the mutation.
+ */
 export const useDeleteCumulativeScore = () => {
     const queryClient = useQueryClient();
     return useMutation({

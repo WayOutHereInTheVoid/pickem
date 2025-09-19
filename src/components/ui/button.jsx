@@ -4,6 +4,15 @@ import { cva } from "class-variance-authority";
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @typedef {Object} ButtonProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'} [variant] - The variant of the button.
+ * @property {'default' | 'sm' | 'lg' | 'icon'} [size] - The size of the button.
+ * @property {boolean} [asChild] - Whether to render as a child component.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
@@ -33,6 +42,11 @@ const buttonVariants = cva(
   }
 )
 
+/**
+ * A button component that can be rendered as a button or a child component.
+ * @param {ButtonProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Button = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
   const Comp = asChild ? Slot : "button"
   return (

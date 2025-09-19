@@ -4,6 +4,19 @@ import Standings from "./pages/Standings.jsx";
 import ManagerPage from "./pages/ManagerPage.jsx";
 import AuthCallback from "./pages/AuthCallback.jsx";
 
+/**
+ * @typedef {Object} NavItem
+ * @property {string} title - The title of the navigation item.
+ * @property {string} to - The path to navigate to.
+ * @property {React.ReactNode} icon - The icon for the navigation item.
+ * @property {React.ReactNode} page - The page component to render.
+ * @property {boolean} [hidden] - Whether the navigation item is hidden.
+ */
+
+/**
+ * An array of navigation items.
+ * @type {Array<NavItem>}
+ */
 export const navItems = [
   {
     title: "Dashboard",

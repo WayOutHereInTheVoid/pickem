@@ -1,3 +1,7 @@
+/**
+ * This file re-exports all the relevant exports from other files in the supabase directory.
+ */
+
 // Import all the relevant exports from other files in the supabase directory
 import { supabase } from './supabase.js';
 import { SupabaseAuthProvider, useSupabaseAuth, SupabaseAuthUI } from './auth.jsx';

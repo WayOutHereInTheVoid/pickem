@@ -5,6 +5,18 @@ import { Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 
+/**
+ * @typedef {Object} CommandProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A command menu component that allows users to search for and select commands.
+ * This component is based on the cmdk library.
+ * @param {CommandProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Command = React.forwardRef(({ className, ...props }, ref) => (
   <CommandPrimitive
     ref={ref}
@@ -16,6 +28,16 @@ const Command = React.forwardRef(({ className, ...props }, ref) => (
 ))
 Command.displayName = CommandPrimitive.displayName
 
+/**
+ * @typedef {Object} CommandDialogProps
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A command menu that is displayed in a dialog.
+ * @param {CommandDialogProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CommandDialog = ({
   children,
   ...props
@@ -32,6 +54,16 @@ const CommandDialog = ({
   );
 }
 
+/**
+ * @typedef {Object} CommandInputProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * The input field for the command menu.
+ * @param {CommandInputProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CommandInput = React.forwardRef(({ className, ...props }, ref) => (
   <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
     <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
@@ -47,6 +79,17 @@ const CommandInput = React.forwardRef(({ className, ...props }, ref) => (
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 
+/**
+ * @typedef {Object} CommandListProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The list of commands.
+ * @param {CommandListProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CommandList = React.forwardRef(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
@@ -56,12 +99,33 @@ const CommandList = React.forwardRef(({ className, ...props }, ref) => (
 
 CommandList.displayName = CommandPrimitive.List.displayName
 
+/**
+ * @typedef {Object} CommandEmptyProps
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A component that is displayed when there are no commands to show.
+ * @param {CommandEmptyProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CommandEmpty = React.forwardRef((props, ref) => (
   <CommandPrimitive.Empty ref={ref} className="py-6 text-center text-sm" {...props} />
 ))
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 
+/**
+ * @typedef {Object} CommandGroupProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A group of commands.
+ * @param {CommandGroupProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CommandGroup = React.forwardRef(({ className, ...props }, ref) => (
   <CommandPrimitive.Group
     ref={ref}
@@ -74,11 +138,32 @@ const CommandGroup = React.forwardRef(({ className, ...props }, ref) => (
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName
 
+/**
+ * @typedef {Object} CommandSeparatorProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * A separator between command groups.
+ * @param {CommandSeparatorProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CommandSeparator = React.forwardRef(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator ref={ref} className={cn("-mx-1 h-px bg-border", className)} {...props} />
 ))
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
+/**
+ * @typedef {Object} CommandItemProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A single command item.
+ * @param {CommandItemProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CommandItem = React.forwardRef(({ className, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
@@ -91,6 +176,17 @@ const CommandItem = React.forwardRef(({ className, ...props }, ref) => (
 
 CommandItem.displayName = CommandPrimitive.Item.displayName
 
+/**
+ * @typedef {Object} CommandShortcutProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A keyboard shortcut for a command.
+ * @param {CommandShortcutProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const CommandShortcut = ({
   className,
   ...props

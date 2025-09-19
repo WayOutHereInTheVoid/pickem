@@ -10,6 +10,10 @@ import { SupabaseAuthProvider } from './integrations/supabase/auth';
 
 const queryClient = new QueryClient();
 
+/**
+ * The main application component.
+ * @returns {JSX.Element}
+ */
 const App = () => (
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>

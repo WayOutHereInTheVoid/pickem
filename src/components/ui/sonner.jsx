@@ -1,6 +1,17 @@
 import { useTheme } from "next-themes"
 import { Toaster as Sonner } from "sonner"
 
+/**
+ * @typedef {Object} ToasterProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * A toaster component that displays toast messages.
+ * This component is based on the sonner library.
+ * @param {ToasterProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Toaster = ({
   ...props
 }) => {

@@ -5,10 +5,25 @@ import { Controller, FormProvider, useFormContext } from "react-hook-form";
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 
+/**
+ * A form component that provides context for form fields.
+ * This component is based on the react-hook-form library.
+ */
 const Form = FormProvider
 
 const FormFieldContext = React.createContext({})
 
+/**
+ * @typedef {Object} FormFieldProps
+ * @property {string} name - The name of the form field.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A form field component that provides context for a single form field.
+ * @param {FormFieldProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const FormField = (
   {
     ...props
@@ -21,6 +36,11 @@ const FormField = (
   );
 }
 
+/**
+ * A hook that provides access to the form field context.
+ * @returns {object} The form field context.
+ * @throws {Error} If used outside of a FormField component.
+ */
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext)
   const itemContext = React.useContext(FormItemContext)
@@ -46,6 +66,17 @@ const useFormField = () => {
 
 const FormItemContext = React.createContext({})
 
+/**
+ * @typedef {Object} FormItemProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A container for a form field.
+ * @param {FormItemProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const FormItem = React.forwardRef(({ className, ...props }, ref) => {
   const id = React.useId()
 
@@ -57,6 +88,17 @@ const FormItem = React.forwardRef(({ className, ...props }, ref) => {
 })
 FormItem.displayName = "FormItem"
 
+/**
+ * @typedef {Object} FormLabelProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The label for a form field.
+ * @param {FormLabelProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const FormLabel = React.forwardRef(({ className, ...props }, ref) => {
   const { error, formItemId } = useFormField()
 
@@ -70,6 +112,9 @@ const FormLabel = React.forwardRef(({ className, ...props }, ref) => {
 })
 FormLabel.displayName = "FormLabel"
 
+/**
+ * A component that wraps the form field control.
+ */
 const FormControl = React.forwardRef(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
@@ -88,6 +133,17 @@ const FormControl = React.forwardRef(({ ...props }, ref) => {
 })
 FormControl.displayName = "FormControl"
 
+/**
+ * @typedef {Object} FormDescriptionProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A description for a form field.
+ * @param {FormDescriptionProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const FormDescription = React.forwardRef(({ className, ...props }, ref) => {
   const { formDescriptionId } = useFormField()
 
@@ -101,6 +157,17 @@ const FormDescription = React.forwardRef(({ className, ...props }, ref) => {
 })
 FormDescription.displayName = "FormDescription"
 
+/**
+ * @typedef {Object} FormMessageProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A message for a form field.
+ * @param {FormMessageProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const FormMessage = React.forwardRef(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField()
   const body = error ? String(error?.message) : children

@@ -1,3 +1,9 @@
+/**
+ * Exports the results of a given week to a CSV string.
+ * @param {number} week - The week to export the results for.
+ * @returns {Promise<string>} A promise that resolves with the CSV content.
+ * @throws {Error} If there is incomplete data for the selected week.
+ */
 export const exportResultsToCSV = async (week) => {
   const weeklyScores = JSON.parse(localStorage.getItem(`week${week}Scores`) || '[]');
   const cumulativeScores = JSON.parse(localStorage.getItem('cumulativeScores') || '[]');

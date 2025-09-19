@@ -5,12 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from 'lucide-react';
 import { toast } from "sonner";
 
+/**
+ * A component that handles authentication callbacks from Supabase.
+ * @returns {JSX.Element}
+ */
 const AuthCallback = () => {
   const navigate = useNavigate();
   const { session, loading } = useSupabaseAuth();
 
   useEffect(() => {
-    // Handle auth callback (password reset, email confirmation, etc.)
+    /**
+     * Handles the authentication callback.
+     */
     const handleAuthCallback = async () => {
       try {
         // Check URL for auth tokens
