@@ -3,10 +3,30 @@ import * as PopoverPrimitive from "@radix-ui/react-popover"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * A popover component that displays a popover when a user clicks on a trigger.
+ * This component is based on the Radix UI Popover primitive.
+ */
 const Popover = PopoverPrimitive.Root
 
+/**
+ * The trigger that opens the popover.
+ */
 const PopoverTrigger = PopoverPrimitive.Trigger
 
+/**
+ * @typedef {Object} PopoverContentProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {'center' | 'start' | 'end'} [align='center'] - The alignment of the content.
+ * @property {number} [sideOffset=4] - The offset of the content from the trigger.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The content of the popover.
+ * @param {PopoverContentProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const PopoverContent = React.forwardRef(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
   <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content

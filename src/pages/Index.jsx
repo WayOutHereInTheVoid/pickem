@@ -6,26 +6,43 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useCumulativeScores } from '../integrations/supabase';
 import { TrophyIcon, BarChartIcon, ArrowRightIcon } from 'lucide-react';
 
+/**
+ * @typedef {Object} DashboardCardProps
+ * @property {string} title - The title of the card.
+ * @property {string} description - The description of the card.
+ * @property {string} linkTo - The link to navigate to when the button is clicked.
+ * @property {React.ElementType} icon - The icon to display in the card.
+ */
+
+/**
+ * A card component for the dashboard.
+ * @param {DashboardCardProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
+const DashboardCard = ({ title, description, linkTo, icon: Icon }) => (
+  <Card className="bg-gradient-subtle hover:bg-secondary/10 transition-all duration-300 shadow-md hover:shadow-lg">
+    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardTitle className="text-xl md:text-2xl font-semibold text-foreground font-oswald">{title}</CardTitle>
+      <Icon className="h-6 w-6 text-primary" />
+    </CardHeader>
+    <CardContent>
+      <p className="text-sm md:text-base text-muted-foreground mb-4 font-source-sans">{description}</p>
+      <Link to={linkTo}>
+        <Button className="w-full bg-gradient-to-r from-primary to-primary-light text-primary-foreground hover:from-primary-light hover:to-primary button-hover font-oswald group">
+          Go to {title}
+          <ArrowRightIcon className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+        </Button>
+      </Link>
+    </CardContent>
+  </Card>
+);
+
+/**
+ * The main dashboard page.
+ * @returns {JSX.Element}
+ */
 const Index = () => {
   const { data: cumulativeScores, isLoading, isError } = useCumulativeScores();
-
-  const DashboardCard = ({ title, description, linkTo, icon: Icon }) => (
-    <Card className="bg-gradient-subtle hover:bg-secondary/10 transition-all duration-300 shadow-md hover:shadow-lg">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl md:text-2xl font-semibold text-foreground font-oswald">{title}</CardTitle>
-        <Icon className="h-6 w-6 text-primary" />
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm md:text-base text-muted-foreground mb-4 font-source-sans">{description}</p>
-        <Link to={linkTo}>
-          <Button className="w-full bg-gradient-to-r from-primary to-primary-light text-primary-foreground hover:from-primary-light hover:to-primary button-hover font-oswald group">
-            Go to {title}
-            <ArrowRightIcon className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Button>
-        </Link>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <div className="space-y-6 p-6 md:p-10">

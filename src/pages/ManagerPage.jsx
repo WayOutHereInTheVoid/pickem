@@ -9,6 +9,10 @@ import ImportPicks from './ImportPicks';
 import { toast } from "sonner";
 import { LogOut, Calendar, Clipboard, UserCog, Menu } from 'lucide-react';
 
+/**
+ * A page for the league manager to log in and manage the league.
+ * @returns {JSX.Element}
+ */
 const ManagerPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,6 +20,10 @@ const ManagerPage = () => {
   const { session, login, logout } = useSupabaseAuth();
   const navigate = useNavigate();
 
+  /**
+   * Handles the login process.
+   * @param {React.FormEvent<HTMLFormElement>} e - The form event.
+   */
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -27,6 +35,9 @@ const ManagerPage = () => {
     }
   };
 
+  /**
+   * Handles the logout process.
+   */
   const handleLogout = async () => {
     await logout();
     navigate('/');

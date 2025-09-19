@@ -3,6 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
+/**
+ * @typedef {Object} ParsedGamesProps
+ * @property {Array<object>} games - An array of game objects.
+ * @property {function} onWinnerChange - A callback function that is called when the winner of a game is changed.
+ */
+
+/**
+ * A component that displays a list of parsed games and allows the user to select the winner of each game.
+ * @param {ParsedGamesProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ParsedGames = ({ games, onWinnerChange }) => {
   return (
     <Card className="mb-6 bg-card">

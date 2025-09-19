@@ -26,6 +26,20 @@ const toggleVariants = cva(
   }
 )
 
+/**
+ * @typedef {Object} ToggleProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {'default' | 'outline'} [variant] - The variant of the toggle.
+ * @property {'default' | 'sm' | 'lg'} [size] - The size of the toggle.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A toggle button that can be used to switch between two states.
+ * This component is based on the Radix UI Toggle primitive.
+ * @param {ToggleProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Toggle = React.forwardRef(({ className, variant, size, ...props }, ref) => (
   <TogglePrimitive.Root
     ref={ref}

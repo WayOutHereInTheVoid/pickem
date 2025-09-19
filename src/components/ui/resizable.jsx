@@ -3,6 +3,18 @@ import * as ResizablePrimitive from "react-resizable-panels"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @typedef {Object} ResizablePanelGroupProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A group of resizable panels.
+ * This component is based on the react-resizable-panels library.
+ * @param {ResizablePanelGroupProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ResizablePanelGroup = ({
   className,
   ...props
@@ -15,8 +27,22 @@ const ResizablePanelGroup = ({
     {...props} />
 )
 
+/**
+ * A single resizable panel.
+ */
 const ResizablePanel = ResizablePrimitive.Panel
 
+/**
+ * @typedef {Object} ResizableHandleProps
+ * @property {boolean} [withHandle] - Whether to display a handle.
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * The handle for resizing a panel.
+ * @param {ResizableHandleProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const ResizableHandle = ({
   withHandle,
   className,

@@ -4,11 +4,34 @@ import { Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @typedef {Object} RadioGroupProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A group of radio buttons.
+ * This component is based on the Radix UI Radio Group primitive.
+ * @param {RadioGroupProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const RadioGroup = React.forwardRef(({ className, ...props }, ref) => {
   return (<RadioGroupPrimitive.Root className={cn("grid gap-2", className)} {...props} ref={ref} />);
 })
 RadioGroup.displayName = RadioGroupPrimitive.Root.displayName
 
+/**
+ * @typedef {Object} RadioGroupItemProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A single radio button in a radio group.
+ * @param {RadioGroupItemProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const RadioGroupItem = React.forwardRef(({ className, ...props }, ref) => {
   return (
     (<RadioGroupPrimitive.Item

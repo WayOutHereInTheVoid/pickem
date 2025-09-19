@@ -3,12 +3,34 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * A provider for the tooltip component.
+ */
 const TooltipProvider = TooltipPrimitive.Provider
 
+/**
+ * A tooltip component that displays a short message when a user hovers over an element.
+ * This component is based on the Radix UI Tooltip primitive.
+ */
 const Tooltip = TooltipPrimitive.Root
 
+/**
+ * The trigger that opens the tooltip.
+ */
 const TooltipTrigger = TooltipPrimitive.Trigger
 
+/**
+ * @typedef {Object} TooltipContentProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {number} [sideOffset=4] - The offset of the content from the trigger.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The content of the tooltip.
+ * @param {TooltipContentProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const TooltipContent = React.forwardRef(({ className, sideOffset = 4, ...props }, ref) => (
   <TooltipPrimitive.Content
     ref={ref}

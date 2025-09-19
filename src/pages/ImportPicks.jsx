@@ -12,6 +12,10 @@ import NFLMatchups from '../components/NFLMatchups';
 import { getCachedOrFetchWeekMatches } from '../utils/nflApi';
 import { Calendar, Clipboard, Loader } from 'lucide-react';
 
+/**
+ * A page for importing picks from a poll.
+ * @returns {JSX.Element}
+ */
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
@@ -43,6 +47,9 @@ const ImportPicks = () => {
   };
 
   React.useEffect(() => {
+    /**
+     * Fetches the NFL matches for the selected week.
+     */
     const fetchNFLMatches = async () => {
       const matches = await getCachedOrFetchWeekMatches(parseInt(selectedWeek));
       setNflMatches(matches);
@@ -51,10 +58,17 @@ const ImportPicks = () => {
     fetchNFLMatches();
   }, [selectedWeek]);
 
+  /**
+   * Handles the change event for the poll results text area.
+   * @param {React.ChangeEvent<HTMLTextAreaElement>} e - The change event.
+   */
   const handleInputChange = (e) => {
     setPollResults(e.target.value);
   };
 
+  /**
+   * Parses the poll results and extracts the picks and games.
+   */
   const parsePollResults = async () => {
     setIsParsing(true);
     // Simulate a delay for the parsing process
@@ -88,12 +102,23 @@ const ImportPicks = () => {
     setIsNFLMatchupsCollapsed(true); // Collapse NFL matchups after parsing
   };
 
+  /**
+   * Handles the change event for the winner of a game.
+   * @param {number} index - The index of the game.
+   * @param {string} winner - The winner of the game.
+   */
   const handleWinnerChange = (index, winner) => {
     setParsedGames(prevGames => prevGames.map((game, i) =>
       i === index ? { ...game, winner } : game
     ));
   };
 
+  /**
+   * Calculates the scores for the week based on the games and picks.
+   * @param {Array<object>} games - An array of game objects.
+   * @param {Array<object>} picks - An array of pick objects.
+   * @returns {object} An object containing the scores for each user.
+   */
   const calculateScores = (games, picks) => {
     const weekScores = {};
     picks.forEach(pick => {
@@ -106,6 +131,9 @@ const ImportPicks = () => {
     return weekScores;
   };
 
+  /**
+   * Saves the picks, games, and scores to the database.
+   */
   const savePicks = async () => {
     setIsSaving(true);
     try {

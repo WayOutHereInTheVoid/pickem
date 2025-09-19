@@ -5,14 +5,37 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * A sheet component that displays a sheet from the side of the screen.
+ * This component is based on the Radix UI Dialog primitive.
+ */
 const Sheet = SheetPrimitive.Root
 
+/**
+ * The trigger that opens the sheet.
+ */
 const SheetTrigger = SheetPrimitive.Trigger
 
+/**
+ * The button that closes the sheet.
+ */
 const SheetClose = SheetPrimitive.Close
 
+/**
+ * A portal that renders its children into a new stacking context.
+ */
 const SheetPortal = SheetPrimitive.Portal
 
+/**
+ * @typedef {Object} SheetOverlayProps
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * A layer that covers the inert portion of the view when the sheet is open.
+ * @param {SheetOverlayProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const SheetOverlay = React.forwardRef(({ className, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
@@ -43,6 +66,18 @@ const sheetVariants = cva(
   }
 )
 
+/**
+ * @typedef {Object} SheetContentProps
+ * @property {'top' | 'bottom' | 'left' | 'right'} [side='right'] - The side of the screen from which the sheet will appear.
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The content of the sheet.
+ * @param {SheetContentProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const SheetContent = React.forwardRef(({ side = "right", className, children, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
@@ -58,6 +93,17 @@ const SheetContent = React.forwardRef(({ side = "right", className, children, ..
 ))
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
+/**
+ * @typedef {Object} SheetHeaderProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The header of the sheet.
+ * @param {SheetHeaderProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const SheetHeader = ({
   className,
   ...props
@@ -68,6 +114,17 @@ const SheetHeader = ({
 )
 SheetHeader.displayName = "SheetHeader"
 
+/**
+ * @typedef {Object} SheetFooterProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The footer of the sheet.
+ * @param {SheetFooterProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const SheetFooter = ({
   className,
   ...props
@@ -78,6 +135,17 @@ const SheetFooter = ({
 )
 SheetFooter.displayName = "SheetFooter"
 
+/**
+ * @typedef {Object} SheetTitleProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The title of the sheet.
+ * @param {SheetTitleProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const SheetTitle = React.forwardRef(({ className, ...props }, ref) => (
   <SheetPrimitive.Title
     ref={ref}
@@ -86,6 +154,17 @@ const SheetTitle = React.forwardRef(({ className, ...props }, ref) => (
 ))
 SheetTitle.displayName = SheetPrimitive.Title.displayName
 
+/**
+ * @typedef {Object} SheetDescriptionProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The description of the sheet.
+ * @param {SheetDescriptionProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const SheetDescription = React.forwardRef(({ className, ...props }, ref) => (
   <SheetPrimitive.Description
     ref={ref}

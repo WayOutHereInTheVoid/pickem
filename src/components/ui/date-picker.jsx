@@ -10,6 +10,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+/**
+ * @typedef {Object} DatePickerProps
+ * @property {Date} date - The selected date.
+ * @property {function} onDateChange - A callback function that is called when the date is changed.
+ * @property {string} [className] - Additional class names for styling.
+ */
+
+/**
+ * A date picker component that allows users to select a date from a calendar.
+ * @param {DatePickerProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 export function DatePicker({ date, onDateChange, className }) {
   return (
     <Popover>

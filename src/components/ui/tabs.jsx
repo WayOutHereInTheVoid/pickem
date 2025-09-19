@@ -3,8 +3,23 @@ import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * A set of tabs that allow the user to switch between different views.
+ * This component is based on the Radix UI Tabs primitive.
+ */
 const Tabs = TabsPrimitive.Root
 
+/**
+ * @typedef {Object} TabsListProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The list of tabs.
+ * @param {TabsListProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const TabsList = React.forwardRef(({ className, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
@@ -16,6 +31,17 @@ const TabsList = React.forwardRef(({ className, ...props }, ref) => (
 ))
 TabsList.displayName = TabsPrimitive.List.displayName
 
+/**
+ * @typedef {Object} TabsTriggerProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The trigger that activates a tab.
+ * @param {TabsTriggerProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const TabsTrigger = React.forwardRef(({ className, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
@@ -27,6 +53,17 @@ const TabsTrigger = React.forwardRef(({ className, ...props }, ref) => (
 ))
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
 
+/**
+ * @typedef {Object} TabsContentProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The content of a tab.
+ * @param {TabsContentProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const TabsContent = React.forwardRef(({ className, ...props }, ref) => (
   <TabsPrimitive.Content
     ref={ref}

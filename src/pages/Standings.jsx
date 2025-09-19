@@ -9,6 +9,10 @@ import { useGames, usePicks, useScores, useCumulativeScores } from '../integrati
 import { exportWeeklyData } from '../utils/exportWeeklyData';
 import { toast } from "sonner";
 
+/**
+ * A page that displays the league standings.
+ * @returns {JSX.Element}
+ */
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [standings, setStandings] = useState({ weekly: [], cumulative: [] });
@@ -45,6 +49,9 @@ const Standings = () => {
     }
   }, [selectedWeek, games, picks, scores, cumulativeScores]);
 
+  /**
+   * Handles the export of weekly data.
+   */
   const handleExport = async () => {
     try {
       const htmlContent = await exportWeeklyData(parseInt(selectedWeek));
@@ -66,6 +73,16 @@ const Standings = () => {
     }
   };
 
+  /**
+   * @typedef {Object} StandingsTableProps
+   * @property {Array<object>} data - An array of standings data.
+   */
+
+  /**
+   * A table that displays standings data.
+   * @param {StandingsTableProps} props - The props for the component.
+   * @returns {JSX.Element}
+   */
   const StandingsTable = ({ data }) => (
     <Table>
       <TableHeader>

@@ -3,6 +3,17 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @typedef {Object} AvatarProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * An image element with a fallback for when the image fails to load.
+ * @param {AvatarProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const Avatar = React.forwardRef(({ className, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
@@ -11,6 +22,17 @@ const Avatar = React.forwardRef(({ className, ...props }, ref) => (
 ))
 Avatar.displayName = AvatarPrimitive.Root.displayName
 
+/**
+ * @typedef {Object} AvatarImageProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {string} src - The source of the image.
+ */
+
+/**
+ * The image to be displayed in the avatar.
+ * @param {AvatarImageProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const AvatarImage = React.forwardRef(({ className, ...props }, ref) => (
   <AvatarPrimitive.Image
     ref={ref}
@@ -19,6 +41,17 @@ const AvatarImage = React.forwardRef(({ className, ...props }, ref) => (
 ))
 AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
+/**
+ * @typedef {Object} AvatarFallbackProps
+ * @property {string} [className] - Additional class names for styling.
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The fallback to be displayed when the image fails to load.
+ * @param {AvatarFallbackProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 const AvatarFallback = React.forwardRef(({ className, ...props }, ref) => (
   <AvatarPrimitive.Fallback
     ref={ref}

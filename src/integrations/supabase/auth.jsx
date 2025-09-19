@@ -7,6 +7,16 @@ import { toast } from "sonner";
 
 const SupabaseAuthContext = createContext();
 
+/**
+ * @typedef {Object} SupabaseAuthProviderProps
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * A provider for the Supabase authentication context.
+ * @param {SupabaseAuthProviderProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 export const SupabaseAuthProvider = ({ children }) => {
   return (
     <SupabaseAuthProviderInner>
@@ -15,6 +25,16 @@ export const SupabaseAuthProvider = ({ children }) => {
   );
 }
 
+/**
+ * @typedef {Object} SupabaseAuthProviderInnerProps
+ * @property {React.ReactNode} children - The content of the component.
+ */
+
+/**
+ * The inner provider for the Supabase authentication context.
+ * @param {SupabaseAuthProviderInnerProps} props - The props for the component.
+ * @returns {JSX.Element}
+ */
 export const SupabaseAuthProviderInner = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,6 +77,12 @@ export const SupabaseAuthProviderInner = ({ children }) => {
     };
   }, [queryClient]);
 
+  /**
+   * Logs in a user with the given email and password.
+   * @param {string} email - The user's email.
+   * @param {string} password - The user's password.
+   * @returns {Promise<object>} A promise that resolves with the user's session data.
+   */
   const login = async (email, password) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -75,6 +101,10 @@ export const SupabaseAuthProviderInner = ({ children }) => {
     }
   };
 
+  /**
+   * Logs out the current user.
+   * @returns {Promise<void>} A promise that resolves when the user is logged out.
+   */
   const logout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -97,6 +127,10 @@ export const SupabaseAuthProviderInner = ({ children }) => {
   );
 };
 
+/**
+ * A hook for accessing the Supabase authentication context.
+ * @returns {{session: object, loading: boolean, login: function, logout: function}} The Supabase authentication context.
+ */
 export const useSupabaseAuth = () => {
   const context = useContext(SupabaseAuthContext);
   if (!context) {
@@ -105,6 +139,10 @@ export const useSupabaseAuth = () => {
   return context;
 };
 
+/**
+ * A component that displays the Supabase authentication UI.
+ * @returns {JSX.Element}
+ */
 export const SupabaseAuthUI = () => (
   <Auth
     supabaseClient={supabase}

@@ -6,6 +6,10 @@ const TOAST_REMOVE_DELAY = 1000000
 
 let count = 0
 
+/**
+ * Generates a unique ID for a toast.
+ * @returns {string} The unique ID.
+ */
 function genId() {
   count = (count + 1) % Number.MAX_SAFE_INTEGER
   return count.toString();
@@ -13,6 +17,10 @@ function genId() {
 
 const toastTimeouts = new Map()
 
+/**
+ * Adds a toast to the remove queue.
+ * @param {string} toastId - The ID of the toast to remove.
+ */
 const addToRemoveQueue = (toastId) => {
   if (toastTimeouts.has(toastId)) {
     return
@@ -29,6 +37,24 @@ const addToRemoveQueue = (toastId) => {
   toastTimeouts.set(toastId, timeout)
 }
 
+/**
+ * @typedef {Object} ToastState
+ * @property {Array<object>} toasts - The list of toasts.
+ */
+
+/**
+ * @typedef {Object} ToastAction
+ * @property {'ADD_TOAST' | 'UPDATE_TOAST' | 'DISMISS_TOAST' | 'REMOVE_TOAST'} type - The type of the action.
+ * @property {object} [toast] - The toast object.
+ * @property {string} [toastId] - The ID of the toast.
+ */
+
+/**
+ * The reducer for the toast state.
+ * @param {ToastState} state - The current state.
+ * @param {ToastAction} action - The action to dispatch.
+ * @returns {ToastState} The new state.
+ */
 export const reducer = (state, action) => {
   switch (action.type) {
     case "ADD_TOAST":
@@ -86,6 +112,10 @@ const listeners = []
 
 let memoryState = { toasts: [] }
 
+/**
+ * Dispatches an action to the toast state.
+ * @param {ToastAction} action - The action to dispatch.
+ */
 function dispatch(action) {
   memoryState = reducer(memoryState, action)
   listeners.forEach((listener) => {
@@ -93,6 +123,18 @@ function dispatch(action) {
   })
 }
 
+/**
+ * @typedef {Object} ToastProps
+ * @property {string} [title] - The title of the toast.
+ * @property {string} [description] - The description of the toast.
+ * @property {React.ReactNode} [action] - An action to display in the toast.
+ */
+
+/**
+ * Displays a toast message.
+ * @param {ToastProps} props - The props for the toast.
+ * @returns {{id: string, dismiss: function, update: function}} The toast object.
+ */
 function toast({
   ...props
 }) {
@@ -124,6 +166,10 @@ function toast({
   }
 }
 
+/**
+ * A hook for managing toast messages.
+ * @returns {{toasts: Array<object>, toast: function, dismiss: function}} The toast state and actions.
+ */
 function useToast() {
   const [state, setState] = React.useState(memoryState)
 
