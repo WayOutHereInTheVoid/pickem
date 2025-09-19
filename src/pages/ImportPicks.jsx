@@ -29,15 +29,15 @@ const ImportPicks = () => {
 
   const teamNameMapping = {
     "Thumbz": "Murder Hornets",
-    "JordyV1bez": "Black Hawk Bones",
+    "PRfan790": "Somewheres",
     "chupalo": "Sonora Sugar Skulls",
     "Scrody": "Newfoundland Growlers",
     "JoshMartinez": "California Burritos",
-    "iammickloven": "Kyoto Ninjas",
+    "GKIRBY05": "Lonestar Legends",
     "TheNewEra22": "Brutal Hogs",
     "ejdale4944": "Southwest Aliens",
-    "ClemCola": "Jesters",
-    "kailamartinez": "Mile High Melonheads",
+    "ClemCola": "Rochester Jesters",
+    "FoodMafia": "Food Mafia",
     "Econley19": "Seattle Prestiges",
     "Detroilet": "D-Town Swirlies"
   };
