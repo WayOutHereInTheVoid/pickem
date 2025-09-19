@@ -7,10 +7,28 @@ import { supabase } from '../lib/supabase';
  */
 export const exportWeeklyData = async (week) => {
   // Fetch games for the selected week
-  const { data: games } = await supabase
+  const { data: gamesData } = await supabase
     .from('games')
     .select('*')
     .eq('week', week);
+
+  // Remove duplicate games by creating a unique key for each matchup
+  const uniqueGames = [];
+  const seenGames = new Set();
+  
+  gamesData?.forEach(game => {
+    // Create a unique key using both team combinations to catch duplicates
+    const key1 = `${game.home_team}-vs-${game.away_team}`;
+    const key2 = `${game.away_team}-vs-${game.home_team}`;
+    
+    if (!seenGames.has(key1) && !seenGames.has(key2)) {
+      seenGames.add(key1);
+      seenGames.add(key2);
+      uniqueGames.push(game);
+    }
+  });
+
+  const games = uniqueGames;
 
   // Fetch scores for the selected week
   const { data: weeklyScores } = await supabase
