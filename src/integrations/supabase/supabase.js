@@ -6,7 +6,14 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
 console.log('Supabase URL:', supabaseUrl);
 console.log('Supabase Key:', supabaseKey ? 'Set' : 'Not set');
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  }
+});
 
 // Add a simple test function to verify the connection
 export const testSupabaseConnection = async () => {

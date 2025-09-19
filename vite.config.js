@@ -5,9 +5,10 @@ import { resolve } from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: process.env.NODE_ENV === 'production' ? '/nfl-pickem-league/' : '/',
   server: {
     host: "::",
-    port: "8080",
+    port: "8080",  // Your current port - no conflict with 3000!
   },
   plugins: [react()],
   resolve: {

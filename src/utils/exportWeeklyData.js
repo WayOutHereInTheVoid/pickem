@@ -42,7 +42,7 @@ export const exportWeeklyData = async (week) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Week ${week} Results - 2024 TRL Pick'em</title>
+      <title>Week ${week} Results - 2025 TRL Pick'em</title>
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
         h1, h2 { color: #2c3e50; }
@@ -55,7 +55,7 @@ export const exportWeeklyData = async (week) => {
       </style>
     </head>
     <body>
-      <h1>2024 TRL Pick'em - Week ${week} Results</h1>
+      <h1>2025 TRL Pick'em - Week ${week} Results</h1>
       
       <h2>Matchups:</h2>
       ${games.map(game => {

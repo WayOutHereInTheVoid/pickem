@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NFL Pickem Manager Account Setup</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
+        button:hover { background: #0056b3; }
+        .success { color: green; background: #d4edda; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .error { color: #721c24; background: #f8d7da; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .info { background: #d1ecf1; padding: 15px; border-radius: 4px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>🏈 NFL Pickem League - Manager Setup</h1>
+    
+    <div class="info">
+        <strong>📋 Pre-filled Manager Credentials:</strong><br>
+        <strong>Email:</strong> manager@nflpickem2025.com<br>
+        <strong>Password:</strong> NFLManager2025!<br>
+        <small>You can change these if needed</small>
+    </div>
+
+    <form id="setupForm">
+        <div class="form-group">
+            <label for="email">Manager Email:</label>
+            <input type="email" id="email" value="manager@nflpickem2025.com" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Manager Password:</label>
+            <input type="password" id="password" value="NFLManager2025!" required>
+            <small>Minimum 8 characters</small>
+        </div>
+        
+        <button type="submit" id="createBtn">Create Manager Account</button>
+    </form>
+    
+    <div id="result"></div>
+
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://stfbyqhbmwnzpskwkinw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0ZmJ5cWhibXduenBza3draW53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMjkwMDAsImV4cCI6MjA3MzgwNTAwMH0.W_wy4W6qyr637-iA_LViJRRAxVUMvVrs-Rnd6lpePik';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        document.getElementById('setupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            const createBtn = document.getElementById('createBtn');
+            
+            createBtn.disabled = true;
+            createBtn.textContent = 'Creating Account...';
+            
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        emailRedirectTo: undefined // Skip email confirmation
+                    }
+                });
+                
+                if (error) throw error;
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <strong>✅ Manager Account Created Successfully!</strong><br><br>
+                        <strong>Your Login Credentials:</strong><br>
+                        📧 Email: ${email}<br>
+                        🔑 Password: ${password}<br><br>
+                        <strong>Next Steps:</strong><br>
+                        1. Go to your NFL Pickem app: <a href="http://localhost:8080/manager" target="_blank">http://localhost:8080/manager</a><br>
+                        2. Use the credentials above to log in<br>
+                        3. Start managing your league!<br><br>
+                        <small>💡 Save these credentials in a secure location</small>
+                    </div>
+                `;
+                
+                // Clear form
+                document.getElementById('setupForm').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error creating account:</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+            
+            createBtn.disabled = false;
+            createBtn.textContent = 'Create Manager Account';
+        });
+    </script>
+</body>
+</html>

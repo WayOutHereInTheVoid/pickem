@@ -2,6 +2,7 @@ import { HomeIcon, BarChartIcon, UserIcon } from "lucide-react";
 import Index from "./pages/Index.jsx";
 import Standings from "./pages/Standings.jsx";
 import ManagerPage from "./pages/ManagerPage.jsx";
+import AuthCallback from "./pages/AuthCallback.jsx";
 
 export const navItems = [
   {
@@ -21,5 +22,12 @@ export const navItems = [
     to: "/manager",
     icon: <UserIcon className="h-4 w-4" />,
     page: <ManagerPage />,
+  },
+  {
+    title: "Auth Callback",
+    to: "/auth/callback",
+    icon: null,
+    page: <AuthCallback />,
+    hidden: true // Hide from navigation menu
   },
 ];

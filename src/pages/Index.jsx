@@ -29,7 +29,7 @@ const Index = () => {
 
   return (
     <div className="space-y-6 p-6 md:p-10">
-      <h1 className="text-3xl md:text-5xl font-bold text-foreground font-oswald mb-8 gradient-text">2024 TRL Pick'em Dashboard</h1>
+      <h1 className="text-3xl md:text-5xl font-bold text-foreground font-oswald mb-8 gradient-text">2025 TRL Pick'em Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <DashboardCard
           title="View Standings"

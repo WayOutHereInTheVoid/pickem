@@ -29,7 +29,7 @@ const Sidebar = () => {
         {isOpen ? <XIcon className="h-8 w-8" /> : <MenuIcon className="h-8 w-8" />}
       </Button>
       <div className={`${isOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out fixed top-0 right-0 h-full w-64 bg-accent flex flex-col items-start py-4 px-2 space-y-4 z-30`}>
-        {navItems.map((item) => (
+        {navItems.filter(item => !item.hidden).map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -40,7 +40,7 @@ const Sidebar = () => {
             }
             onClick={() => setIsOpen(false)}
           >
-            {React.cloneElement(item.icon, { className: "h-6 w-6 mr-2" })}
+            {item.icon && React.cloneElement(item.icon, { className: "h-6 w-6 mr-2" })}
             <span>{item.title}</span>
           </NavLink>
         ))}
