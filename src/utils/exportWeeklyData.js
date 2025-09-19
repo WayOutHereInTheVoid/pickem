@@ -15,20 +15,74 @@ export const exportWeeklyData = async (week) => {
   // Remove duplicate games by creating a unique key for each matchup
   const uniqueGames = [];
   const seenGames = new Set();
+  const seenMatchups = new Map(); // Track original matchup data for debugging
   
-  gamesData?.forEach(game => {
-    // Create a unique key using both team combinations to catch duplicates
-    const key1 = `${game.home_team}-vs-${game.away_team}`;
-    const key2 = `${game.away_team}-vs-${game.home_team}`;
+  // Enhanced helper function to normalize team names for duplicate detection
+  const normalizeTeamName = (teamString) => {
+    if (!teamString) return '';
     
-    if (!seenGames.has(key1) && !seenGames.has(key2)) {
-      seenGames.add(key1);
-      seenGames.add(key2);
+    return teamString
+      // Remove various record patterns: " 0-1", " 1-0", " (0-1)", "(1-0)", etc.
+      .replace(/[\s(]*\d+-\d+[\s)]*/g, '')
+      // Remove extra punctuation and special characters
+      .replace(/[^\w\s]/g, '')
+      // Normalize whitespace (multiple spaces to single space)
+      .replace(/\s+/g, ' ')
+      // Remove leading/trailing whitespace
+      .trim()
+      // Case insensitive comparison
+      .toLowerCase();
+  };
+  
+  // Create a canonical matchup identifier
+  const createMatchupId = (team1, team2) => {
+    const normalized1 = normalizeTeamName(team1);
+    const normalized2 = normalizeTeamName(team2);
+    
+    // Always put teams in alphabetical order to ensure consistent matching
+    const sortedTeams = [normalized1, normalized2].sort();
+    return sortedTeams.join('|vs|');
+  };
+  
+  // Debug logging for troubleshooting (remove after fix confirmed)
+  console.log(`Processing ${gamesData?.length || 0} games for week ${week}`);
+  
+  gamesData?.forEach((game, index) => {
+    const matchupId = createMatchupId(game.home_team, game.away_team);
+    
+    // Debug log for the problematic matchup
+    if (game.home_team?.toLowerCase().includes('jesters') || 
+        game.away_team?.toLowerCase().includes('jesters') ||
+        game.home_team?.toLowerCase().includes('somewheres') || 
+        game.away_team?.toLowerCase().includes('somewheres')) {
+      console.log(`Game ${index + 1}: ${game.away_team} vs ${game.home_team}`);
+      console.log(`Normalized home: "${normalizeTeamName(game.home_team)}"`);
+      console.log(`Normalized away: "${normalizeTeamName(game.away_team)}"`);
+      console.log(`Matchup ID: "${matchupId}"`);
+      console.log(`Already seen: ${seenGames.has(matchupId)}`);
+      console.log('---');
+    }
+    
+    if (!seenGames.has(matchupId)) {
+      seenGames.add(matchupId);
+      seenMatchups.set(matchupId, {
+        originalHome: game.home_team,
+        originalAway: game.away_team,
+        index: index + 1
+      });
       uniqueGames.push(game);
+    } else {
+      // Log when we skip a duplicate
+      const original = seenMatchups.get(matchupId);
+      console.log(`Skipping duplicate: Game ${index + 1} (${game.away_team} vs ${game.home_team}) - already seen in Game ${original.index} (${original.originalAway} vs ${original.originalHome})`);
     }
   });
 
   const games = uniqueGames;
+  
+  // Debug log final results
+  console.log(`Final result: ${games.length} unique games will be displayed for week ${week}`);
+  console.log('Unique games:', games.map(g => `${g.away_team} vs ${g.home_team}`));
 
   // Fetch scores for the selected week
   const { data: weeklyScores } = await supabase
@@ -122,21 +176,22 @@ export const exportWeeklyData = async (week) => {
     /* Matchups Section */
     .matchups-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 25px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     .matchup {
       background-color: rgba(93, 203, 60, 0.1);
       border-left: 4px solid var(--dark-green);
-      padding: 12px;
+      padding: 8px;
       border-radius: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-weight: 400;
       color: var(--gray);
+      font-size: 0.9em;
     }
 
     .winner {
@@ -251,7 +306,15 @@ export const exportWeeklyData = async (week) => {
     <h2>Week ${week} Results</h2>
     <div class="matchups-container">
       ${games.map(game => {
-        const winner = game.winner === 'home' ? game.home_team : game.away_team;
+        // Helper function to extract team name without record
+        const getTeamName = (teamString) => {
+          // Remove record pattern like " 0-1", " 1-0", etc.
+          return teamString.replace(/\s+\d+-\d+$/, '').trim();
+        };
+        
+        const rawWinner = game.winner === 'home' ? game.home_team : game.away_team;
+        const winner = getTeamName(rawWinner);
+        
         return `
       <div class="matchup">
         <span>${game.away_team} vs ${game.home_team}</span>
