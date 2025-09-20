@@ -6,11 +6,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useCumulativeScores } from '../integrations/supabase';
 import { TrophyIcon, BarChartIcon, ArrowRightIcon, AlertTriangleIcon, UserPlus, Send } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const DashboardCard = ({ title, description, linkTo, icon: Icon }) => (
   <Card className="bg-card border border-border hover:border-primary transition-all duration-300 group">
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-xl font-bold">{title}</CardTitle>
+      <CardTitle className="text-xl font-semibold">{title}</CardTitle>
       <Icon className="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors" />
     </CardHeader>
     <CardContent>
@@ -26,29 +27,31 @@ const DashboardCard = ({ title, description, linkTo, icon: Icon }) => (
 );
 
 const LeaderboardSkeleton = () => (
-  <div className="space-y-4">
-    <Skeleton className="h-8 w-1/4" />
-    <div className="space-y-2">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="flex justify-between items-center p-2">
-          <div className="flex items-center space-x-4">
-            <Skeleton className="h-6 w-6 rounded-full" />
-            <Skeleton className="h-6 w-32" />
-          </div>
-          <Skeleton className="h-6 w-12" />
-        </div>
-      ))}
-    </div>
+  <div className="space-y-2">
+    {[...Array(5)].map((_, i) => (
+      <div key={i} className="flex items-center space-x-4 p-2">
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <Skeleton className="h-6 flex-grow" />
+        <Skeleton className="h-6 w-12" />
+      </div>
+    ))}
   </div>
 );
 
 const Index = () => {
   const { data: cumulativeScores, isLoading, isError, refetch } = useCumulativeScores();
 
+  const getRankClass = (rank) => {
+    if (rank === 1) return 'bg-yellow-400/20';
+    if (rank === 2) return 'bg-gray-400/20';
+    if (rank === 3) return 'bg-yellow-600/20';
+    return '';
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-bold gradient-text">Dashboard</h1>
+        <h1 className="text-5xl font-bold gradient-text">Dashboard</h1>
         <p className="text-muted-foreground">Welcome to the 2025 TRL Pick'em League</p>
       </div>
 
@@ -110,10 +113,15 @@ const Index = () => {
                   .sort((a, b) => b.score - a.score)
                   .slice(0, 5)
                   .map((score, index) => (
-                    <TableRow key={score.name} className={index === 0 ? 'font-bold bg-primary/10' : ''}>
-                      <TableCell className="font-medium text-primary">{index + 1}</TableCell>
-                      <TableCell>{score.name}</TableCell>
-                      <TableCell className="text-right font-semibold">{score.score}</TableCell>
+                    <TableRow key={score.name} className={getRankClass(index + 1)}>
+                      <TableCell className="font-bold text-lg text-primary">{index + 1}</TableCell>
+                      <TableCell className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarFallback>{score.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium">{score.name}</span>
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-xl">{score.score}</TableCell>
                     </TableRow>
                   ))}
               </TableBody>

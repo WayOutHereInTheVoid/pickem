@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { usePicks, useAddPick, useGames, useAddGame, useScores, useAddScore, useUpdateCumulativeScore, useCumulativeScores } from '../integrations/supabase';
+import { useAddPick, useAddGame, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
 import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
 import NFLMatchups from '../components/NFLMatchups';
 import { getCachedOrFetchWeekMatches } from '../utils/nflApi';
 import { Calendar, Clipboard, Loader } from 'lucide-react';
 
-/**
- * A page for importing picks from a poll.
- * @returns {JSX.Element}
- */
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
@@ -24,7 +19,7 @@ const ImportPicks = () => {
   const [nflMatches, setNflMatches] = useState([]);
   const [isParsing, setIsParsing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isNFLMatchupsCollapsed, setIsNFLMatchupsCollapsed] = useState(false);
+  const [saveProgress, setSaveProgress] = useState(0);
 
   const addPick = useAddPick();
   const addGame = useAddGame();
@@ -32,53 +27,29 @@ const ImportPicks = () => {
   const updateCumulativeScore = useUpdateCumulativeScore();
 
   const teamNameMapping = {
-    "Thumbz": "Murder Hornets",
-    "PRfan790": "Somewheres",
-    "chupalo": "Sonora Sugar Skulls",
-    "Scrody": "Newfoundland Growlers",
-    "JoshMartinez": "California Burritos",
-    "GKIRBY05": "Lonestar Legends",
-    "TheNewEra22": "Brutal Hogs",
-    "ejdale4944": "Southwest Aliens",
-    "ClemCola": "Rochester Jesters",
-    "FoodMafia": "Food Mafia",
-    "Econley19": "Seattle Prestiges",
-    "Detroilet": "D-Town Swirlies"
+    "Thumbz": "Murder Hornets", "PRfan790": "Somewheres", "chupalo": "Sonora Sugar Skulls",
+    "Scrody": "Newfoundland Growlers", "JoshMartinez": "California Burritos", "GKIRBY05": "Lonestar Legends",
+    "TheNewEra22": "Brutal Hogs", "ejdale4944": "Southwest Aliens", "ClemCola": "Rochester Jesters",
+    "FoodMafia": "Food Mafia", "Econley19": "Seattle Prestiges", "Detroilet": "D-Town Swirlies"
   };
 
   React.useEffect(() => {
-    /**
-     * Fetches the NFL matches for the selected week.
-     */
     const fetchNFLMatches = async () => {
       const matches = await getCachedOrFetchWeekMatches(parseInt(selectedWeek));
       setNflMatches(matches);
     };
-
     fetchNFLMatches();
   }, [selectedWeek]);
 
-  /**
-   * Handles the change event for the poll results text area.
-   * @param {React.ChangeEvent<HTMLTextAreaElement>} e - The change event.
-   */
-  const handleInputChange = (e) => {
-    setPollResults(e.target.value);
-  };
+  const handleInputChange = (e) => setPollResults(e.target.value);
 
-  /**
-   * Parses the poll results and extracts the picks and games.
-   */
   const parsePollResults = async () => {
     setIsParsing(true);
-    // Simulate a delay for the parsing process
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const lines = pollResults.split('\n');
     const picks = [];
     const games = [];
     let currentTeam = '';
-
     lines.forEach(line => {
       line = line.trim();
       if (line.startsWith('"') && line.endsWith('"')) {
@@ -92,33 +63,18 @@ const ImportPicks = () => {
         picks.push({ name: teamNameMapping[line] || line, pick: currentTeam });
       }
     });
-
     setParsedPicks(picks);
     setParsedGames(games);
-    console.log('Parsed picks:', picks);
-    console.log('Parsed games:', games);
     toast.success(`Successfully parsed ${picks.length} picks and ${games.length} games`);
     setIsParsing(false);
-    setIsNFLMatchupsCollapsed(true); // Collapse NFL matchups after parsing
   };
 
-  /**
-   * Handles the change event for the winner of a game.
-   * @param {number} index - The index of the game.
-   * @param {string} winner - The winner of the game.
-   */
   const handleWinnerChange = (index, winner) => {
     setParsedGames(prevGames => prevGames.map((game, i) =>
       i === index ? { ...game, winner } : game
     ));
   };
 
-  /**
-   * Calculates the scores for the week based on the games and picks.
-   * @param {Array<object>} games - An array of game objects.
-   * @param {Array<object>} picks - An array of pick objects.
-   * @returns {object} An object containing the scores for each user.
-   */
   const calculateScores = (games, picks) => {
     const weekScores = {};
     picks.forEach(pick => {
@@ -131,34 +87,33 @@ const ImportPicks = () => {
     return weekScores;
   };
 
-  /**
-   * Saves the picks, games, and scores to the database.
-   */
   const savePicks = async () => {
     setIsSaving(true);
+    setSaveProgress(0);
+    const totalOperations = parsedGames.length + parsedPicks.length + Object.keys(calculateScores(parsedGames, parsedPicks)).length * 2;
+    let completedOperations = 0;
+
+    const updateProgress = () => {
+      completedOperations++;
+      setSaveProgress((completedOperations / totalOperations) * 100);
+    };
+
     try {
       for (const game of parsedGames) {
         await addGame.mutateAsync({ ...game, week: parseInt(selectedWeek) });
+        updateProgress();
       }
-
       for (const pick of parsedPicks) {
         await addPick.mutateAsync({ ...pick, week: parseInt(selectedWeek) });
+        updateProgress();
       }
-
       const weekScores = calculateScores(parsedGames, parsedPicks);
       for (const [name, score] of Object.entries(weekScores)) {
-        await addScore.mutateAsync({
-          week: parseInt(selectedWeek),
-          name,
-          score
-        });
-
-        await updateCumulativeScore.mutateAsync({
-          name,
-          score
-        });
+        await addScore.mutateAsync({ week: parseInt(selectedWeek), name, score });
+        updateProgress();
+        await updateCumulativeScore.mutateAsync({ name, score });
+        updateProgress();
       }
-
       toast.success(`Picks, games, and scores saved successfully for Week ${selectedWeek}!`);
     } catch (error) {
       console.error('Error saving data:', error);
@@ -170,79 +125,55 @@ const ImportPicks = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-card">
-        <CardHeader>
-          <CardTitle className="text-foreground flex items-center">
-            <Calendar className="w-5 h-5 mr-2" />
-            Select Week
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-            <SelectTrigger className="w-full bg-secondary text-foreground">
-              <SelectValue placeholder="Select week" />
-            </SelectTrigger>
-            <SelectContent>
-              {[...Array(16)].map((_, i) => (
-                <SelectItem key={i + 1} value={(i + 1).toString()}>
-                  Week {i + 1}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center"><Calendar className="w-5 h-5 mr-2" /> Select Week</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Select value={selectedWeek} onValueChange={setSelectedWeek}>
+              <SelectTrigger><SelectValue placeholder="Select week" /></SelectTrigger>
+              <SelectContent>
+                {[...Array(18)].map((_, i) => (
+                  <SelectItem key={i + 1} value={(i + 1).toString()}>Week {i + 1}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+        <NFLMatchups matches={nflMatches} />
+      </div>
       
-      <Card className="bg-card">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-foreground flex items-center">
-            <Clipboard className="w-5 h-5 mr-2" />
-            Paste Poll Results
-          </CardTitle>
+          <CardTitle className="flex items-center"><Clipboard className="w-5 h-5 mr-2" /> Paste Poll Results</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <Textarea
             placeholder="Paste poll results here..."
             value={pollResults}
             onChange={handleInputChange}
             rows={10}
-            className="mb-4 bg-secondary text-foreground focus:ring-2 focus:ring-primary transition-all duration-300"
           />
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Button
-              onClick={parsePollResults}
-              className="w-full bg-primary text-primary-foreground hover:bg-primary-light transition-colors duration-300"
-              disabled={isParsing}
-            >
-              {isParsing ? (
-                <>
-                  <Loader className="w-4 h-4 mr-2 animate-spin" />
-                  Parsing...
-                </>
-              ) : (
-                'Parse Picks and Games'
-              )}
-            </Button>
-          </motion.div>
+          <Button onClick={parsePollResults} className="w-full" disabled={isParsing}>
+            {isParsing ? <><Loader className="w-4 h-4 mr-2 animate-spin" /> Parsing...</> : 'Parse Picks and Games'}
+          </Button>
         </CardContent>
       </Card>
       
-      <NFLMatchups matches={nflMatches} isCollapsed={isNFLMatchupsCollapsed} />
-      
-      {parsedGames.length > 0 && (
-        <ParsedGames games={parsedGames} onWinnerChange={handleWinnerChange} />
-      )}
-      
-      {parsedPicks.length > 0 && (
-        <ParsedPicks 
-          picks={parsedPicks} 
-          onSave={savePicks}
-          isSaving={isSaving}
-        />
-      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {parsedGames.length > 0 && (
+          <ParsedGames games={parsedGames} onWinnerChange={handleWinnerChange} />
+        )}
+        {parsedPicks.length > 0 && (
+          <ParsedPicks
+            picks={parsedPicks}
+            onSave={savePicks}
+            isSaving={isSaving}
+            progress={saveProgress}
+          />
+        )}
+      </div>
     </div>
   );
 };

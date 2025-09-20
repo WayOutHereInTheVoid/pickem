@@ -9,7 +9,18 @@ import { useGames, usePicks, useScores, useCumulativeScores } from '../integrati
 import { exportWeeklyData } from '../utils/exportWeeklyData';
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DownloadIcon, SearchIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { Separator } from "@/components/ui/separator";
+import { DownloadIcon, SearchIcon, ChevronLeftIcon, ChevronRightIcon, ArrowUp, ArrowDown, Minus } from 'lucide-react';
+
+const RankChange = ({ change }) => {
+  if (change === null || change === 0) {
+    return <span className="flex items-center text-muted-foreground"><Minus className="h-4 w-4" /></span>;
+  }
+  if (change > 0) {
+    return <span className="flex items-center text-green-500"><ArrowUp className="h-4 w-4 mr-1" /> {change}</span>;
+  }
+  return <span className="flex items-center text-red-500"><ArrowDown className="h-4 w-4 mr-1" /> {Math.abs(change)}</span>;
+};
 
 const StandingsTable = ({ data, isLoading }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,21 +67,23 @@ const StandingsTable = ({ data, isLoading }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Rank</TableHead>
-              <TableHead>Team Name</TableHead>
-              <TableHead className="text-right">Score</TableHead>
+              <TableHead className="w-16 font-bold">Rank</TableHead>
+              <TableHead className="w-24 font-bold">Change</TableHead>
+              <TableHead className="font-bold">Team Name</TableHead>
+              <TableHead className="text-right font-bold">Score</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.length > 0 ? paginatedData.map((entry, index) => (
-              <TableRow key={entry.name} className={entry.rank === 1 ? 'bg-primary/10' : ''}>
-                <TableCell className="font-medium text-primary">{entry.rank}</TableCell>
-                <TableCell>{entry.name}</TableCell>
-                <TableCell className="text-right font-bold text-lg">{entry.score}</TableCell>
+              <TableRow key={entry.name} className="even:bg-muted/30">
+                <TableCell className="font-medium text-primary p-4">{entry.rank}</TableCell>
+                <TableCell className="p-4"><RankChange change={entry.rankChange} /></TableCell>
+                <TableCell className="p-4">{entry.name}</TableCell>
+                <TableCell className="text-right font-bold text-lg p-4">{entry.score}</TableCell>
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={3} className="text-center h-24">
+                <TableCell colSpan={4} className="text-center h-24">
                   No results found.
                 </TableCell>
               </TableRow>
@@ -87,7 +100,6 @@ const StandingsTable = ({ data, isLoading }) => {
             disabled={currentPage === 1}
           >
             <ChevronLeftIcon className="h-4 w-4" />
-            <span className="sr-only">Previous page</span>
           </Button>
           <span className="text-sm">
             Page {currentPage} of {totalPages}
@@ -99,7 +111,6 @@ const StandingsTable = ({ data, isLoading }) => {
             disabled={currentPage === totalPages}
           >
             <ChevronRightIcon className="h-4 w-4" />
-            <span className="sr-only">Next page</span>
           </Button>
         </div>
       )}
@@ -120,17 +131,38 @@ const Standings = () => {
   const isLoading = gamesLoading || picksLoading || scoresLoading || cumulativeLoading;
 
   useEffect(() => {
-    if (games && picks && scores && cumulativeScores) {
-      const weekScores = scores.filter(score => score.week === parseInt(selectedWeek));
+    if (scores && cumulativeScores) {
+      const currentWeek = parseInt(selectedWeek);
+
+      const getRankings = (week) => {
+        if (week < 1) return {};
+        const weekScores = scores.filter(s => s.week === week);
+        const rankings = {};
+        weekScores.sort((a, b) => b.score - a.score).forEach((s, i) => {
+          rankings[s.name] = i + 1;
+        });
+        return rankings;
+      };
+
+      const prevWeekRankings = getRankings(currentWeek - 1);
+
+      const weekScores = scores.filter(score => score.week === currentWeek);
       const weeklyStandings = weekScores
         .sort((a, b) => b.score - a.score)
-        .map((entry, index) => ({ ...entry, rank: index + 1 }));
+        .map((entry, index) => {
+          const rank = index + 1;
+          const prevRank = prevWeekRankings[entry.name];
+          const rankChange = prevRank ? prevRank - rank : null;
+          return { ...entry, rank, rankChange };
+        });
+
       const cumulativeStandings = cumulativeScores
         .sort((a, b) => b.score - a.score)
-        .map((entry, index) => ({ ...entry, rank: index + 1 }));
+        .map((entry, index) => ({ ...entry, rank: index + 1, rankChange: null })); // Simplified for cumulative
+
       setStandings({ weekly: weeklyStandings, cumulative: cumulativeStandings });
     }
-  }, [selectedWeek, games, picks, scores, cumulativeScores]);
+  }, [selectedWeek, scores, cumulativeScores]);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -163,12 +195,12 @@ const Standings = () => {
         <CardContent className="flex flex-col md:flex-row gap-4 items-center">
           <div className="grid gap-2 w-full md:w-auto">
             <Select value={selectedWeek} onValueChange={setSelectedWeek} disabled={isLoading}>
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className="w-full md:w-[180px] text-base py-6">
                 <SelectValue placeholder="Select week" />
               </SelectTrigger>
               <SelectContent>
                 {[...Array(18)].map((_, i) => (
-                  <SelectItem key={i + 1} value={(i + 1).toString()}>
+                  <SelectItem key={i + 1} value={(i + 1).toString()} className="text-base">
                     Week {i + 1}
                   </SelectItem>
                 ))}
@@ -182,10 +214,12 @@ const Standings = () => {
         </CardContent>
       </Card>
 
+      <Separator />
+
       <Tabs defaultValue="weekly" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="weekly">Weekly</TabsTrigger>
-          <TabsTrigger value="cumulative">Cumulative</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 bg-muted/50 rounded-lg p-1">
+          <TabsTrigger value="weekly" className="rounded-md data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-md">Weekly</TabsTrigger>
+          <TabsTrigger value="cumulative" className="rounded-md data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-md">Cumulative</TabsTrigger>
         </TabsList>
         <TabsContent value="weekly">
           <StandingsTable data={standings.weekly} isLoading={isLoading} />
