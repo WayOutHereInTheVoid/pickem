@@ -1,49 +1,50 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Loader } from 'lucide-react';
+import { Progress } from "@/components/ui/progress";
 
-/**
- * @typedef {Object} ParsedPicksProps
- * @property {Array<object>} picks - An array of pick objects.
- * @property {function} onSave - A callback function that is called when the save button is clicked.
- * @property {boolean} isSaving - Whether the picks are currently being saved.
- */
-
-/**
- * A component that displays a list of parsed picks and allows the user to save them.
- * @param {ParsedPicksProps} props - The props for the component.
- * @returns {JSX.Element}
- */
-const ParsedPicks = ({ picks, onSave, isSaving }) => {
+const ParsedPicks = ({ picks, onSave, isSaving, progress }) => {
   return (
-    <Card className="bg-card">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-foreground">Parsed Picks</CardTitle>
+        <CardTitle>Parsed Picks</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
-          {picks.map((pick, index) => (
-            <div key={index} className="flex justify-between items-center">
-              <span className="text-foreground">{pick.name}</span>
-              <span className="text-primary">{pick.pick}</span>
-            </div>
-          ))}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Participant</TableHead>
+              <TableHead>Picked Team</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {picks.map((pick, index) => (
+              <TableRow key={index} className="even:bg-muted/30">
+                <TableCell>{pick.name}</TableCell>
+                <TableCell className="font-medium text-primary">{pick.pick}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <div className="mt-6 space-y-4">
+          <Button
+            onClick={onSave}
+            className="w-full"
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <>
+                <Loader className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              'Save Picks and Calculate Scores'
+            )}
+          </Button>
+          {isSaving && <Progress value={progress} className="w-full" />}
         </div>
-        <Button 
-          onClick={onSave} 
-          className="mt-4 w-full bg-primary text-primary-foreground hover:bg-primary-light transition-colors duration-300"
-          disabled={isSaving}
-        >
-          {isSaving ? (
-            <>
-              <Loader className="w-4 h-4 mr-2 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            'Save Picks and Calculate Scores'
-          )}
-        </Button>
       </CardContent>
     </Card>
   );
