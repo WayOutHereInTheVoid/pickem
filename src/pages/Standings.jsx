@@ -24,26 +24,17 @@ const RankChange = ({ change }) => {
 
 const StandingsTable = ({ data, isLoading }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   const filteredData = useMemo(() =>
     data.filter(entry =>
       entry.name.toLowerCase().includes(searchTerm.toLowerCase())
     ), [data, searchTerm]);
 
-  const paginatedData = useMemo(() =>
-    filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage),
-    [filteredData, currentPage]
-  );
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
   if (isLoading) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-10 w-full" />
-        {[...Array(itemsPerPage)].map((_, i) => (
+        {[...Array(12)].map((_, i) => (
           <Skeleton key={i} className="h-12 w-full" />
         ))}
       </div>
@@ -74,7 +65,7 @@ const StandingsTable = ({ data, isLoading }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.length > 0 ? paginatedData.map((entry, index) => (
+            {filteredData.length > 0 ? filteredData.map((entry, index) => (
               <TableRow key={entry.name} className="even:bg-muted/30">
                 <TableCell className="font-medium text-primary p-4">{entry.rank}</TableCell>
                 <TableCell className="p-4"><RankChange change={entry.rankChange} /></TableCell>
@@ -91,29 +82,6 @@ const StandingsTable = ({ data, isLoading }) => {
           </TableBody>
         </Table>
       </Card>
-      {totalPages > 1 && (
-        <div className="flex justify-end items-center space-x-2 mt-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-          >
-            <ChevronLeftIcon className="h-4 w-4" />
-          </Button>
-          <span className="text-sm">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-          >
-            <ChevronRightIcon className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
