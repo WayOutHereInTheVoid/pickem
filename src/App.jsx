@@ -23,7 +23,8 @@ const App = () => (
             <Toaster />
             <div className="flex h-screen bg-background text-foreground">
               <Sidebar />
-              <main className="flex-1 overflow-x-hidden overflow-y-auto p-6 md:p-8 pt-20 md:pt-8">
+              <main className="flex-1 overflow-x-hidden overflow-y-auto p-6 md:p-8">
+                <div className="h-16 md:hidden" />
                 <Routes>
                   {navItems.map(({ to, page }) => (
                     <Route key={to} path={to} element={page} />

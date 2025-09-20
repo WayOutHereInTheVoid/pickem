@@ -1,7 +1,8 @@
-import { HomeIcon, BarChartIcon, UserIcon } from "lucide-react";
+import { HomeIcon, BarChartIcon, UserIcon, Send } from "lucide-react";
 import Index from "./pages/Index.jsx";
 import Standings from "./pages/Standings.jsx";
 import ManagerPage from "./pages/ManagerPage.jsx";
+import SubmitPicks from "./pages/SubmitPicks.jsx";
 import AuthCallback from "./pages/AuthCallback.jsx";
 
 /**
@@ -29,6 +30,12 @@ export const navItems = [
     to: "/standings",
     icon: <BarChartIcon className="h-4 w-4" />,
     page: <Standings />,
+  },
+  {
+    title: "Submit Picks",
+    to: "/submit-picks",
+    icon: <Send className="h-4 w-4" />,
+    page: <SubmitPicks />,
   },
   {
     title: "Manager Login",
