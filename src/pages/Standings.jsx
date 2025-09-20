@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useGames, usePicks, useScores, useCumulativeScores } from '../integrations/supabase';
 import { exportWeeklyData } from '../utils/exportWeeklyData';
+import { calculateRanksWithTies, calculateRanksWithTiesAndDisplay } from '../utils/scoreCalculations';
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
@@ -67,7 +68,7 @@ const StandingsTable = ({ data, isLoading }) => {
           <TableBody>
             {filteredData.length > 0 ? filteredData.map((entry, index) => (
               <TableRow key={entry.name} className="even:bg-muted/30">
-                <TableCell className="font-medium text-primary p-4">{entry.rank}</TableCell>
+                <TableCell className="font-medium text-primary p-4">{entry.displayRank}</TableCell>
                 <TableCell className="p-4"><RankChange change={entry.rankChange} /></TableCell>
                 <TableCell className="p-4">{entry.name}</TableCell>
                 <TableCell className="text-right font-bold text-lg p-4">{entry.score}</TableCell>
@@ -105,9 +106,10 @@ const Standings = () => {
       const getRankings = (week) => {
         if (week < 1) return {};
         const weekScores = scores.filter(s => s.week === week);
+        const rankedScores = calculateRanksWithTies(weekScores);
         const rankings = {};
-        weekScores.sort((a, b) => b.score - a.score).forEach((s, i) => {
-          rankings[s.name] = i + 1;
+        rankedScores.forEach(s => {
+          rankings[s.name] = s.rank;
         });
         return rankings;
       };
@@ -115,18 +117,20 @@ const Standings = () => {
       const prevWeekRankings = getRankings(currentWeek - 1);
 
       const weekScores = scores.filter(score => score.week === currentWeek);
-      const weeklyStandings = weekScores
-        .sort((a, b) => b.score - a.score)
-        .map((entry, index) => {
-          const rank = index + 1;
-          const prevRank = prevWeekRankings[entry.name];
-          const rankChange = prevRank ? prevRank - rank : null;
-          return { ...entry, rank, rankChange };
-        });
+      // Calculate proper rankings with tie handling
+      const rankedWeekScores = calculateRanksWithTiesAndDisplay(weekScores);
+      const weeklyStandings = rankedWeekScores.map((entry) => {
+        const prevRank = prevWeekRankings[entry.name];
+        const rankChange = prevRank ? prevRank - entry.rank : null;
+        return { ...entry, rankChange };
+      });
 
-      const cumulativeStandings = cumulativeScores
-        .sort((a, b) => b.score - a.score)
-        .map((entry, index) => ({ ...entry, rank: index + 1, rankChange: null })); // Simplified for cumulative
+      // Calculate proper rankings for cumulative scores with tie handling
+      const rankedCumulativeScores = calculateRanksWithTiesAndDisplay(cumulativeScores);
+      const cumulativeStandings = rankedCumulativeScores.map((entry) => ({
+        ...entry,
+        rankChange: null // No rank change calculation for cumulative view
+      }));
 
       setStandings({ weekly: weeklyStandings, cumulative: cumulativeStandings });
     }

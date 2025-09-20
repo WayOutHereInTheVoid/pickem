@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCumulativeScores } from '../integrations/supabase';
+import { calculateRanksWithTiesAndDisplay } from '../utils/scoreCalculations';
 import { TrophyIcon, BarChartIcon, ArrowRightIcon, AlertTriangleIcon, UserPlus, Send } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -109,21 +110,24 @@ const Index = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {cumulativeScores
-                  .sort((a, b) => b.score - a.score)
-                  .slice(0, 5)
-                  .map((score, index) => (
-                    <TableRow key={score.name} className={getRankClass(index + 1)}>
-                      <TableCell className="font-bold text-lg text-primary">{index + 1}</TableCell>
-                      <TableCell className="flex items-center space-x-3">
-                        <Avatar>
-                          <AvatarFallback>{score.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium">{score.name}</span>
-                      </TableCell>
-                      <TableCell className="text-right font-bold text-xl">{score.score}</TableCell>
-                    </TableRow>
-                  ))}
+                {(() => {
+                  // Calculate proper rankings with tie handling
+                  const rankedScores = calculateRanksWithTiesAndDisplay(cumulativeScores);
+                  return rankedScores
+                    .slice(0, 5)
+                    .map((score) => (
+                      <TableRow key={score.name} className={getRankClass(score.rank)}>
+                        <TableCell className="font-bold text-lg text-primary">{score.displayRank}</TableCell>
+                        <TableCell className="flex items-center space-x-3">
+                          <Avatar>
+                            <AvatarFallback>{score.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">{score.name}</span>
+                        </TableCell>
+                        <TableCell className="text-right font-bold text-xl">{score.score}</TableCell>
+                      </TableRow>
+                    ));
+                })()}
               </TableBody>
             </Table>
           ) : (
