@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -64,8 +64,8 @@ const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false }) => {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <CardContent className="py-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            <CardContent className="py-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {matches.map((match, index) => {
                   const homeTeam = match.homeTeam.displayName;
                   const awayTeam = match.awayTeam.displayName;
@@ -80,17 +80,27 @@ const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false }) => {
 
                   const scoreColors = getScoreColor(parseInt(homeScore), parseInt(awayScore));
 
+                  // Determine winning teams for star emoji
+                  const homeScoreNum = parseInt(homeScore) || 0;
+                  const awayScoreNum = parseInt(awayScore) || 0;
+                  const isHomeWinner = homeScoreNum > awayScoreNum && homeScoreNum > 0;
+                  const isAwayWinner = awayScoreNum > homeScoreNum && awayScoreNum > 0;
+
                   return (
-                    <div key={index} className="bg-secondary p-2 rounded-lg text-xs">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold" style={{ color: getTeamColor(awayTeam) }}>{awayTeam}</span>
-                        <span className={`${scoreColors.away} font-bold`}>{awayScore}</span>
+                    <div key={index} className="bg-secondary p-6 rounded-lg border border-border shadow-sm min-h-[140px]">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-lg font-semibold truncate pr-2" style={{ color: getTeamColor(awayTeam) }}>
+                          {isAwayWinner && "⭐ "}{awayTeam}
+                        </span>
+                        <span className={`${scoreColors.away} text-3xl font-bold min-w-[4rem] text-right`}>{awayScore}</span>
                       </div>
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-semibold" style={{ color: getTeamColor(homeTeam) }}>{homeTeam}</span>
-                        <span className={`${scoreColors.home} font-bold`}>{homeScore}</span>
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-lg font-semibold truncate pr-2" style={{ color: getTeamColor(homeTeam) }}>
+                          {isHomeWinner && "⭐ "}{homeTeam}
+                        </span>
+                        <span className={`${scoreColors.home} text-3xl font-bold min-w-[4rem] text-right`}>{homeScore}</span>
                       </div>
-                      <div className="text-xxs text-muted-foreground text-center">{status}</div>
+                      <div className="text-sm text-muted-foreground text-center bg-muted rounded-md px-4 py-2 font-medium border">{status}</div>
                     </div>
                   );
                 })}
