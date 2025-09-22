@@ -65,7 +65,7 @@ const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false }) => {
             transition={{ duration: 0.3 }}
           >
             <CardContent className="py-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-4">
                 {matches.map((match, index) => {
                   const homeTeam = match.homeTeam.displayName;
                   const awayTeam = match.awayTeam.displayName;
@@ -87,20 +87,24 @@ const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false }) => {
                   const isAwayWinner = awayScoreNum > homeScoreNum && awayScoreNum > 0;
 
                   return (
-                    <div key={index} className="bg-secondary p-6 rounded-lg border border-border shadow-sm min-h-[140px]">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-lg font-semibold truncate pr-2" style={{ color: getTeamColor(awayTeam) }}>
-                          {isAwayWinner && "⭐ "}{awayTeam}
-                        </span>
-                        <span className={`${scoreColors.away} text-3xl font-bold min-w-[4rem] text-right`}>{awayScore}</span>
+                    <div key={index} className="bg-secondary p-4 rounded-lg border border-border shadow-sm">
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="flex items-center">
+                          <span className="text-lg font-semibold truncate" style={{ color: getTeamColor(awayTeam) }}>
+                            {isAwayWinner && "⭐ "}{awayTeam}
+                          </span>
+                        </div>
+                        <span className={`${scoreColors.away} text-2xl font-bold`}>{awayScore}</span>
                       </div>
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-lg font-semibold truncate pr-2" style={{ color: getTeamColor(homeTeam) }}>
-                          {isHomeWinner && "⭐ "}{homeTeam}
-                        </span>
-                        <span className={`${scoreColors.home} text-3xl font-bold min-w-[4rem] text-right`}>{homeScore}</span>
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center">
+                          <span className="text-lg font-semibold truncate" style={{ color: getTeamColor(homeTeam) }}>
+                            {isHomeWinner && "⭐ "}{homeTeam}
+                          </span>
+                        </div>
+                        <span className={`${scoreColors.home} text-2xl font-bold`}>{homeScore}</span>
                       </div>
-                      <div className="text-sm text-muted-foreground text-center bg-muted rounded-md px-4 py-2 font-medium border">{status}</div>
+                      <div className="text-xs text-muted-foreground text-center bg-muted rounded-md px-3 py-1 font-medium border">{status}</div>
                     </div>
                   );
                 })}
