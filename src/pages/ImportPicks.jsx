@@ -8,7 +8,8 @@ import { useAddPick, useAddGame, useAddScore, useUpdateCumulativeScore } from '.
 import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
 import NFLMatchups from '../components/NFLMatchups';
-import { getCachedOrFetchWeekMatches } from '../utils/nflApi';
+import FantasyScoreboard from '../components/FantasyScoreboard';
+import { getCachedOrFetchWeekMatches, forceRefreshWeekMatches } from '../utils/nflApi';
 import { Calendar, Clipboard, Loader } from 'lucide-react';
 
 const ImportPicks = () => {
@@ -20,6 +21,7 @@ const ImportPicks = () => {
   const [isParsing, setIsParsing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveProgress, setSaveProgress] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const addPick = useAddPick();
   const addGame = useAddGame();
@@ -40,6 +42,20 @@ const ImportPicks = () => {
     };
     fetchNFLMatches();
   }, [selectedWeek]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const freshMatches = await forceRefreshWeekMatches(parseInt(selectedWeek));
+      setNflMatches(freshMatches);
+      toast.success(`NFL scores refreshed for Week ${selectedWeek}`);
+    } catch (error) {
+      console.error('Error refreshing NFL matches:', error);
+      toast.error('Failed to refresh NFL scores');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleInputChange = (e) => setPollResults(e.target.value);
 
@@ -143,7 +159,9 @@ const ImportPicks = () => {
           </CardContent>
         </Card>
         
-        <NFLMatchups matches={nflMatches} />
+        <NFLMatchups matches={nflMatches} onRefresh={handleRefresh} isRefreshing={isRefreshing} />
+        
+        <FantasyScoreboard week={parseInt(selectedWeek)} />
       </div>
       
       <Card>

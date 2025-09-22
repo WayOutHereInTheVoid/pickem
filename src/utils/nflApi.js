@@ -117,3 +117,56 @@ export async function getCachedOrFetchWeekMatches(week) {
 
   return allMatches;
 }
+
+/**
+ * Forces a refresh of NFL matches for a given week, bypassing cache.
+ * @param {number} week - The week to refresh matches for.
+ * @returns {Promise<Array<object>>} A promise that resolves with fresh match data.
+ */
+export async function forceRefreshWeekMatches(week) {
+  const weekDates = nflWeeks2025[week];
+  if (!weekDates) {
+    console.log(`Week ${week} data not available.`);
+    return [];
+  }
+
+  const dates = generateDateRange(weekDates.start, weekDates.end);
+  let allMatches = [];
+
+  for (const date of dates) {
+    const matches = await fetchNFLMatches(date);
+    allMatches = allMatches.concat(matches);
+    // Add a small delay to avoid hitting API rate limits
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  // Update cache with fresh data
+  const { error: updateError } = await supabase
+    .from('nfl_matches_cache')
+    .upsert({ week, matches: JSON.stringify(allMatches) });
+
+  if (updateError) {
+    console.error('Error updating cache:', updateError);
+  }
+
+  return allMatches;
+}
+
+/**
+ * Clears cached data for a specific week.
+ * @param {number} week - The week to clear cache for.
+ * @returns {Promise<boolean>} A promise that resolves with success status.
+ */
+export async function clearWeekCache(week) {
+  const { error } = await supabase
+    .from('nfl_matches_cache')
+    .delete()
+    .eq('week', week);
+
+  if (error) {
+    console.error('Error clearing cache:', error);
+    return false;
+  }
+
+  return true;
+}

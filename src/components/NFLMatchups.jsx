@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getTeamColor } from '../utils/teamColors';
 
@@ -9,6 +9,8 @@ import { getTeamColor } from '../utils/teamColors';
  * @typedef {Object} NFLMatchupsProps
  * @property {Array<object>} matches - An array of match objects.
  * @property {boolean} [isCollapsed=false] - Whether the component is collapsed by default.
+ * @property {Function} [onRefresh] - Function to call when refresh button is clicked.
+ * @property {boolean} [isRefreshing=false] - Whether a refresh is currently in progress.
  */
 
 /**
@@ -16,7 +18,7 @@ import { getTeamColor } from '../utils/teamColors';
  * @param {NFLMatchupsProps} props - The props for the component.
  * @returns {JSX.Element}
  */
-const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false }) => {
+const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false, onRefresh, isRefreshing = false }) => {
   const [isCollapsed, setIsCollapsed] = useState(initialIsCollapsed);
 
   useEffect(() => {
@@ -47,14 +49,27 @@ const NFLMatchups = ({ matches, isCollapsed: initialIsCollapsed = false }) => {
     <Card className="bg-card">
       <CardHeader className="flex flex-row items-center justify-between py-2">
         <CardTitle className="text-foreground text-lg">NFL Matchups</CardTitle>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleCollapse}
-          className="p-0 h-8 w-8"
-        >
-          {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-        </Button>
+        <div className="flex items-center gap-2">
+          {onRefresh && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onRefresh}
+              className="p-0 h-8 w-8"
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleCollapse}
+            className="p-0 h-8 w-8"
+          >
+            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+          </Button>
+        </div>
       </CardHeader>
       <AnimatePresence initial={false}>
         {!isCollapsed && (
