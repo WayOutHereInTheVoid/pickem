@@ -9,14 +9,14 @@ const BASE_URL = 'https://api.sleeper.app/v1';
 const teamNameMapping = {
   1: "Murder Hornets",
   2: "Lonestar Legends", 
-  3: "Sonora Sugar Skulls",
+  3: "Sugar Skulls",
   4: "Newfoundland Growlers",
   5: "California Burritos",
   6: "Food Mafia",
   7: "Brutal Hogs",
   8: "Southwest Aliens",
-  9: "Jesters",
-  10: "PRfan790",
+  9: "Rochester Jesters",
+  10: "Somewheres",
   11: "Seattle Prestiges",
   12: "D-Town Swirlies"
 };

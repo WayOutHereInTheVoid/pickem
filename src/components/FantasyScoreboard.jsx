@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getFormattedMatchups, forceRefreshFantasyMatchups } from '../utils/sleeperApi';
+import { getAccessibleTeamColor } from '../utils/fantasyTeamColors';
 import { toast } from "sonner";
 
 /**
@@ -154,11 +155,19 @@ const FantasyScoreboard = ({ week, isCollapsed: initialIsCollapsed = false, onRe
                     const isTeam1Winner = team1Points > team2Points && team1Points > 0;
                     const isTeam2Winner = team2Points > team1Points && team2Points > 0;
 
+                    // Get team colors with accessibility adjustments
+                    // Using a light gray background color typical of secondary elements
+                    const team1Color = getAccessibleTeamColor(matchup.team1.name, "#f1f5f9", 4.5);
+                    const team2Color = getAccessibleTeamColor(matchup.team2.name, "#f1f5f9", 4.5);
+
                     return (
                       <div key={matchup.matchupId} className="bg-secondary p-3 rounded-lg border border-border shadow-sm">
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex items-center">
-                            <span className="text-sm font-semibold truncate">
+                            <span 
+                              className="text-sm font-semibold truncate"
+                              style={{ color: team1Color }}
+                            >
                               {isTeam1Winner && "⭐ "}{matchup.team1.name}
                             </span>
                           </div>
@@ -169,7 +178,10 @@ const FantasyScoreboard = ({ week, isCollapsed: initialIsCollapsed = false, onRe
                         <div className="text-center text-xs text-muted-foreground mb-2">vs</div>
                         <div className="flex justify-between items-center mb-3">
                           <div className="flex items-center">
-                            <span className="text-sm font-semibold truncate">
+                            <span 
+                              className="text-sm font-semibold truncate"
+                              style={{ color: team2Color }}
+                            >
                               {isTeam2Winner && "⭐ "}{matchup.team2.name}
                             </span>
                           </div>

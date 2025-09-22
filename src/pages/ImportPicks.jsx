@@ -29,7 +29,7 @@ const ImportPicks = () => {
   const updateCumulativeScore = useUpdateCumulativeScore();
 
   const teamNameMapping = {
-    "Thumbz": "Murder Hornets", "PRfan790": "Somewheres", "chupalo": "Sonora Sugar Skulls",
+    "Thumbz": "Murder Hornets", "PRfan790": "Somewheres", "chupalo": "Sugar Skulls",
     "Scrody": "Newfoundland Growlers", "JoshMartinez": "California Burritos", "GKIRBY05": "Lonestar Legends",
     "TheNewEra22": "Brutal Hogs", "ejdale4944": "Southwest Aliens", "ClemCola": "Rochester Jesters",
     "FoodMafia": "Food Mafia", "Econley19": "Seattle Prestiges", "Detroilet": "D-Town Swirlies"
