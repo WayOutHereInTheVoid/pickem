@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useSupabaseAuth } from '../integrations/supabase';
 import ImportPicks from './ImportPicks';
 import { toast } from "sonner";
-import { LogOut, Calendar, UserCog, Users, Settings } from 'lucide-react';
+import { LogOut, Calendar, UserCog } from 'lucide-react';
 
 const ManagerPage = () => {
   const [email, setEmail] = useState('');
@@ -85,43 +85,17 @@ const ManagerPage = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Calendar className="w-6 h-6 text-primary" />
-              <span>Import Picks</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ImportPicks />
-          </CardContent>
-        </Card>
-        <div className="grid grid-cols-1 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Users className="w-6 h-6 text-primary" />
-                <span>Manage Users</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">User management functionality coming soon.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Settings className="w-6 h-6 text-primary" />
-                <span>League Settings</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">League settings management coming soon.</p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Calendar className="w-6 h-6 text-primary" />
+            <span>Import Picks</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ImportPicks />
+        </CardContent>
+      </Card>
     </div>
   );
 };

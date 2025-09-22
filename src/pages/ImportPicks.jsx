@@ -125,14 +125,15 @@ const ImportPicks = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+      {/* Week Selection and NFL Matchups - More prominent layout */}
+      <div className="space-y-4">
+        <Card className="w-full">
           <CardHeader>
             <CardTitle className="flex items-center"><Calendar className="w-5 h-5 mr-2" /> Select Week</CardTitle>
           </CardHeader>
           <CardContent>
             <Select value={selectedWeek} onValueChange={setSelectedWeek}>
-              <SelectTrigger><SelectValue placeholder="Select week" /></SelectTrigger>
+              <SelectTrigger className="w-48"><SelectValue placeholder="Select week" /></SelectTrigger>
               <SelectContent>
                 {[...Array(18)].map((_, i) => (
                   <SelectItem key={i + 1} value={(i + 1).toString()}>Week {i + 1}</SelectItem>
@@ -141,6 +142,7 @@ const ImportPicks = () => {
             </Select>
           </CardContent>
         </Card>
+        
         <NFLMatchups matches={nflMatches} />
       </div>
       
