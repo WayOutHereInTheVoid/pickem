@@ -5,7 +5,8 @@ import { resolve } from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/nfl-pickem-league/' : '/',
+  // Remove GitHub Pages base path for Vercel deployment
+  base: "/",
   server: {
     host: "127.0.0.1",
     port: "8080",
@@ -22,5 +23,15 @@ export default defineConfig({
         replacement: resolve(__dirname, "lib"),
       },
     ],
+  },
+  // Vercel-optimized build settings
+  build: {
+    outDir: "dist",
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
 });
