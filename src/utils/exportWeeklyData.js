@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { ALL_PARTICIPANTS } from './participantUtils';
 
 /**
  * Exports the weekly data to an HTML file.
@@ -102,12 +103,20 @@ export const exportWeeklyData = async (week) => {
     return acc;
   }, {});
 
-  // Combine weekly and cumulative scores
-  const combinedScores = weeklyScores.map(weeklyScore => ({
-    name: weeklyScore.name,
-    weeklyScore: weeklyScore.score,
-    cumulativeScore: cumulativeScoresMap[weeklyScore.name] || 0
-  }));
+  // Combine weekly and cumulative scores for ALL 12 participants
+  const combinedScores = ALL_PARTICIPANTS.map(name => {
+    // Handle team name variations (Sugar Skulls vs Sonora Sugar Skulls)
+    const weeklyScore = weeklyScores.find(s => 
+      s.name === name || 
+      (name === 'Sugar Skulls' && s.name === 'Sonora Sugar Skulls')
+    );
+    
+    return {
+      name,
+      weeklyScore: weeklyScore?.score || 0,
+      cumulativeScore: cumulativeScoresMap[name] || cumulativeScoresMap['Sonora Sugar Skulls'] || 0
+    };
+  });
 
   // Sort combined scores by cumulative score (descending)
   combinedScores.sort((a, b) => b.cumulativeScore - a.cumulativeScore);

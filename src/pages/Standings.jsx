@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useGames, usePicks, useScores, useCumulativeScores } from '../integrations/supabase';
 import { exportWeeklyData } from '../utils/exportWeeklyData';
 import { calculateRanksWithTies, calculateRanksWithTiesAndDisplay } from '../utils/scoreCalculations';
+import { getCompleteWeeklyScores, getCompleteCumulativeScores } from '../utils/participantUtils';
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
@@ -105,8 +106,8 @@ const Standings = () => {
 
       const getRankings = (week) => {
         if (week < 1) return {};
-        const weekScores = scores.filter(s => s.week === week);
-        const rankedScores = calculateRanksWithTies(weekScores);
+        const completeWeekScores = getCompleteWeeklyScores(scores, week);
+        const rankedScores = calculateRanksWithTies(completeWeekScores);
         const rankings = {};
         rankedScores.forEach(s => {
           rankings[s.name] = s.rank;
@@ -116,9 +117,9 @@ const Standings = () => {
 
       const prevWeekRankings = getRankings(currentWeek - 1);
 
-      const weekScores = scores.filter(score => score.week === currentWeek);
+      const completeWeekScores = getCompleteWeeklyScores(scores, currentWeek);
       // Calculate proper rankings with tie handling
-      const rankedWeekScores = calculateRanksWithTiesAndDisplay(weekScores);
+      const rankedWeekScores = calculateRanksWithTiesAndDisplay(completeWeekScores);
       const weeklyStandings = rankedWeekScores.map((entry) => {
         const prevRank = prevWeekRankings[entry.name];
         const rankChange = prevRank ? prevRank - entry.rank : null;
@@ -126,7 +127,8 @@ const Standings = () => {
       });
 
       // Calculate proper rankings for cumulative scores with tie handling
-      const rankedCumulativeScores = calculateRanksWithTiesAndDisplay(cumulativeScores);
+      const completeCumulativeScores = getCompleteCumulativeScores(cumulativeScores);
+      const rankedCumulativeScores = calculateRanksWithTiesAndDisplay(completeCumulativeScores);
       const cumulativeStandings = rankedCumulativeScores.map((entry) => ({
         ...entry,
         rankChange: null // No rank change calculation for cumulative view
