@@ -39,11 +39,18 @@ export const useScore = (id) => useQuery({
 
 /**
  * A hook for fetching all scores.
+ * @param {number} [contestId] - The ID of the contest to fetch scores for.
  * @returns {import('@tanstack/react-query').UseQueryResult} The result of the query.
  */
-export const useScores = () => useQuery({
-    queryKey: ['scores'],
-    queryFn: () => fromSupabase(supabase.from('scores').select('*')),
+export const useScores = (contestId) => useQuery({
+    queryKey: ['scores', contestId],
+    queryFn: () => {
+        let query = supabase.from('scores').select('*');
+        if (contestId) {
+            query = query.eq('contest_id', contestId);
+        }
+        return fromSupabase(query);
+    },
 });
 
 /**

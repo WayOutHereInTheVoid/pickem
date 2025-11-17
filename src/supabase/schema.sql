@@ -2,6 +2,7 @@
 CREATE TABLE games (
   id SERIAL PRIMARY KEY,
   week INTEGER NOT NULL,
+  contest_id INTEGER NOT NULL DEFAULT 1,
   home_team VARCHAR(255) NOT NULL,
   away_team VARCHAR(255) NOT NULL,
   winner VARCHAR(255),
@@ -12,6 +13,7 @@ CREATE TABLE games (
 CREATE TABLE picks (
   id SERIAL PRIMARY KEY,
   week INTEGER NOT NULL,
+  contest_id INTEGER NOT NULL DEFAULT 1,
   name VARCHAR(255) NOT NULL,
   pick VARCHAR(255) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -21,6 +23,7 @@ CREATE TABLE picks (
 CREATE TABLE scores (
   id SERIAL PRIMARY KEY,
   week INTEGER NOT NULL,
+  contest_id INTEGER NOT NULL DEFAULT 1,
   name VARCHAR(255) NOT NULL,
   score INTEGER NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -36,9 +39,9 @@ CREATE TABLE cumulative_scores (
 );
 
 -- Create indexes for faster queries
-CREATE INDEX idx_games_week ON games(week);
-CREATE INDEX idx_picks_week ON picks(week);
-CREATE INDEX idx_scores_week ON scores(week);
+CREATE INDEX idx_games_week ON games(week, contest_id);
+CREATE INDEX idx_picks_week ON picks(week, contest_id);
+CREATE INDEX idx_scores_week ON scores(week, contest_id);
 CREATE INDEX idx_cumulative_scores_name ON cumulative_scores(name);
 
 -- Create a function to update the updated_at column

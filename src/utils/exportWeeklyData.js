@@ -7,11 +7,13 @@ import { ALL_PARTICIPANTS } from './participantUtils';
  * @returns {Promise<string>} A promise that resolves with the HTML content.
  */
 export const exportWeeklyData = async (week) => {
+  const contestId = week <= 10 ? 1 : 2;
   // Fetch games for the selected week
   const { data: gamesData } = await supabase
     .from('games')
     .select('*')
-    .eq('week', week);
+    .eq('week', week)
+    .eq('contest_id', contestId);
 
   // Remove duplicate games by creating a unique key for each matchup
   const uniqueGames = [];
@@ -89,13 +91,15 @@ export const exportWeeklyData = async (week) => {
   const { data: weeklyScores } = await supabase
     .from('scores')
     .select('*')
-    .eq('week', week);
+    .eq('week', week)
+    .eq('contest_id', contestId);
 
   // Fetch cumulative scores up to and including the selected week
   const { data: cumulativeScores } = await supabase
     .from('scores')
     .select('name, score')
-    .lte('week', week);
+    .lte('week', week)
+    .eq('contest_id', contestId);
 
   // Calculate cumulative scores
   const cumulativeScoresMap = cumulativeScores.reduce((acc, score) => {

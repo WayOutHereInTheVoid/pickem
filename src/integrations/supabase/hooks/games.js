@@ -40,11 +40,18 @@ export const useGame = (id) => useQuery({
 
 /**
  * A hook for fetching all games.
+ * @param {number} [contestId] - The ID of the contest to fetch games for.
  * @returns {import('@tanstack/react-query').UseQueryResult} The result of the query.
  */
-export const useGames = () => useQuery({
-    queryKey: ['games'],
-    queryFn: () => fromSupabase(supabase.from('games').select('*')),
+export const useGames = (contestId) => useQuery({
+    queryKey: ['games', contestId],
+    queryFn: () => {
+        let query = supabase.from('games').select('*');
+        if (contestId) {
+            query = query.eq('contest_id', contestId);
+        }
+        return fromSupabase(query);
+    },
 });
 
 /**
