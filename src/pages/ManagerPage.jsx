@@ -8,6 +8,10 @@ import ImportPicks from './ImportPicks';
 import { toast } from "sonner";
 import { LogOut, Calendar, UserCog } from 'lucide-react';
 
+/**
+ * A page for managers to log in and access manager-specific functions.
+ * @returns {JSX.Element} The rendered ManagerPage component.
+ */
 const ManagerPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

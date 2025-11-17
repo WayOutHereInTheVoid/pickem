@@ -5,10 +5,23 @@ import { Button } from "@/components/ui/button";
 import { useSupabaseAuth } from '../integrations/supabase';
 import { LogOutIcon, MenuIcon, XIcon, ShieldCheck } from 'lucide-react';
 
+/**
+ * @typedef {Object} SidebarContentProps
+ * @property {function(): void} [onLinkClick] - Callback function when a navigation link is clicked.
+ */
+
+/**
+ * Renders the content of the sidebar, including navigation links and a logout button.
+ * @param {SidebarContentProps} props - The props for the component.
+ * @returns {JSX.Element} The rendered SidebarContent component.
+ */
 const SidebarContent = ({ onLinkClick }) => {
   const { session, logout } = useSupabaseAuth();
   const location = useLocation();
 
+  /**
+   * Handles the logout process.
+   */
   const handleLogout = async () => {
     await logout();
     if (onLinkClick) onLinkClick();
@@ -55,9 +68,17 @@ const SidebarContent = ({ onLinkClick }) => {
   );
 };
 
+/**
+ * A responsive sidebar component that displays navigation links and a logout button.
+ * It is collapsible on mobile and fixed on desktop.
+ * @returns {JSX.Element} The rendered Sidebar component.
+ */
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  /**
+   * Toggles the visibility of the sidebar on mobile.
+   */
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };

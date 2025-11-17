@@ -5,6 +5,25 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Loader } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 
+/**
+ * @typedef {Object} Pick
+ * @property {string} name - The name of the participant.
+ * @property {string} pick - The team the participant picked.
+ */
+
+/**
+ * @typedef {Object} ParsedPicksProps
+ * @property {Pick[]} picks - An array of pick objects to display.
+ * @property {function(): void} onSave - Callback function when the save button is clicked.
+ * @property {boolean} isSaving - Whether the picks are currently being saved.
+ * @property {number} progress - The progress of the save operation (0-100).
+ */
+
+/**
+ * A component that displays a list of parsed picks and allows the user to save them.
+ * @param {ParsedPicksProps} props - The props for the component.
+ * @returns {JSX.Element} The rendered ParsedPicks component.
+ */
 const ParsedPicks = ({ picks, onSave, isSaving, progress }) => {
   return (
     <Card>
