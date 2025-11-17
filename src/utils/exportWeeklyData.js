@@ -115,10 +115,15 @@ export const exportWeeklyData = async (week) => {
       (name === 'Sugar Skulls' && s.name === 'Sonora Sugar Skulls')
     );
     
+    const isSugarSkulls = name === 'Sugar Skulls';
+    const cumulativeScore = isSugarSkulls
+      ? (cumulativeScoresMap[name] || cumulativeScoresMap['Sonora Sugar Skulls'] || 0)
+      : (cumulativeScoresMap[name] || 0);
+
     return {
       name,
       weeklyScore: weeklyScore?.score || 0,
-      cumulativeScore: cumulativeScoresMap[name] || cumulativeScoresMap['Sonora Sugar Skulls'] || 0
+      cumulativeScore: cumulativeScore
     };
   });
 
