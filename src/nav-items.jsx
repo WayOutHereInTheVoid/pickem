@@ -1,6 +1,7 @@
 import { HomeIcon, BarChartIcon, UserIcon } from "lucide-react";
 import Index from "./pages/Index.jsx";
 import Standings from "./pages/Standings.jsx";
+import HistoricalStandings from "./pages/HistoricalStandings.jsx";
 import ManagerPage from "./pages/ManagerPage.jsx";
 import AuthCallback from "./pages/AuthCallback.jsx";
 
@@ -29,6 +30,12 @@ export const navItems = [
     to: "/standings",
     icon: <BarChartIcon className="h-4 w-4" />,
     page: <Standings />,
+  },
+  {
+    title: "Contest 1 Results",
+    to: "/historical-standings",
+    icon: <BarChartIcon className="h-4 w-4" />,
+    page: <HistoricalStandings />,
   },
   {
     title: "Manager Login",

@@ -70,14 +70,26 @@ const ImportPicks = () => {
     const picks = [];
     const games = [];
     let currentTeam = '';
+    let isFirstGame = true;
+
     lines.forEach(line => {
       line = line.trim();
       if (line.startsWith('"') && line.endsWith('"')) {
         currentTeam = line.replace(/"/g, '');
-        if (games.length === 0 || games[games.length - 1].away_team) {
-          games.push({ home_team: currentTeam, away_team: '', winner: null });
+        if (isFirstGame) {
+          // The first two "teams" are the fantasy matchup
+          if (games.length === 0) {
+            games.push({ home_team: currentTeam, away_team: '', winner: null });
+          } else if (!games[0].away_team) {
+            games[0].away_team = currentTeam;
+            isFirstGame = false;
+          }
         } else {
-          games[games.length - 1].away_team = currentTeam;
+          if (games.length === 1 || games[games.length - 1].away_team) {
+            games.push({ home_team: currentTeam, away_team: '', winner: null });
+          } else {
+            games[games.length - 1].away_team = currentTeam;
+          }
         }
       } else if (line && currentTeam) {
         picks.push({ name: teamNameMapping[line] || line, pick: currentTeam });
@@ -112,6 +124,7 @@ const ImportPicks = () => {
     setSaveProgress(0);
     const totalOperations = parsedGames.length + parsedPicks.length + Object.keys(calculateScores(parsedGames, parsedPicks)).length * 2;
     let completedOperations = 0;
+    const contestId = parseInt(selectedWeek) <= 10 ? 1 : 2;
 
     const updateProgress = () => {
       completedOperations++;
@@ -120,16 +133,16 @@ const ImportPicks = () => {
 
     try {
       for (const game of parsedGames) {
-        await addGame.mutateAsync({ ...game, week: parseInt(selectedWeek) });
+        await addGame.mutateAsync({ ...game, week: parseInt(selectedWeek), contest_id: contestId });
         updateProgress();
       }
       for (const pick of parsedPicks) {
-        await addPick.mutateAsync({ ...pick, week: parseInt(selectedWeek) });
+        await addPick.mutateAsync({ ...pick, week: parseInt(selectedWeek), contest_id: contestId });
         updateProgress();
       }
       const weekScores = calculateScores(parsedGames, parsedPicks);
       for (const [name, score] of Object.entries(weekScores)) {
-        await addScore.mutateAsync({ week: parseInt(selectedWeek), name, score });
+        await addScore.mutateAsync({ week: parseInt(selectedWeek), name, score, contest_id: contestId });
         updateProgress();
         await updateCumulativeScore.mutateAsync({ name, score });
         updateProgress();

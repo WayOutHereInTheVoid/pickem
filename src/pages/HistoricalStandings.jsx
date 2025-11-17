@@ -105,15 +105,15 @@ const StandingsTable = ({ data, isLoading }) => {
  * A page that displays the league standings.
  * @returns {JSX.Element} The rendered Standings page.
  */
-const Standings = () => {
-  const [selectedWeek, setSelectedWeek] = useState("11");
+const HistoricalStandings = () => {
+  const [selectedWeek, setSelectedWeek] = useState("1");
   const [standings, setStandings] = useState({ weekly: [], cumulative: [] });
   const [isExporting, setIsExporting] = useState(false);
 
-  const { data: games, isLoading: gamesLoading } = useGames(2);
-  const { data: picks, isLoading: picksLoading } = usePicks(2);
-  const { data: scores, isLoading: scoresLoading } = useScores(2);
-  const { data: cumulativeScores, isLoading: cumulativeLoading } = useCumulativeScores(2);
+  const { data: games, isLoading: gamesLoading } = useGames(1);
+  const { data: picks, isLoading: picksLoading } = usePicks(1);
+  const { data: scores, isLoading: scoresLoading } = useScores(1);
+  const { data: cumulativeScores, isLoading: cumulativeLoading } = useCumulativeScores(1);
 
   const isLoading = gamesLoading || picksLoading || scoresLoading || cumulativeLoading;
 
@@ -190,9 +190,9 @@ const Standings = () => {
                 <SelectValue placeholder="Select week" />
               </SelectTrigger>
               <SelectContent>
-                {[...Array(8)].map((_, i) => (
-                  <SelectItem key={i + 11} value={(i + 11).toString()} className="text-base">
-                    Week {i + 11}
+                {[...Array(10)].map((_, i) => (
+                  <SelectItem key={i + 1} value={(i + 1).toString()} className="text-base">
+                    Week {i + 1}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -223,4 +223,4 @@ const Standings = () => {
   );
 };
 
-export default Standings;
+export default HistoricalStandings;
