@@ -5,6 +5,24 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CheckCircle } from 'lucide-react';
 
+/**
+ * @typedef {Object} Game
+ * @property {string} home_team - The name of the home team.
+ * @property {string} away_team - The name of the away team.
+ * @property {string|null} winner - The winner of the game ('home', 'away', or null).
+ */
+
+/**
+ * @typedef {Object} ParsedGamesProps
+ * @property {Game[]} games - An array of game objects to display.
+ * @property {function(number, string): void} onWinnerChange - Callback function when a winner is selected.
+ */
+
+/**
+ * A component that displays a list of parsed games and allows the user to select the winner for each.
+ * @param {ParsedGamesProps} props - The props for the component.
+ * @returns {JSX.Element} The rendered ParsedGames component.
+ */
 const ParsedGames = ({ games, onWinnerChange }) => {
   const allWinnersSelected = games.every(game => game.winner);
 

@@ -14,6 +14,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { DownloadIcon, SearchIcon, ChevronLeftIcon, ChevronRightIcon, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 
+/**
+ * A component that displays the change in rank.
+ * @param {object} props - The props for the component.
+ * @param {number|null} props.change - The change in rank.
+ * @returns {JSX.Element} The rendered RankChange component.
+ */
 const RankChange = ({ change }) => {
   if (change === null || change === 0) {
     return <span className="flex items-center text-muted-foreground"><Minus className="h-4 w-4" /></span>;
@@ -24,6 +30,13 @@ const RankChange = ({ change }) => {
   return <span className="flex items-center text-red-500"><ArrowDown className="h-4 w-4 mr-1" /> {Math.abs(change)}</span>;
 };
 
+/**
+ * A component that displays a table of standings.
+ * @param {object} props - The props for the component.
+ * @param {Array<object>} props.data - The data to display.
+ * @param {boolean} props.isLoading - Whether the data is loading.
+ * @returns {JSX.Element} The rendered StandingsTable component.
+ */
 const StandingsTable = ({ data, isLoading }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -88,6 +101,10 @@ const StandingsTable = ({ data, isLoading }) => {
   );
 };
 
+/**
+ * A page that displays the league standings.
+ * @returns {JSX.Element} The rendered Standings page.
+ */
 const Standings = () => {
   const [selectedWeek, setSelectedWeek] = useState("1");
   const [standings, setStandings] = useState({ weekly: [], cumulative: [] });

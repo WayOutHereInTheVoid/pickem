@@ -9,6 +9,15 @@ import { TrophyIcon, BarChartIcon, ArrowRightIcon, AlertTriangleIcon, UserPlus, 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
+/**
+ * A card component for the dashboard.
+ * @param {object} props - The props for the component.
+ * @param {string} props.title - The title of the card.
+ * @param {string} props.description - The description of the card.
+ * @param {string} props.linkTo - The link to navigate to.
+ * @param {React.ElementType} props.icon - The icon to display.
+ * @returns {JSX.Element} The rendered DashboardCard component.
+ */
 const DashboardCard = ({ title, description, linkTo, icon: Icon }) => (
   <Card className="bg-card border border-border hover:border-primary transition-all duration-300 group">
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -27,6 +36,10 @@ const DashboardCard = ({ title, description, linkTo, icon: Icon }) => (
   </Card>
 );
 
+/**
+ * A skeleton component for the leaderboard.
+ * @returns {JSX.Element} The rendered LeaderboardSkeleton component.
+ */
 const LeaderboardSkeleton = () => (
   <div className="space-y-2">
     {[...Array(5)].map((_, i) => (
@@ -39,9 +52,18 @@ const LeaderboardSkeleton = () => (
   </div>
 );
 
+/**
+ * The main dashboard page.
+ * @returns {JSX.Element} The rendered Index page.
+ */
 const Index = () => {
   const { data: cumulativeScores, isLoading, isError, refetch } = useCumulativeScores();
 
+  /**
+   * Gets the class name for a given rank.
+   * @param {number} rank - The rank to get the class name for.
+   * @returns {string} The class name.
+   */
   const getRankClass = (rank) => {
     if (rank === 1) return 'bg-yellow-400/20';
     if (rank === 2) return 'bg-gray-400/20';

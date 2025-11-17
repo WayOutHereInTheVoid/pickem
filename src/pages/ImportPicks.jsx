@@ -12,6 +12,10 @@ import FantasyScoreboard from '../components/FantasyScoreboard';
 import { getCachedOrFetchWeekMatches, forceRefreshWeekMatches } from '../utils/nflApi';
 import { Calendar, Clipboard, Loader } from 'lucide-react';
 
+/**
+ * A page for importing and processing poll results to determine weekly scores.
+ * @returns {JSX.Element} The rendered ImportPicks page.
+ */
 const ImportPicks = () => {
   const [pollResults, setPollResults] = useState('');
   const [parsedPicks, setParsedPicks] = useState([]);
