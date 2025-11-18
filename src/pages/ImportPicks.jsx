@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAddPick, useAddGame, useAddScore, useUpdateCumulativeScore } from '../integrations/supabase';
+import { useAddPick, useAddGame, useAddScore } from '../integrations/supabase';
 import ParsedGames from '../components/ParsedGames';
 import ParsedPicks from '../components/ParsedPicks';
 import NFLMatchups from '../components/NFLMatchups';
@@ -30,7 +30,6 @@ const ImportPicks = () => {
   const addPick = useAddPick();
   const addGame = useAddGame();
   const addScore = useAddScore();
-  const updateCumulativeScore = useUpdateCumulativeScore();
 
   const teamNameMapping = {
     "Thumbz": "Murder Hornets", "PRfan790": "Somewheres", "chupalo": "Sonora Sugar Skulls",
@@ -143,8 +142,6 @@ const ImportPicks = () => {
       const weekScores = calculateScores(parsedGames, parsedPicks);
       for (const [name, score] of Object.entries(weekScores)) {
         await addScore.mutateAsync({ week: parseInt(selectedWeek), name, score, contest_id: contestId });
-        updateProgress();
-        await updateCumulativeScore.mutateAsync({ name, score });
         updateProgress();
       }
       toast.success(`Picks, games, and scores saved successfully for Week ${selectedWeek}!`);

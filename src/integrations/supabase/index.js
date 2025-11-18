@@ -16,13 +16,6 @@ import {
 } from './hooks/picks.js';
 
 import {
-  useCumulativeScores,
-  useAddCumulativeScore,
-  useUpdateCumulativeScore,
-  useDeleteCumulativeScore
-} from './hooks/cumulative_scores.js';
-
-import {
   useGame,
   useGames,
   useAddGame,
@@ -49,10 +42,6 @@ export {
   useAddPick,
   useUpdatePick,
   useDeletePick,
-  useCumulativeScores,
-  useAddCumulativeScore,
-  useUpdateCumulativeScore,
-  useDeleteCumulativeScore,
   useGame,
   useGames,
   useAddGame,
