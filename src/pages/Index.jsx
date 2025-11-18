@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useCumulativeScores } from '../integrations/supabase';
+import { useScores } from '../integrations/supabase';
 import { calculateRanksWithTiesAndDisplay } from '../utils/scoreCalculations';
+import { getCompleteCumulativeScores } from '../utils/participantUtils';
 import { TrophyIcon, BarChartIcon, ArrowRightIcon, AlertTriangleIcon, UserPlus, Send } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -57,7 +58,9 @@ const LeaderboardSkeleton = () => (
  * @returns {JSX.Element} The rendered Index page.
  */
 const Index = () => {
-  const { data: cumulativeScores, isLoading, isError, refetch } = useCumulativeScores();
+  const { data: scores, isLoading, isError, refetch } = useScores(2);
+
+  const cumulativeScores = scores ? getCompleteCumulativeScores(scores, 18) : [];
 
   /**
    * Gets the class name for a given rank.

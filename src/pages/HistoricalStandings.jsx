@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useGames, usePicks, useScores, useCumulativeScores } from '../integrations/supabase';
+import { useGames, usePicks, useScores } from '../integrations/supabase';
 import { exportWeeklyData } from '../utils/exportWeeklyData';
 import { calculateRanksWithTies, calculateRanksWithTiesAndDisplay } from '../utils/scoreCalculations';
 import { getCompleteWeeklyScores, getCompleteCumulativeScores } from '../utils/participantUtils';
@@ -113,12 +113,11 @@ const HistoricalStandings = () => {
   const { data: games, isLoading: gamesLoading } = useGames(1);
   const { data: picks, isLoading: picksLoading } = usePicks(1);
   const { data: scores, isLoading: scoresLoading } = useScores(1);
-  const { data: cumulativeScores, isLoading: cumulativeLoading } = useCumulativeScores(1);
 
-  const isLoading = gamesLoading || picksLoading || scoresLoading || cumulativeLoading;
+  const isLoading = gamesLoading || picksLoading || scoresLoading;
 
   useEffect(() => {
-    if (scores && cumulativeScores) {
+    if (scores) {
       const currentWeek = parseInt(selectedWeek);
 
       const getRankings = (week) => {
@@ -144,7 +143,7 @@ const HistoricalStandings = () => {
       });
 
       // Calculate proper rankings for cumulative scores with tie handling
-      const completeCumulativeScores = getCompleteCumulativeScores(cumulativeScores);
+      const completeCumulativeScores = getCompleteCumulativeScores(scores, currentWeek);
       const rankedCumulativeScores = calculateRanksWithTiesAndDisplay(completeCumulativeScores);
       const cumulativeStandings = rankedCumulativeScores.map((entry) => ({
         ...entry,
@@ -153,7 +152,7 @@ const HistoricalStandings = () => {
 
       setStandings({ weekly: weeklyStandings, cumulative: cumulativeStandings });
     }
-  }, [selectedWeek, scores, cumulativeScores]);
+  }, [selectedWeek, scores]);
 
   const handleExport = async () => {
     setIsExporting(true);
