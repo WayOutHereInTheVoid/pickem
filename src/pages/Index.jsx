@@ -60,7 +60,8 @@ const LeaderboardSkeleton = () => (
 const Index = () => {
   const { data: scores, isLoading, isError, refetch } = useScores(2);
 
-  const cumulativeScores = scores ? getCompleteCumulativeScores(scores, 18) : [];
+  const latestWeek = scores ? Math.max(...scores.map(s => s.week)) : 0;
+  const cumulativeScores = scores ? getCompleteCumulativeScores(scores, latestWeek) : [];
 
   /**
    * Gets the class name for a given rank.

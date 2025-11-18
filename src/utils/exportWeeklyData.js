@@ -1,5 +1,5 @@
-import { supabase } from '../lib/supabase';
-import { ALL_PARTICIPANTS } from './participantUtils';
+import { supabase } from '../integrations/supabase/supabase.js';
+import { ALL_PARTICIPANTS, getCompleteCumulativeScores } from './participantUtils.js';
 
 /**
  * Exports the weekly data to an HTML file.
@@ -87,38 +87,33 @@ export const exportWeeklyData = async (week) => {
   console.log(`Final result: ${games.length} unique games will be displayed for week ${week}`);
   console.log('Unique games:', games.map(g => `${g.away_team} vs ${g.home_team}`));
 
-  // Fetch scores for the selected week
-  const { data: weeklyScores } = await supabase
+  // Fetch all scores for the contest
+  const { data: scores } = await supabase
     .from('scores')
     .select('*')
-    .eq('week', week)
     .eq('contest_id', contestId);
 
-  // Fetch cumulative scores up to and including the selected week
-  const { data: cumulativeScores } = await supabase
-    .from('scores')
-    .select('name, score')
-    .lte('week', week)
-    .eq('contest_id', contestId);
+  // Calculate weekly scores
+  const weeklyScores = scores.filter(s => s.week === week);
 
   // Calculate cumulative scores
-  const cumulativeScoresMap = cumulativeScores.reduce((acc, score) => {
-    acc[score.name] = (acc[score.name] || 0) + score.score;
-    return acc;
-  }, {});
+  const cumulativeScores = getCompleteCumulativeScores(scores, week);
 
   // Combine weekly and cumulative scores for ALL 12 participants
   const combinedScores = ALL_PARTICIPANTS.map(name => {
-    // Handle team name variations (Sugar Skulls vs Sonora Sugar Skulls)
     const weeklyScore = weeklyScores.find(s => 
       s.name === name || 
+      (name === 'Sugar Skulls' && s.name === 'Sonora Sugar Skulls')
+    );
+    const cumulativeScore = cumulativeScores.find(s =>
+      s.name === name ||
       (name === 'Sugar Skulls' && s.name === 'Sonora Sugar Skulls')
     );
     
     return {
       name,
       weeklyScore: weeklyScore?.score || 0,
-      cumulativeScore: cumulativeScoresMap[name] || cumulativeScoresMap['Sonora Sugar Skulls'] || 0
+      cumulativeScore: cumulativeScore?.score || 0
     };
   });
 
