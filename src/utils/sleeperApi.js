@@ -2,23 +2,23 @@ import axios from 'axios';
 import { supabase } from '../lib/supabase.js';
 
 // Sleeper Fantasy League Configuration
-const LEAGUE_ID = '1256486983484583936';
+const LEAGUE_ID = '1402858006072299520';
 const BASE_URL = 'https://api.sleeper.app/v1';
 
 // Team name mapping (roster_id -> custom team name)
 const teamNameMapping = {
   1: "Murder Hornets",
-  2: "Lonestar Legends", 
-  3: "Sonora Sugar Skulls",
-  4: "Newfoundland Growlers",
-  5: "California Burritos",
+  2: "Legends",
+  3: "Sugar Skulls",
+  4: "Gamblers",
+  5: "Burritos",
   6: "Food Mafia",
   7: "Brutal Hogs",
-  8: "Southwest Aliens",
-  9: "Rochester Jesters",
-  10: "Somewheres",
-  11: "Seattle Prestiges",
-  12: "D-Town Swirlies"
+  8: "Bird Gang",
+  9: "Jesters",
+  10: "Yetis",
+  11: "Prestige",
+  12: "Swirlies"
 };
 
 /**
@@ -35,7 +35,7 @@ export async function getCurrentNFLWeek() {
       console.error('Error details:', error.response.data);
     }
     // Return default values if API fails
-    return { week: 1, season: '2025', season_type: 'regular' };
+    return { week: 1, season: '2026', season_type: 'regular' };
   }
 }
 

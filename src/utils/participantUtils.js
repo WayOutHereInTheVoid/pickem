@@ -1,17 +1,17 @@
 // Master participant list - all 12 teams that should always appear
 export const ALL_PARTICIPANTS = [
   'Food Mafia',
-  'Brutal Hogs', 
-  'Rochester Jesters',
-  'Southwest Aliens',
+  'Brutal Hogs',
+  'Jesters',
+  'Bird Gang',
   'Murder Hornets',
-  'Seattle Prestiges',
-  'California Burritos',
-  'D-Town Swirlies',
-  'Lonestar Legends',
-  'Newfoundland Growlers',
-  'Somewheres',
-  'Sonora Sugar Skulls'  // Note: This handles both "Sugar Skulls" and "Sonora Sugar Skulls"
+  'Prestige',
+  'Burritos',
+  'Swirlies',
+  'Legends',
+  'Gamblers',
+  'Yetis',
+  'Sugar Skulls'
 ];
 
 /**
@@ -22,13 +22,10 @@ export const ALL_PARTICIPANTS = [
  */
 export const getCompleteWeeklyScores = (scores, week) => {
   const weekScores = scores.filter(s => s.week === week);
-  
+
   return ALL_PARTICIPANTS.map(name => {
-    const existingScore = weekScores.find(s => 
-      s.name === name || 
-      (name === 'Sugar Skulls' && s.name === 'Sonora Sugar Skulls')
-    );
-    
+    const existingScore = weekScores.find(s => s.name === name);
+
     return {
       name,
       score: existingScore?.score || 0,
@@ -44,11 +41,8 @@ export const getCompleteWeeklyScores = (scores, week) => {
  */
 export const getCompleteCumulativeScores = (cumulativeScores) => {
   return ALL_PARTICIPANTS.map(name => {
-    const existingScore = cumulativeScores.find(s => 
-      s.name === name || 
-      (name === 'Sugar Skulls' && s.name === 'Sonora Sugar Skulls')
-    );
-    
+    const existingScore = cumulativeScores.find(s => s.name === name);
+
     return {
       name,
       score: existingScore?.score || 0

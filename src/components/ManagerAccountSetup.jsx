@@ -12,7 +12,7 @@ import { KeyIcon, UserPlusIcon } from 'lucide-react';
  */
 const ManagerAccountSetup = () => {
   const [email, setEmail] = useState('manager@nflpickem.local');
-  const [password, setPassword] = useState('Manager2025!');
+  const [password, setPassword] = useState('Manager2026!');
   const [isCreating, setIsCreating] = useState(false);
 
   /**

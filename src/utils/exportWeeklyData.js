@@ -109,16 +109,12 @@ export const exportWeeklyData = async (week) => {
 
   // Combine weekly and cumulative scores for ALL 12 participants
   const combinedScores = ALL_PARTICIPANTS.map(name => {
-    // Handle team name variations (Sugar Skulls vs Sonora Sugar Skulls)
-    const weeklyScore = weeklyScores.find(s => 
-      s.name === name || 
-      (name === 'Sugar Skulls' && s.name === 'Sonora Sugar Skulls')
-    );
-    
+    const weeklyScore = weeklyScores.find(s => s.name === name);
+
     return {
       name,
       weeklyScore: weeklyScore?.score || 0,
-      cumulativeScore: cumulativeScoresMap[name] || cumulativeScoresMap['Sonora Sugar Skulls'] || 0
+      cumulativeScore: cumulativeScoresMap[name] || 0
     };
   });
 
@@ -131,7 +127,7 @@ export const exportWeeklyData = async (week) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2025 TRL Pick'em</title>
+  <title>2026 TRL Pick'em</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -314,7 +310,7 @@ export const exportWeeklyData = async (week) => {
 </head>
 <body>
   <div class="container">
-    <h1>2025 TRL Pick'em</h1>
+    <h1>2026 TRL Pick'em</h1>
     
     <h2>Week ${week} Results</h2>
     <div class="matchups-container">

@@ -9,17 +9,17 @@
  */
 const fantasyTeamColors = {
   "Murder Hornets": "#e0b82b",
-  "California Burritos": "#7da3ff", 
-  "D-Town Swirlies": "#5cb5d9",
-  "Newfoundland Growlers": "#613814",
+  "Burritos": "#7da3ff",
+  "Swirlies": "#5cb5d9",
+  "Gamblers": "#613814",
   "Brutal Hogs": "#8a1c1c",
-  "Southwest Aliens": "#6b9438",
-  "Seattle Prestiges": "#087a47",
+  "Bird Gang": "#6b9438",
+  "Prestige": "#087a47",
   "Sugar Skulls": "#b56145",
-  "Rochester Jesters": "#fc5c03",
-  "Lonestar Legends": "#172e42",
+  "Jesters": "#fc5c03",
+  "Legends": "#172e42",
   "Food Mafia": "#d9a680",
-  "Somewheres": "#f5c44f"
+  "Yetis": "#f5c44f"
 };
 
 /**

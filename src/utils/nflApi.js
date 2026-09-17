@@ -3,25 +3,25 @@ import { supabase } from '../lib/supabase';
 
 const API_KEY = '36d1384792mshe01cc9caeff0647p1d0516jsn2f458adb4379';
 
-const nflWeeks2025 = {
-  1: { start: '2025-09-04', end: '2025-09-09' },
-  2: { start: '2025-09-11', end: '2025-09-16' },
-  3: { start: '2025-09-18', end: '2025-09-23' },
-  4: { start: '2025-09-25', end: '2025-09-30' },
-  5: { start: '2025-10-02', end: '2025-10-07' },
-  6: { start: '2025-10-09', end: '2025-10-14' },
-  7: { start: '2025-10-16', end: '2025-10-21' },
-  8: { start: '2025-10-23', end: '2025-10-28' },
-  9: { start: '2025-10-30', end: '2025-11-04' },
-  10: { start: '2025-11-06', end: '2025-11-11' },
-  11: { start: '2025-11-13', end: '2025-11-18' },
-  12: { start: '2025-11-20', end: '2025-11-25' },
-  13: { start: '2025-11-27', end: '2025-12-02' },
-  14: { start: '2025-12-04', end: '2025-12-09' },
-  15: { start: '2025-12-11', end: '2025-12-16' },
-  16: { start: '2025-12-18', end: '2025-12-23' },
-  17: { start: '2025-12-25', end: '2025-12-30' },
-  18: { start: '2026-01-03', end: '2026-01-05' }
+const nflWeeks2026 = {
+  1: { start: '2026-09-09', end: '2026-09-15' },
+  2: { start: '2026-09-17', end: '2026-09-22' },
+  3: { start: '2026-09-24', end: '2026-09-29' },
+  4: { start: '2026-10-01', end: '2026-10-06' },
+  5: { start: '2026-10-08', end: '2026-10-13' },
+  6: { start: '2026-10-15', end: '2026-10-20' },
+  7: { start: '2026-10-22', end: '2026-10-27' },
+  8: { start: '2026-10-29', end: '2026-11-03' },
+  9: { start: '2026-11-05', end: '2026-11-10' },
+  10: { start: '2026-11-12', end: '2026-11-17' },
+  11: { start: '2026-11-19', end: '2026-11-24' },
+  12: { start: '2026-11-26', end: '2026-12-01' },
+  13: { start: '2026-12-03', end: '2026-12-08' },
+  14: { start: '2026-12-10', end: '2026-12-15' },
+  15: { start: '2026-12-17', end: '2026-12-22' },
+  16: { start: '2026-12-24', end: '2026-12-29' },
+  17: { start: '2026-12-31', end: '2027-01-05' },
+  18: { start: '2027-01-09', end: '2027-01-11' }
 };
 
 /**
@@ -90,7 +90,7 @@ export async function getCachedOrFetchWeekMatches(week) {
   }
 
   // If no cache, fetch new data
-  const weekDates = nflWeeks2025[week];
+  const weekDates = nflWeeks2026[week];
   if (!weekDates) {
     console.log(`Week ${week} data not available.`);
     return [];
@@ -124,7 +124,7 @@ export async function getCachedOrFetchWeekMatches(week) {
  * @returns {Promise<Array<object>>} A promise that resolves with fresh match data.
  */
 export async function forceRefreshWeekMatches(week) {
-  const weekDates = nflWeeks2025[week];
+  const weekDates = nflWeeks2026[week];
   if (!weekDates) {
     console.log(`Week ${week} data not available.`);
     return [];
