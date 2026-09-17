@@ -2,22 +2,22 @@ import axios from 'axios';
 import { supabase } from '../lib/supabase.js';
 
 // Sleeper Fantasy League Configuration
-const LEAGUE_ID = '1256486983484583936';
+const LEAGUE_ID = '1402858006072299520';
 const BASE_URL = 'https://api.sleeper.app/v1';
 
 // Team name mapping (roster_id -> custom team name)
 const teamNameMapping = {
-  1: "Murder Hornets",
+  1: "MF Murder Hornets",
   2: "Lonestar Legends", 
   3: "Sonora Sugar Skulls",
-  4: "Newfoundland Growlers",
+  4: "Gilbert Gamblers",
   5: "California Burritos",
   6: "Food Mafia",
   7: "Brutal Hogs",
-  8: "Southwest Aliens",
+  8: "Cali Bird Gang",
   9: "Rochester Jesters",
-  10: "Somewheres",
-  11: "Seattle Prestiges",
+  10: "Denver Yetis",
+  11: "Prestige Worldwide",
   12: "D-Town Swirlies"
 };
 
